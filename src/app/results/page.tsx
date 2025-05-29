@@ -34,6 +34,22 @@ export default function ResultsPage() {
   const approxYears = approxYearsParam ? Number(approxYearsParam) : null;
   const birthDate = birthDateParam || null;
 
+  // Format today's date
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).replace(/\//g, ".");
+
+  // Add state for details toggle
+  const [showDetails, setShowDetails] = useState(false);
+  // Add state for sharing
+  const [isSharing, setIsSharing] = useState(false);
+
+  // Handler for commit (show ceremony modal)
+  const handleCommit = () => setShowCeremonyModal(true);
+
   // Handlers
   const handleShare = async () => {
     if (!days) return;
@@ -74,22 +90,6 @@ export default function ResultsPage() {
     );
   }
 
-  // Format today's date
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).replace(/\//g, ".");
-
-  // Add state for details toggle
-  const [showDetails, setShowDetails] = useState(false);
-  // Add state for sharing
-  const [isSharing, setIsSharing] = useState(false);
-
-  // Handler for commit (show ceremony modal)
-  const handleCommit = () => setShowCeremonyModal(true);
-
   // Remove old handleConnect logic
   // Add AuthKit connect button logic
   function ConnectForCosmicConvergence() {
@@ -103,9 +103,7 @@ export default function ResultsPage() {
     }
 
     return (
-      <SignInButton>
-        CONNECT FOR COSMIC CONVERGENCE
-      </SignInButton>
+      <SignInButton />
     );
   }
 
