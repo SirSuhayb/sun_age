@@ -136,7 +136,7 @@ export default function CeremonyStepper() {
                 <div className="w-full border border-gray-300 rounded-none p-4 mb-4 bg-white/90 text-left">
                   <div className="text-xs font-mono text-gray-500 mb-4 uppercase tracking-widest">Message to Sign</div>
                   <div className="w-full border border-blue-200 bg-[#F2F7FF] rounded-none p-3 font-mono text-sm text-left mb-3 whitespace-pre-line select-all" style={{ color: '#2563eb', fontFamily: 'Geist Mono, monospace' }}>
-                    "{signatureMsg}"
+                    &quot;{signatureMsg}&quot;
                   </div>
                   <div className="text-sm text-gray-500 mt-12 text-left">Your vow is an onchain signature transforming intention into cosmic law, creating an unbreakable bond with your future self. This is proof of your word.</div>
                 </div>
@@ -277,7 +277,7 @@ export default function CeremonyStepper() {
                 </div>
                 {/* Vow Quote Callout */}
                 <div className="w-full rounded-none p-4 mb-6 text-center italic font-serif border border-gray-300" style={{ background: 'rgba(255,255,255,0.4)' }}>
-                  "Your vow echoes through the cosmos, binding your present self to all the futures you will become. You are now part of something infinite."
+                  &quot;Your vow echoes through the cosmos, binding your present self to all the futures you will become. You are now part of something infinite.&quot;
                 </div>
               </div>
             </>
