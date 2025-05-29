@@ -7,6 +7,7 @@ import { useSolarPledge } from '~/hooks/useSolarPledge';
 import SolarPledgeABI from '~/lib/abis/SolarPledge.json';
 import { SOLAR_PLEDGE_ADDRESS } from '~/lib/constants';
 import { useReadContract, useAccount, useConnect } from 'wagmi';
+import { useFrameSDK } from '~/hooks/useFrameSDK';
 
 const steps = ["prepare", "inscribe", "empower", "sealed"];
 
@@ -28,6 +29,65 @@ export default function CeremonyStepper() {
 
   // SolarPledge hook
   const { approveUSDC, createPledge, isApproved, isLoading, error } = useSolarPledge();
+
+  // Farcaster context and wallet connection
+  const { context, isConnected, isSDKLoaded } = useFrameSDK();
+  const { connect, connectors } = useConnect();
+
+  // Gating logic
+  const isFarcasterAuthenticated = !!context?.user?.fid;
+  const hasBirthDate = !!birthDate; // Replace with real check if needed
+  const isUSDCApproved = isApproved(pledge);
+
+  // Error state for gating
+  const [gateError, setGateError] = useState<string | null>(null);
+
+  // Check requirements before allowing pledge
+  const canPledge = isConnected && isFarcasterAuthenticated && isUSDCApproved && hasBirthDate && !isLoading && !!vowText;
+
+  // Feedback for missing requirements
+  let pledgeButtonText = `Seal Vow with $${pledge} Solar Energy`;
+  if (!isConnected) pledgeButtonText = 'Connect Wallet';
+  else if (!isFarcasterAuthenticated) pledgeButtonText = 'Sign in with Farcaster';
+  else if (!hasBirthDate) pledgeButtonText = 'Set Birth Date';
+  else if (!isUSDCApproved) pledgeButtonText = isLoading ? 'Approving...' : 'Approve USDC';
+  else if (!vowText) pledgeButtonText = 'Enter your vow';
+  else if (isLoading) pledgeButtonText = 'Sealing...';
+
+  // Handler for pledge button
+  const handlePledge = async () => {
+    setGateError(null);
+    if (!isConnected) {
+      connect({ connector: connectors[0] });
+      return;
+    }
+    if (!isFarcasterAuthenticated) {
+      setGateError('Please sign in with Farcaster to continue.');
+      return;
+    }
+    if (!hasBirthDate) {
+      setGateError('Please set your birth date to continue.');
+      return;
+    }
+    if (!isUSDCApproved) {
+      try {
+        await approveUSDC(BigInt(pledge * 1_000_000));
+      } catch (err) {
+        setGateError('USDC approval failed.');
+      }
+      return;
+    }
+    if (!vowText) {
+      setGateError('Please enter your vow.');
+      return;
+    }
+    try {
+      await createPledge(vowText, farcasterHandle, pledge);
+      setStep(3);
+    } catch (err) {
+      setGateError('Failed to create pledge.');
+    }
+  };
 
   // Live contract stats
   const { data: totalPledges } = useReadContract({
@@ -72,9 +132,6 @@ export default function CeremonyStepper() {
       />
     );
   }
-
-  const { isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-white relative">
@@ -197,33 +254,15 @@ export default function CeremonyStepper() {
                   </ul>
                 </div>
                 {/* USDC approval and pledge logic */}
-                {!isApproved(pledge) ? (
-                  <button
-                    className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-sm tracking-widest uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
-                    onClick={() => {
-                      if (!isConnected) {
-                        connect({ connector: connectors[0] });
-                        return;
-                      }
-                      approveUSDC(BigInt(pledge * 1_000_000));
-                    }}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Approving...' : 'Approve USDC'}
-                  </button>
-                ) : (
-                  <button
-                    className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-sm tracking-widest uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
-                    onClick={async () => {
-                      await createPledge(vowText, farcasterHandle, pledge);
-                      setStep(3);
-                    }}
-                    disabled={isLoading || !vowText}
-                  >
-                    {isLoading ? 'Sealing...' : `Seal Vow with $${pledge} Solar Energy`}
-                  </button>
-                )}
-                {error && <div className="text-red-500 text-sm mt-2">{error.message}</div>}
+                <button
+                  className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-sm tracking-widest uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
+                  onClick={handlePledge}
+                  disabled={!canPledge}
+                >
+                  {pledgeButtonText}
+                </button>
+                {gateError && <div className="text-red-500 text-xs mt-2">{gateError}</div>}
+                {error && <div className="text-red-500 text-xs mt-2">{error.message}</div>}
               </div>
 
               {/* TODO: Wallet signature and USDC pledge logic here */}
