@@ -20,6 +20,11 @@ import {
 import MilestoneCard from "./SunCycleAge/MilestoneCard";
 import sdk from "@farcaster/frame-sdk";
 import { useRouter } from "next/navigation";
+import { useSolarPledge } from '~/hooks/useSolarPledge';
+import SolarPledgeABI from '~/lib/abis/SolarPledge.json';
+import { SOLAR_PLEDGE_ADDRESS } from '~/lib/constants';
+import { useReadContract } from 'wagmi';
+import { SignInButton } from '@farcaster/auth-kit';
 // import { revokeUserConsent } from "~/lib/consent";
 
 function WarpcastEmbed({ url }: { url: string }) {
@@ -45,22 +50,45 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
   const [isSigning, setIsSigning] = useState(false);
   const [signError, setSignError] = useState<Error | null>(null);
   const [signSuccess, setSignSuccess] = useState(false);
+  const { createPledge, isLoading: isPledgeLoading, error: pledgeError, hasPledged, approveUSDC, isApproved } = useSolarPledge();
+  const router = useRouter();
 
   // Add touch feedback state
   const [touchFeedback, setTouchFeedback] = useState<string | null>(null);
 
+  // Live contract stats for cosmic convergence callout
+  const { data: totalPledges } = useReadContract({
+    address: SOLAR_PLEDGE_ADDRESS,
+    abi: SolarPledgeABI,
+    functionName: 'totalPledges',
+  });
+  const { data: communityPool } = useReadContract({
+    address: SOLAR_PLEDGE_ADDRESS,
+    abi: SolarPledgeABI,
+    functionName: 'communityPool',
+  });
+  const { data: convergenceEnd } = useReadContract({
+    address: SOLAR_PLEDGE_ADDRESS,
+    abi: SolarPledgeABI,
+    functionName: 'convergenceEnd',
+  });
+  const now = Math.floor(Date.now() / 1000);
+  const daysRemaining = convergenceEnd ? Math.max(0, Math.floor((Number(convergenceEnd) - now) / 86400)) : null;
+
   const handleSign = async () => {
     setSignError(null);
     setIsSigning(true);
-    setTimeout(() => {
-      if (Math.random() < 0.25) {
-        setIsSigning(false);
-        setSignError(new Error('Failed to sign. Please try again.'));
-        return;
-      }
-      setIsSigning(false);
+    try {
+      const commitment = `I pledge to honor my ${bookmark.days} solar rotations`;
+      const farcasterHandle = context?.user?.username || '';
+      const pledgeAmount = 1; // 1 USDC
+      await createPledge(commitment, farcasterHandle, pledgeAmount);
       setSignSuccess(true);
-    }, 1600);
+    } catch (err) {
+      setSignError(err instanceof Error ? err : new Error('Failed to sign. Please try again.'));
+    } finally {
+      setIsSigning(false);
+    }
   };
 
   const handleSignModalClose = () => {
@@ -201,9 +229,32 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
 
       {tab === 'sol sign' && (
         <div className="w-full text-sm font-mono space-y-3 flex flex-col items-center justify-center p-8 text-center">
-          <div className="text-3xl mb-2">✍️</div>
-          <div className="text-lg font-bold mb-1">Nothing here yet</div>
-          <div className="text-gray-500">Your sol signature and sign-ins will appear here.</div>
+          {/* Cosmic Convergence Callout with live stats */}
+          <div className="w-full border border-blue-200 bg-[#F2F7FF] rounded-none p-3 font-mono text-sm text-left mb-4" style={{ color: '#2563eb', fontFamily: 'Geist Mono, monospace' }}>
+            <span className="font-bold uppercase tracking-widest">COSMIC CONVERGENCE | EPOCH 0</span><br />
+            <span className="text-xs font-mono" style={{ color: '#2563eb' }}>
+              {totalPledges !== undefined ? `${totalPledges} vows committed` : '...'} •
+              ${communityPool !== undefined ? (Number(communityPool) / 1_000_000).toLocaleString() : '...'} pooled •
+              {daysRemaining !== null ? `${daysRemaining} days remaining` : '...'}
+            </span>
+          </div>
+          {hasPledged ? (
+            <>
+              <div className="text-3xl mb-2">✅</div>
+              <div className="text-lg font-bold mb-1">Pledge Signed</div>
+              <div className="text-gray-500">You have already signed the solar pledge.</div>
+            </>
+          ) : (
+            <>
+              <div className="text-3xl mb-2">✍️</div>
+              <div className="text-lg font-bold mb-1">Sign the Solar Pledge</div>
+              <div className="text-gray-500 mb-4">Commit to your solar journey with a pledge of 1 USDC.</div>
+              <SignInButton />
+              {pledgeError && (
+                <div className="text-red-500 text-sm mt-2">{pledgeError.message}</div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -569,7 +620,7 @@ export default function SunCycleAge({ initialConsentData }: SunCycleAgeProps) {
   const [commitSuccess, setCommitSuccess] = useState(false);
 
   // Add state for dev commit button toggle
-  const [devShowCommit, setDevShowCommit] = useState(false);
+  const [devShowCommit, setDevShowCommit] = useState(true);
 
   // Effect to sync devShowCommit with window.__showCommitButton
   useEffect(() => {
@@ -580,6 +631,18 @@ export default function SunCycleAge({ initialConsentData }: SunCycleAgeProps) {
 
   // Helper to determine if commit button should show
   const shouldShowCommit = (context?.user?.fid || devShowCommit);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('SunCycleAge debug:', {
+      devShowCommit,
+      hasFid: !!context?.user?.fid,
+      shouldShowCommit,
+      onCommit: devShowCommit ? handleCommit : undefined,
+      days,
+      showResultCard: days !== null
+    });
+  }, [devShowCommit, context?.user?.fid, shouldShowCommit, days]);
 
   // Go to bookmark page with convergence tab
   const handleCommit = () => {
@@ -592,6 +655,51 @@ export default function SunCycleAge({ initialConsentData }: SunCycleAgeProps) {
 
   // Tooltip modal state
   const [showTooltip, setShowTooltip] = useState(false);
+
+  // TOP-LEVEL CONDITIONAL: If not in a Farcaster frame, only show bookmarks/calculate UI
+  if (!isInFrame) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+        <div className="max-w-md w-full flex flex-col items-center space-y-6 mt-24 px-4">
+          <Image src="/sunsun.png" alt="Sun" width={72} height={72} className="w-16 h-16 object-contain mx-auto mb-2" priority />
+          <div className="text-2xl font-serif font-bold mb-2 text-center">Solara</div>
+          <div className="text-sm font-mono text-gray-500 text-center mb-4">Farcaster features are only available in Warpcast.<br />You can still calculate and bookmark your Sol Age below.</div>
+          <FormSection birthDate={birthDate} setBirthDate={setBirthDate} calculateAge={() => {
+            if (!birthDate) return;
+            const birth = new Date(birthDate);
+            const now = new Date();
+            const diffMs = now.getTime() - birth.getTime();
+            const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const years = Math.floor(totalDays / 365.25);
+            setDays(totalDays);
+            setApproxYears(years);
+          }} />
+          {days !== null && (
+            <ResultCard
+              days={days}
+              approxYears={approxYears ?? 0}
+              nextMilestone={null}
+              daysToMilestone={null}
+              milestoneDate={null}
+              quote={"Sun cycle age measures your existence through rotations around our star. One day = one rotation."}
+              showDetails={false}
+              setShowDetails={() => {}}
+              onShare={() => {}}
+              isSharing={false}
+              onRecalculate={() => setDays(null)}
+              bookmark={null}
+              handleBookmark={() => {}}
+              formattedDate={""}
+              milestoneCard={null}
+              onCommit={undefined}
+              isCommitting={false}
+              birthDate={birthDate}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (!isSDKLoaded) {
     return (
@@ -652,6 +760,30 @@ export default function SunCycleAge({ initialConsentData }: SunCycleAgeProps) {
       <div className="w-full flex flex-col items-center pb-0 px-2 max-w-[390px] mx-auto bg-white mb-0">
         <FormSection birthDate={birthDate} setBirthDate={setBirthDate} calculateAge={calculateAge} />
       </div>
+
+      {/* Show ResultCard after calculation */}
+      {days !== null && (
+        <ResultCard
+          days={days}
+          approxYears={approxYears ?? 0}
+          nextMilestone={nextMilestone}
+          daysToMilestone={daysToMilestone}
+          milestoneDate={milestoneDate}
+          quote={quote}
+          showDetails={showDetails}
+          setShowDetails={setShowDetails}
+          onShare={onShare}
+          isSharing={isSharing}
+          onRecalculate={calculateAge}
+          bookmark={bookmark}
+          handleBookmark={handleBookmark}
+          formattedDate={formattedDate}
+          milestoneCard={null}
+          onCommit={devShowCommit ? handleCommit : undefined}
+          isCommitting={isCommitting}
+          birthDate={birthDate}
+        />
+      )}
       
       {/* Tooltip Modal and Gradient Overlay */}
       {showTooltip && (

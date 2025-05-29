@@ -40,8 +40,8 @@ export function useFrameSDK() {
           frameSDK.on("frameRemoved", () => setIsFramePinned(false));
         }
 
-        // Connect to wallet if not already connected
-        if (!isConnected && connectors.length > 0) {
+        // Only auto-connect if in a Farcaster frame
+        if (frameContext && !isConnected && connectors.length > 0) {
           await connect({ connector: connectors[0] });
         }
       } catch (err) {

@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFrameSDK } from '~/hooks/useFrameSDK';
 import Image from 'next/image';
+import ResultCard from '~/components/SunCycleAge/ResultCard';
+import { sdk } from '@farcaster/frame-sdk';
+import { SignInButton, useProfile } from '@farcaster/auth-kit';
 
 export default function ResultsPage() {
   const searchParams = useSearchParams();
@@ -50,7 +53,8 @@ export default function ResultsPage() {
         lastVisitDate: now.toISOString(),
       };
       localStorage.setItem("sunCycleBookmark", JSON.stringify(data));
-      // Show success message or handle UI feedback
+      // Navigate to /soldash after saving
+      router.push('/soldash?tab=sol%20age');
     }
   };
 
@@ -78,48 +82,59 @@ export default function ResultsPage() {
     day: "2-digit",
   }).replace(/\//g, ".");
 
+  // Add state for details toggle
+  const [showDetails, setShowDetails] = useState(false);
+  // Add state for sharing
+  const [isSharing, setIsSharing] = useState(false);
+
+  // Handler for commit (show ceremony modal)
+  const handleCommit = () => setShowCeremonyModal(true);
+
+  // Remove old handleConnect logic
+  // Add AuthKit connect button logic
+  function ConnectForCosmicConvergence() {
+    const { profile } = useProfile();
+
+    if (profile) {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/ceremony';
+      }
+      return null;
+    }
+
+    return (
+      <SignInButton>
+        CONNECT FOR COSMIC CONVERGENCE
+      </SignInButton>
+    );
+  }
+
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-white relative">
-      {/* Main content section with background, border, and margin */}
-      <div className="w-full flex flex-col items-center justify-center" style={{ background: 'rgba(255,252,242,0.5)', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-        <div className="max-w-md mx-auto w-full px-6 pt-8 pb-6 min-h-[60vh]">
-          {/* Stats Card */}
-          <div className="flex flex-col items-center mb-8 mt-32">
-            <Image src="/sunsun.png" alt="Sun" width={96} height={96} className="w-24 h-24 object-contain mb-4" style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }} priority />
-            <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">DEAR TRAVELER, YOU HAVE MADE</div>
-            <div className="text-6xl font-serif font-light tracking-tight text-black text-center mb-0">{days.toLocaleString()}</div>
-            <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">SOLAR ROTATIONS SINCE {birthDate.replace(/-/g, ".")}</div>
-            <div className="text-lg font-serif italic text-gray-700 text-center mb-0">~ {approxYears} years old</div>
-          </div>
-          {/* Cosmic Convergence Callout Card */}
-          <div className="w-full flex flex-col items-center border border-gray-500 bg-white rounded-none p-4 mb-4 shadow mx-6" style={{ marginLeft: 0, marginRight: 0 }}>
-            <Image src="/cosmicConverge_small.svg" alt="Cosmic Convergence" width={80} height={40} className="mb-2" />
-            <div className="font-mono font-base text-sm text-gray-900 uppercase tracking-base text-center mb-3">THE COSMIC CONVERGENCE APPROACHES IN</div>
-            <div className="flex items-center justify-center gap-2 text-2xl font-serif font-light text-black mb-2">
-              <span role="img" aria-label="star">⭐</span>
-              30 days
-              <span role="img" aria-label="star">⭐</span>
-            </div>
-            <div className="text-yellow-700 font-mono text-sm font-semibold mt-2 text-center">Your {days.toLocaleString()} rotations qualify <br /> for $SOLAR tokens</div>
-          </div>
-        </div>
-      </div>
-      {/* CTA section below main content, on white */}
-      <div className="w-full bg-white flex flex-col items-center pt-6 pb-4">
-        <div className="max-w-md mx-auto w-full px-6 flex flex-col items-center">
-          {shouldShowCommit && (
-            <button
-              className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-medium tracking-base uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
-              onClick={() => setShowCeremonyModal(true)}
-            >
-              COMMIT TO COSMIC CONVERGENCE
-            </button>
-          )}
-          <div className="flex w-full justify-between items-center mt-2 mb-6">
-            <button onClick={handleShare} className="font-mono text-sm text-base underline underline-offset-2">SHARE SOL AGE ↗</button>
-            <span className="mx-2 text-gray-400">|</span>
-            <button onClick={handleRecalculate} className="font-mono text-sm text-base underline underline-offset-2">CALCULATE AGAIN ↗</button>
-          </div>
+      <div className="max-w-md mx-auto w-full px-6 pt-8 pb-6 min-h-[60vh]">
+        <ResultCard
+          days={days}
+          approxYears={approxYears ?? 0}
+          nextMilestone={null}
+          daysToMilestone={null}
+          milestoneDate={null}
+          quote={"Sun cycle age measures your existence through rotations around our star. One day = one rotation."}
+          showDetails={showDetails}
+          setShowDetails={setShowDetails}
+          onShare={handleShare}
+          isSharing={isSharing}
+          onRecalculate={handleRecalculate}
+          bookmark={null}
+          handleBookmark={handleBookmark}
+          formattedDate={formattedDate}
+          milestoneCard={null}
+          onCommit={shouldShowCommit ? handleCommit : undefined}
+          isCommitting={false}
+          birthDate={birthDate}
+        />
+        {/* Add the AuthKit connect button below the ResultCard if not signed in */}
+        <div className="mt-6 w-full flex justify-center">
+          <ConnectForCosmicConvergence />
         </div>
       </div>
       {/* Ceremony Modal */}

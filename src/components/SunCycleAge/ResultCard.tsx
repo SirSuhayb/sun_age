@@ -27,6 +27,7 @@ interface ResultCardProps {
   onCommit?: (() => void) | undefined;
   isCommitting?: boolean;
   birthDate?: string;
+  handleConnect?: () => void;
 }
 
 const ResultCard: React.FC<ResultCardProps> = (props) => {
@@ -120,6 +121,26 @@ const ResultCard: React.FC<ResultCardProps> = (props) => {
     <a href="https://warpcast.com/~/channel/occulture" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600 transition-colors">/occulture</a>
   );
 
+  // Add Farcaster connect logic
+  const handleConnect = async () => {
+    if (context?.user?.fid) return;
+    // No Farcaster SIWF here; logic handled in results page
+    window.location.href = '/ceremony';
+  };
+
+  // Debug log for context
+  console.log('ResultCard context?.user?.fid:', context?.user?.fid);
+  console.log('ResultCard debug:', {
+    hasFid: !!context?.user?.fid,
+    hasOnCommit: !!props.onCommit,
+    shouldShowCommit: !!(context?.user?.fid || props.onCommit),
+    props: {
+      onCommit: props.onCommit,
+      isCommitting: props.isCommitting,
+      birthDate: props.birthDate
+    }
+  });
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -127,6 +148,17 @@ const ResultCard: React.FC<ResultCardProps> = (props) => {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="flex flex-col items-center justify-center min-h-[60vh] w-full px-2 sm:px-0 mb-24"
     >
+      {/* Debug element */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-0 left-0 bg-black text-white p-2 text-xs z-50">
+          ResultCard rendered
+          <br />
+          onCommit: {props.onCommit ? 'present' : 'missing'}
+          <br />
+          hasFid: {context?.user?.fid ? 'yes' : 'no'}
+        </div>
+      )}
+      
       {/* Persistent Global Header */}
       <div className="w-full flex flex-col items-center mb-4">
         {/* Solara Logo (inline SVG) */}
@@ -255,17 +287,9 @@ const ResultCard: React.FC<ResultCardProps> = (props) => {
           </button>
         ) : (
           <>
+            {/* Always show connect button if not authenticated */}
             <button
-              onClick={() => {
-                if (typeof props.onCommit === 'function') {
-                  props.onCommit();
-                } else {
-                  if (process.env.NODE_ENV === 'development') {
-                    // eslint-disable-next-line no-console
-                    console.warn('onCommit handler missing for connect button');
-                  }
-                }
-              }}
+              onClick={handleConnect}
               className="font-mono font-medium text-sm uppercase tracking-widest py-3 px-2 w-full rounded-none border border-yellow-500 dark:border-yellow-400 bg-yellow-400 dark:bg-yellow-500 text-black transition-colors hover:bg-yellow-300 dark:hover:bg-yellow-600"
             >
               CONNECT FOR COSMIC CONVERGENCE

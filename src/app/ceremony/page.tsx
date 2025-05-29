@@ -3,6 +3,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSolarPledge } from '~/hooks/useSolarPledge';
+import SolarPledgeABI from '~/lib/abis/SolarPledge.json';
+import { SOLAR_PLEDGE_ADDRESS } from '~/lib/constants';
+import { useReadContract, useAccount, useConnect } from 'wagmi';
 
 const steps = ["prepare", "inscribe", "empower", "sealed"];
 
@@ -17,8 +21,37 @@ export default function CeremonyStepper() {
   const birthDate = "02.10.1994";
   const today = "05.21.2025";
   const signatureMsg = `I inscribe this Solar Vow into eternity: FID 12345 has completed ${solAge} rotations around our star, sealed by cosmic signature on ${today}`;
+  const [vowText, setVowText] = useState('');
+  const [farcasterHandle, setFarcasterHandle] = useState('');
   const [pledge, setPledge] = useState(5);
   const [customPledge, setCustomPledge] = useState("");
+
+  // SolarPledge hook
+  const { approveUSDC, createPledge, isApproved, isLoading, error } = useSolarPledge();
+
+  // Live contract stats
+  const { data: totalPledges } = useReadContract({
+    address: SOLAR_PLEDGE_ADDRESS,
+    abi: SolarPledgeABI,
+    functionName: 'totalPledges',
+  });
+  const { data: communityPool } = useReadContract({
+    address: SOLAR_PLEDGE_ADDRESS,
+    abi: SolarPledgeABI,
+    functionName: 'communityPool',
+  });
+  const { data: convergenceEnd } = useReadContract({
+    address: SOLAR_PLEDGE_ADDRESS,
+    abi: SolarPledgeABI,
+    functionName: 'convergenceEnd',
+  });
+  const now = Math.floor(Date.now() / 1000);
+  const daysRemaining = convergenceEnd ? Math.max(0, Math.floor((Number(convergenceEnd) - now) / 86400)) : null;
+
+  // Sponsored count and multiplier logic
+  const PLEDGE_FEE = 1; // $1 USDC per sponsorship
+  const sponsoredCount = Math.floor(pledge / PLEDGE_FEE);
+  const multiplier = 1 + Math.floor(pledge / 5); // Simple example
 
   // Step navigation
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
@@ -39,6 +72,9 @@ export default function CeremonyStepper() {
       />
     );
   }
+
+  const { isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center bg-white relative">
@@ -117,12 +153,16 @@ export default function CeremonyStepper() {
                 <Image src="/battery.png" alt="Battery" width={150} height={150} className="mb-6 self-center" style={{ filter: 'drop-shadow(0 0 60px #FFD700cc) drop-shadow(0 0 32px #FFB30099)' }} />
                 <div className="text-2xl font-serif font-bold mb-2 w-full text-center">Empower Your Solar Vow</div>
                 <div className="text-xs font-mono text-gray-500 mb-6 uppercase tracking-widest w-full text-center">A measure of strength through collective energy</div>
-                {/* Cosmic Convergence Callout */}
+                {/* Cosmic Convergence Callout with live stats */}
                 <div className="w-full border border-blue-200 bg-[#F2F7FF] rounded-none p-3 font-mono text-sm text-left mb-4" style={{ color: '#2563eb', fontFamily: 'Geist Mono, monospace' }}>
                   <span className="font-bold uppercase tracking-widest">COSMIC CONVERGENCE | EPOCH 0</span><br />
-                  <span className="text-xs font-mono" style={{ color: '#2563eb' }}>{`{vows} vows committed • $${pledge} pooled • {days} remaining`}</span>
+                  <span className="text-xs font-mono" style={{ color: '#2563eb' }}>
+                    {totalPledges !== undefined ? `${totalPledges} vows committed` : '...'} •
+                    ${communityPool !== undefined ? (Number(communityPool) / 1_000_000).toLocaleString() : '...'} pooled •
+                    {daysRemaining !== null ? `${daysRemaining} days remaining` : '...'}
+                  </span>
                 </div>
-                {/* Solar Energy Level Card */}
+                {/* Solar Energy Level Card with sponsoredCount and multiplier */}
                 <div className="w-full border border-gray-300 rounded-none p-4 mb-4 bg-white/90 text-left">
                   <div className="text-xs font-mono text-gray-700 mb-2 uppercase tracking-widest font-bold">CHOOSE YOUR SOLAR ENERGY LEVEL</div>
                   <div className="text-sm font-sans text-gray-700 mb-4">Your contribution joins the solar community and sponsors future vow-makers.</div>
@@ -147,15 +187,43 @@ export default function CeremonyStepper() {
                     />
                   </div>
                 </div>
-                {/* Final Amount Callout */}
+                {/* Final Amount Callout with sponsoredCount and multiplier */}
                 <div className="w-full border border-gray-300 rounded-none p-4 mb-4" style={{ background: '#F6F5E6' }}>
                   <div className="text-xs font-mono text-gray-700 mb-2 uppercase tracking-widest font-bold">YOUR ${pledge} SOLAR VOW WILL:</div>
                   <ul className="text-sm font-mono text-gray-700 list-none ml-0 mt-1">
-                    <li className="mb-1">🌞 Enable (sponsoredCount) free ceremonies</li>
+                    <li className="mb-1">🌞 Enable {sponsoredCount} free ceremonies</li>
                     <li className="mb-1">🌊 Add ${pledge} to Genesis pool</li>
-                    <li>🔒 Secure your vow with (multiplier)x energy</li>
+                    <li>🔒 Secure your vow with {multiplier}x energy</li>
                   </ul>
                 </div>
+                {/* USDC approval and pledge logic */}
+                {!isApproved(pledge) ? (
+                  <button
+                    className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-sm tracking-widest uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
+                    onClick={() => {
+                      if (!isConnected) {
+                        connect({ connector: connectors[0] });
+                        return;
+                      }
+                      approveUSDC(BigInt(pledge * 1_000_000));
+                    }}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Approving...' : 'Approve USDC'}
+                  </button>
+                ) : (
+                  <button
+                    className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-sm tracking-widest uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
+                    onClick={async () => {
+                      await createPledge(vowText, farcasterHandle, pledge);
+                      setStep(3);
+                    }}
+                    disabled={isLoading || !vowText}
+                  >
+                    {isLoading ? 'Sealing...' : `Seal Vow with $${pledge} Solar Energy`}
+                  </button>
+                )}
+                {error && <div className="text-red-500 text-sm mt-2">{error.message}</div>}
               </div>
 
               {/* TODO: Wallet signature and USDC pledge logic here */}

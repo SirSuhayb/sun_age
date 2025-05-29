@@ -5,13 +5,20 @@ import dynamic from "next/dynamic";
 // import posthog from "posthog-js";
 // import { PostHogProvider as PHProvider } from "posthog-js/react";
 // import { getUUID } from "~/lib/utils";
+import { WagmiProvider, createConfig, http } from 'wagmi';
+import { base } from 'wagmi/chains';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { type ReactNode } from 'react';
+import { AuthKitProvider } from '@farcaster/auth-kit';
 
-const WagmiProvider = dynamic(
-  () => import("~/components/providers/WagmiProvider"),
-  {
-    ssr: false,
+const config = createConfig({
+  chains: [base],
+  transports: {
+    [base.id]: http(),
   },
-);
+});
+
+const queryClient = new QueryClient();
 
 // export function PostHogProvider({ children }: { children: React.ReactNode }) {
 //   useEffect(() => {
@@ -37,12 +44,23 @@ const WagmiProvider = dynamic(
 //   return <PHProvider client={posthog}>{children}</PHProvider>;
 // }
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   return (
-    <WagmiProvider>
-      {/* <PostHogProvider> */}
-        {children}
-      {/* </PostHogProvider> */}
-    </WagmiProvider>
+    <AuthKitProvider
+      config={{
+        // TODO: Fill in with your actual values:
+        rpcUrl: "https://mainnet.optimism.io", // or your preferred chain
+        // clientId: "YOUR_CLIENT_ID", // If using OAuth
+        // redirectUri: "YOUR_REDIRECT_URI", // If using OAuth
+      }}
+    >
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          {/* <PostHogProvider> */}
+            {children}
+          {/* </PostHogProvider> */}
+        </QueryClientProvider>
+      </WagmiProvider>
+    </AuthKitProvider>
   );
 }
