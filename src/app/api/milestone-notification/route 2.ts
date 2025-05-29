@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { sendFrameNotification } from "~/lib/notifs";
+import { sendFrameNotification } from "../../../lib/notifs";
 import { getNextMilestone } from "~/lib/milestones";
 
 const requestSchema = z.object({
@@ -24,11 +24,10 @@ export async function POST(request: NextRequest) {
   const { fid, milestone, days, isWelcome } = requestBody.data;
 
   if (isWelcome) {
-    const sendResult = await sendFrameNotification({
-      fid: parseInt(fid),
-      title: "Welcome to Your Sun Cycle Journey",
-      body: "You've embarked on a mindful journey of cosmic reflection. Each rotation around the sun is an opportunity for growth and discovery. The stars have been waiting. 🌟",
-    });
+    const sendResult = await sendFrameNotification(
+      parseInt(fid),
+      "Welcome to Your Sun Cycle Journey\n\nYou've embarked on a mindful journey of cosmic reflection. Each rotation around the sun is an opportunity for growth and discovery. The stars have been waiting. 🌟"
+    );
 
     if (sendResult.state === "error") {
       return Response.json(
@@ -53,11 +52,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const sendResult = await sendFrameNotification({
-    fid: parseInt(fid),
-    title: `Milestone Reached: ${currentMilestone.cycles} Cycles`,
-    body: `${currentMilestone.description}\n\n${currentMilestone.name}`,
-  });
+  const sendResult = await sendFrameNotification(
+    parseInt(fid),
+    `Milestone Reached: ${currentMilestone.cycles} Cycles\n\n${currentMilestone.description}\n\n${currentMilestone.label}`
+  );
 
   if (sendResult.state === "error") {
     return Response.json(
