@@ -101,13 +101,9 @@ export default function RootLayout({
             <CosmicBackground />
             {/* App header - now global, with About and $SOLAR icons handled in Header */}
             <HeaderClient formattedDate={formattedDate} />
-            {/* Main content container with responsive centering */}
+            {/* Main content - full width, let individual pages handle centering */}
             <div className="min-h-screen flex flex-col bg-white">
-              <div className="flex-1 flex justify-center">
-                <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8">
-                  <main id="main-content" className="flex-1 flex flex-col justify-between min-h-screen">{children}</main>
-                </div>
-              </div>
+              <main id="main-content" className="flex-1 flex flex-col justify-between min-h-screen">{children}</main>
             </div>
             {/* Footer is handled in SunCycleAge.tsx */}
           </ThemeProviderClient>

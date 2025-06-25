@@ -168,55 +168,59 @@ export default function SolDashPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-white relative">
+      {/* Full width background with centered content */}
       <div className="w-full flex flex-col items-center flex-grow" style={{ background: 'rgba(255,252,242,0.5)', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-        <div className="max-w-md mx-auto w-full px-2 pt-8 pb-8 min-h-[60vh]">
-          <BookmarkCard
-            bookmark={bookmark}
-            milestone={milestone}
-            milestoneDate={milestoneDate}
-            daysToMilestone={daysToMilestone}
-            onRecalculate={handleRecalculate}
-            onClear={() => setShowConfirmClear(true)}
-            isRecalculating={isRecalculating}
-            sinceLastVisit={bookmark.lastVisitDays ? bookmark.days - bookmark.lastVisitDays : 0}
-            milestoneCard={milestoneCard}
-            showMilestoneModal={showMilestoneModal}
-            setShowMilestoneModal={setShowMilestoneModal}
-            nextNumericalMilestones={nextNumericalMilestones}
-            onShare={async () => {
-              setIsSharing(true);
-              const url = process.env.NEXT_PUBLIC_URL || window.location.origin;
-              const userName = bookmark.userName || 'TRAVELLER';
-              const ogImageUrl = `${url}/api/og/solage?userName=${encodeURIComponent(userName)}&solAge=${bookmark.days}&birthDate=${encodeURIComponent(bookmark.birthDate)}&age=${bookmark.approxYears}`;
-              const message = `Forget birthdays—I've completed ${bookmark.days} rotations around the sun ☀️🌎 What's your Sol Age? ${url}`;
-              if (isInFrame && sdk) {
-                await sdk.actions.composeCast({
-                  text: message,
-                  embeds: [ogImageUrl]
-                });
-              } else {
-                window.location.href = `https://warpcast.com/~/compose?text=${encodeURIComponent(message + '\n\n[My Sol Age Card](' + ogImageUrl + ')')}`;
-              }
-              setTimeout(() => setIsSharing(false), 1000);
-            }}
-            isSharing={isSharing}
-            initialTab="sol vows"
-            hasPledged={hasPledged}
-            vow={vow}
-            onSolVowsTab={handleSolVowsTab}
-            isLoading={isLoading}
-            onChainPledge={onChainPledge}
-          />
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8">
+          <div className="max-w-md mx-auto w-full pt-8 pb-8 min-h-[60vh]">
+            <BookmarkCard
+              bookmark={bookmark}
+              milestone={milestone}
+              milestoneDate={milestoneDate}
+              daysToMilestone={daysToMilestone}
+              onRecalculate={handleRecalculate}
+              onClear={() => setShowConfirmClear(true)}
+              isRecalculating={isRecalculating}
+              sinceLastVisit={bookmark.lastVisitDays ? bookmark.days - bookmark.lastVisitDays : 0}
+              milestoneCard={milestoneCard}
+              showMilestoneModal={showMilestoneModal}
+              setShowMilestoneModal={setShowMilestoneModal}
+              nextNumericalMilestones={nextNumericalMilestones}
+              onShare={async () => {
+                setIsSharing(true);
+                const url = process.env.NEXT_PUBLIC_URL || window.location.origin;
+                const userName = bookmark.userName || 'TRAVELLER';
+                const ogImageUrl = `${url}/api/og/solage?userName=${encodeURIComponent(userName)}&solAge=${bookmark.days}&birthDate=${encodeURIComponent(bookmark.birthDate)}&age=${bookmark.approxYears}`;
+                const message = `Forget birthdays—I've completed ${bookmark.days} rotations around the sun ☀️🌎 What's your Sol Age? ${url}`;
+                if (isInFrame && sdk) {
+                  await sdk.actions.composeCast({
+                    text: message,
+                    embeds: [ogImageUrl]
+                  });
+                } else {
+                  window.location.href = `https://warpcast.com/~/compose?text=${encodeURIComponent(message + '\n\n[My Sol Age Card](' + ogImageUrl + ')')}`;
+                }
+                setTimeout(() => setIsSharing(false), 1000);
+              }}
+              isSharing={isSharing}
+              initialTab="sol vows"
+              hasPledged={hasPledged}
+              vow={vow}
+              onSolVowsTab={handleSolVowsTab}
+              isLoading={isLoading}
+              onChainPledge={onChainPledge}
+            />
+          </div>
         </div>
       </div>
-      {/* The buttons below are being moved into the BookmarkCard component */}
 
-      {/* Footer - same as main page */}
+      {/* Footer - full width background, centered content */}
       <footer className="w-full border-t border-gray-200 bg-white pt-2 pb-12">
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-sm font-mono text-black text-center">
-            Solara is made for <a href="https://farcaster.xyz/~/channel/occulture" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">/occulture</a> <br />
-            built by <a href="https://farcaster.xyz/sirsu.eth" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">sirsu</a>
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8 mx-auto">
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-sm font-mono text-black text-center">
+              Solara is made for <a href="https://farcaster.xyz/~/channel/occulture" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">/occulture</a> <br />
+              built by <a href="https://farcaster.xyz/sirsu.eth" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">sirsu</a>
+            </div>
           </div>
         </div>
       </footer>
@@ -236,13 +240,13 @@ export default function SolDashPage() {
               <div className="text-xs font-mono text-gray-500 mb-5 tracking-widest uppercase">Are you sure you want to clear your bookmark?</div>
               <div className="flex justify-between gap-4 mt-6">
                 <button
-                  className="flex-1 px-6 py-3 border border-gray-400 bg-gray-100 text-gray-700 rounded-none uppercase tracking-widest font-mono text-base hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-6 py-3 border border-gray-400 bg-gray-100 text-gray-700 uppercase tracking-widest font-mono text-base hover:bg-gray-200 transition-colors"
                   onClick={() => setShowConfirmClear(false)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="flex-1 px-6 py-3 border border-red-500 bg-red-100 text-red-700 rounded-none uppercase tracking-widest font-mono text-base hover:bg-red-200 transition-colors"
+                  className="flex-1 px-6 py-3 border border-red-500 bg-red-100 text-red-700 uppercase tracking-widest font-mono text-base hover:bg-red-200 transition-colors"
                   onClick={() => {
                     localStorage.removeItem("sunCycleBookmark");
                     setBookmark(null);

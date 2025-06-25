@@ -14,6 +14,9 @@ export default function ResultsPage() {
   const router = useRouter();
   const { context, isInFrame, sdk } = useFrameSDK();
 
+  // Check if user is on desktop (not in Farcaster frame)
+  const isDesktop = !isInFrame;
+
   // Dev toggle for showing commit button
   const [devShowCommit, setDevShowCommit] = useState(false);
   const [showDevPopover, setShowDevPopover] = useState(false);
@@ -72,17 +75,19 @@ export default function ResultsPage() {
   if (!days || !birthDate) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white z-20">
-        <div className="max-w-md w-full px-6 py-16 border border-gray-200 bg-white/90 rounded-none shadow text-center">
-          <div className="text-2xl font-serif font-bold mb-4 text-black">No Calculation Data</div>
-          <div className="text-base font-mono text-gray-600 mb-8">
-            We couldn&apos;t find your Sol Age calculation. Please calculate your age to continue.
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8">
+          <div className="max-w-md w-full mx-auto py-16 border border-gray-200 bg-white/90 shadow text-center">
+            <div className="text-2xl font-serif font-bold mb-4 text-black">No Calculation Data</div>
+            <div className="text-base font-mono text-gray-600 mb-8">
+              We couldn&apos;t find your Sol Age calculation. Please calculate your age to continue.
+            </div>
+            <SpinnerButton
+              onClick={() => router.push('/')}
+              className="w-full py-4 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border border-black hover:bg-[#e6c75a] transition-colors"
+            >
+              Calculate Age
+            </SpinnerButton>
           </div>
-          <SpinnerButton
-            onClick={() => router.push('/')}
-            className="w-full py-4 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
-          >
-            Calculate Age
-          </SpinnerButton>
         </div>
       </div>
     );
@@ -97,51 +102,58 @@ export default function ResultsPage() {
   }).replace(/\//g, ".");
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center bg-white relative z-20">
-      {/* Main content section with background, border, and margin */}
-      <div className="w-full flex flex-col items-center justify-center" style={{ background: 'rgba(255,252,242,0.5)', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-        <div className="max-w-md mx-auto w-full px-6 pt-8 pb-6 min-h-[60vh]">
-          {/* Stats Card */}
-          <div className="flex flex-col items-center mb-8 mt-32">
-            <Image src="/sunsun.png" alt="Sun" width={96} height={96} className="w-24 h-24 object-contain mb-4" style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }} priority />
-            <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">DEAR TRAVELER, YOU HAVE MADE</div>
-            <div className="text-6xl font-serif font-light tracking-tight text-black text-center mb-0">{days.toLocaleString()}</div>
-            <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">SOLAR ROTATIONS SINCE {birthDate.replace(/-/g, ".")}</div>
-            <div className="text-lg font-serif italic text-gray-700 text-center mb-0">~ {approxYears} years old</div>
-          </div>
-          {/* Solar Journey Callout Card */}
-          <div className="w-full flex flex-col items-center border border-gray-500 bg-white p-4 mb-4 shadow mx-6" style={{ marginLeft: 0, marginRight: 0 }}>
-            <div className="text-4xl mb-2">🌞</div>
-            <div className="font-mono font-base text-sm text-gray-900 uppercase tracking-base text-center mb-3">YOUR SOLAR JOURNEY CONTINUES</div>
-            <div className="flex items-center justify-center gap-2 text-2xl font-serif font-light text-black mb-2">
-              <span role="img" aria-label="star">⭐</span>
-              INFINITE
-              <span role="img" aria-label="star">⭐</span>
+    <div className="w-full min-h-screen flex flex-col bg-white relative z-20">
+      {/* Main content section with background, border, and margin - full width */}
+      <div className="w-full flex flex-col items-center" style={{ background: 'rgba(255,252,242,0.5)', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8">
+          <div className="max-w-md mx-auto w-full pt-8 pb-6 min-h-[60vh]">
+            {/* Stats Card */}
+            <div className="flex flex-col items-center mb-8 mt-32">
+              <Image src="/sunsun.png" alt="Sun" width={96} height={96} className="w-24 h-24 object-contain mb-4" style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }} priority />
+              <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">DEAR TRAVELER, YOU HAVE MADE</div>
+              <div className="text-6xl font-serif font-light tracking-tight text-black text-center mb-0">{days.toLocaleString()}</div>
+              <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">SOLAR ROTATIONS SINCE {birthDate.replace(/-/g, ".")}</div>
+              <div className="text-lg font-serif italic text-gray-700 text-center mb-0">~ {approxYears} years old</div>
             </div>
-            <div className="text-yellow-700 font-mono text-sm font-semibold mt-2 text-center">Your {days.toLocaleString()} rotations represent <br /> your cosmic evolution</div>
+            {/* Solar Journey Callout Card */}
+            <div className="w-full flex flex-col items-center border border-gray-500 bg-white p-4 mb-4 shadow" style={{ marginLeft: 0, marginRight: 0 }}>
+              <div className="text-4xl mb-2">🌞</div>
+              <div className="font-mono font-base text-sm text-gray-900 uppercase tracking-base text-center mb-3">YOUR SOLAR JOURNEY CONTINUES</div>
+              <div className="flex items-center justify-center gap-2 text-2xl font-serif font-light text-black mb-2">
+                <span role="img" aria-label="star">⭐</span>
+                INFINITE
+                <span role="img" aria-label="star">⭐</span>
+              </div>
+              <div className="text-yellow-700 font-mono text-sm font-semibold mt-2 text-center">Your {days.toLocaleString()} rotations represent <br /> your cosmic evolution</div>
+            </div>
           </div>
         </div>
       </div>
-      {/* CTA section below main content, on white */}
+      
+      {/* CTA section below main content, on white - full width */}
       <div className="w-full bg-white flex flex-col items-center pt-6 pb-4">
-        <div className="max-w-md mx-auto w-full px-6 flex flex-col items-center">
-          {shouldShowCommit && (
-            <button
-              className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-medium tracking-base uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
-              onClick={() => setShowCeremonyModal(true)}
-            >
-              MAKE YOUR SOLAR VOW
-            </button>
-          )}
-          <div className="flex w-full justify-between items-center mt-2 mb-6">
-            <button onClick={handleShare} className="font-mono text-sm text-base underline underline-offset-2">SHARE SOL AGE ↗</button>
-            <span className="mx-2 text-gray-400">|</span>
-            <button onClick={handleRecalculate} className="font-mono text-sm text-base underline underline-offset-2">CALCULATE AGAIN ↗</button>
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8">
+          <div className="max-w-md mx-auto w-full flex flex-col items-center">
+            {/* Only show vow button for Farcaster frame users */}
+            {shouldShowCommit && !isDesktop && (
+              <button
+                className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-medium tracking-base uppercase border border-black hover:bg-[#e6c75a] transition-colors"
+                onClick={() => setShowCeremonyModal(true)}
+              >
+                MAKE YOUR SOLAR VOW
+              </button>
+            )}
+            <div className="flex w-full justify-between items-center mt-2 mb-6">
+              <button onClick={handleShare} className="font-mono text-sm text-base underline underline-offset-2">SHARE SOL AGE ↗</button>
+              <span className="mx-2 text-gray-400">|</span>
+              <button onClick={handleRecalculate} className="font-mono text-sm text-base underline underline-offset-2">CALCULATE AGAIN ↗</button>
+            </div>
           </div>
         </div>
       </div>
-      {/* Ceremony Modal */}
-      {showCeremonyModal && (
+      
+      {/* Ceremony Modal - only show for Farcaster users */}
+      {showCeremonyModal && !isDesktop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Sunrise gradient overlay, matching tooltip modal */}
           <div className="absolute inset-0 bg-solara-sunrise" style={{ opacity: 0.6 }} />
@@ -162,7 +174,7 @@ export default function ResultsPage() {
               Or you can simply bookmark and keep tabs on your Sol Age as you reach new milestones in your own cosmic journey.
             </div>
             <button
-              className="w-full py-4 mt-2 mb-2 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border-none rounded-none hover:bg-[#e6c75a] transition-colors"
+              className="w-full py-4 mt-2 mb-2 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border-none hover:bg-[#e6c75a] transition-colors"
               onClick={() => {
                 setShowCeremonyModal(false);
                 // Try to get from URL params first
@@ -198,7 +210,7 @@ export default function ResultsPage() {
               I WANT TO TAKE A VOW
             </button>
             <button
-              className="w-full py-2 mb-2 bg-transparent text-black font-mono text-base underline underline-offset-2 border-none rounded-none hover:text-[#d4af37] transition-colors"
+              className="w-full py-2 mb-2 bg-transparent text-black font-mono text-base underline underline-offset-2 border-none hover:text-[#d4af37] transition-colors"
               onClick={() => {
                 handleBookmark();
                 setShowCeremonyModal(false);
@@ -210,6 +222,7 @@ export default function ResultsPage() {
           </div>
         </div>
       )}
+      
       {/* Floating Dev Toggle Button */}
       <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1100 }}>
         {process.env.NODE_ENV === 'development' && (
@@ -217,13 +230,13 @@ export default function ResultsPage() {
             <button
               aria-label="Show Dev Toggle"
               onClick={() => setShowDevPopover((v) => !v)}
-              className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="w-12 h-12 bg-black text-white flex items-center justify-center shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
               style={{ fontSize: 24 }}
             >
               <span>⚙️</span>
             </button>
             {showDevPopover && (
-              <div className="absolute bottom-14 right-0 bg-white border border-gray-300 rounded shadow-lg p-4 min-w-[220px] flex flex-col items-start" style={{ zIndex: 1200 }}>
+              <div className="absolute bottom-14 right-0 bg-white border border-gray-300 shadow-lg p-4 min-w-[220px] flex flex-col items-start" style={{ zIndex: 1200 }}>
                 <label className="font-mono text-xs mb-2">Show Farcaster Commit Button (dev):</label>
                 <input
                   type="checkbox"
@@ -242,12 +255,15 @@ export default function ResultsPage() {
           </>
         )}
       </div>
-      {/* Local Footer (copied from main page) */}
+      
+      {/* Local Footer (copied from main page) - full width */}
       <footer className="w-full border-t border-gray-200 bg-white pt-2 pb-12">
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-sm font-mono text-black text-center">
-            Solara is made for <a href="https://farcaster.xyz/~/channel/occulture" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">/occulture</a> <br />
-            built by <a href="https://farcaster.xyz/sirsu.eth" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">sirsu</a>
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8 mx-auto">
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-sm font-mono text-black text-center">
+              Solara is made for <a href="https://farcaster.xyz/~/channel/occulture" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">/occulture</a> <br />
+              built by <a href="https://farcaster.xyz/sirsu.eth" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">sirsu</a>
+            </div>
           </div>
         </div>
       </footer>

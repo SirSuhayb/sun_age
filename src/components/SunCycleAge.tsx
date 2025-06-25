@@ -61,7 +61,7 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
   onChainPledge?: Pledge;
 }) {
   const [tab, setTab] = useState<'sol age' | 'sol vows' | 'journal' | 'swap'>(initialTab || 'sol age');
-  const { context } = useFrameSDK();
+  const { context, isInFrame } = useFrameSDK();
   const { daysRemaining, totalPooled } = useConvergenceStats();
   const [isSigning, setIsSigning] = useState(false);
   const [signError, setSignError] = useState<Error | null>(null);
@@ -70,6 +70,9 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
 
   // Add touch feedback state
   const [touchFeedback, setTouchFeedback] = useState<string | null>(null);
+
+  // Check if user is on desktop (not in Farcaster frame)
+  const isDesktop = !isInFrame;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (e.currentTarget.scrollTop > 20) {
@@ -105,297 +108,217 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
     }
   }, [tab, onSolVowsTab]);
 
-  return (
-    <div className="max-w-mobile desktop:max-w-desktop-content w-full flex flex-col items-center sm:space-y-6 relative mt-24 px-0 sm:px-0 h-full">
-      <div
-        className={`transition-all duration-300 w-full flex flex-col items-center ${
-          isScrolled ? 'space-y-1 py-2' : 'space-y-4 py-4'
-        }`}
-      >
-        <Image
-          src="/sunsun.png"
-          alt="Sun"
-          width={72}
-          height={72}
-          className={`object-contain mx-auto transition-all duration-300 ${
-            isScrolled ? 'w-12 h-12' : 'w-16 h-16 sm:w-20 sm:h-20'
-          }`}
-          style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }}
-          priority
-        />
-        <div className={`text-center transition-all duration-300 ${isScrolled ? 'opacity-0 h-0' : 'opacity-100'}`}>
-          <div className="text-xs font-mono tracking-widest text-gray-600 uppercase mb-2">WELCOME BACK TRAVELER...</div>
-          <div className="text-4xl sm:text-5xl font-serif font-extrabold tracking-tight text-black mb-1">{bookmark.days} <span className="font-serif">Sol Age</span></div>
-          <div className="text-xs font-mono text-gray-600 mb-2">+{sinceLastVisit} since your last visit</div>
-        </div>
-      </div>
-      
-      {/* Enhanced Tabs with better mobile support */}
-      <div className="flex w-full border-b border-gray-300 overflow-x-auto sticky top-0 bg-white/80 backdrop-blur-sm z-10">
-        {['sol age', 'sol vows', 'journal', 'swap'].map((tabName) => (
-          <button
-            key={tabName}
-            onClick={() => setTab(tabName as any)}
-            className={`flex-1 min-w-[100px] py-3 px-2 text-xs font-mono uppercase tracking-widest transition-colors duration-200 ${
-              tab === tabName 
-                ? 'border-b-2 border-black font-bold' 
-                : 'text-gray-600 hover:text-black'
-            }`}
-          >
-            {tabName.toUpperCase()}
-          </button>
-        ))}
-      </div>
+  // Filter tabs based on platform - hide sol vows for desktop users
+  const availableTabs = isDesktop 
+    ? ['sol age', 'journal', 'swap'] 
+    : ['sol age', 'sol vows', 'journal', 'swap'];
 
-      {/* Tab Content with improved mobile spacing */}
-      <div className="w-full overflow-y-auto flex-grow p-4" onScroll={handleScroll}>
-        {tab === 'sol age' && (
-          <div className="w-full text-sm font-mono space-y-3">
-            <div className="flex justify-between items-center p-2 hover:bg-gray-50 rounded transition-colors">
-              <span className="text-gray-600">FROM BIRTH</span>
-              <span className="font-bold text-right">{bookmark.days.toLocaleString()} DAYS</span>
-            </div>
-            <div className="flex justify-between items-center p-2 hover:bg-gray-50 rounded transition-colors">
-              <span className="text-gray-600">BIRTH DATE</span>
-              <span className="font-bold text-right">{bookmark.birthDate.replace(/-/g, ".")}</span>
-            </div>
-            <div className="flex justify-between items-center p-2 hover:bg-gray-50 transition-colors">
-              <span className="text-gray-600">NEXT MILESTONE</span>
-              <span className="font-bold text-right">{milestone.emoji} {milestone.label} <span className="font-normal">(in {daysToMilestone} days)</span></span>
-            </div>
-            
-            {/* Enhanced Milestone Card Section */}
-            {milestoneCard && (
-              <div className="w-full flex flex-col items-center my-4">
-                {milestoneCard}
-                <button
-                  className="mt-3 text-sm underline text-black hover:text-gray-800 font-mono font-semibold transition-colors duration-200"
-                  onClick={() => setShowMilestoneModal(true)}
-                >
-                  View More Milestones ↗
-                </button>
-                
-                {/* Enhanced Modal */}
-                {showMilestoneModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    {/* Sunrise gradient overlay */}
-                    <div className="absolute inset-0 bg-solara-sunrise" style={{ opacity: 0.6 }} />
-                    {/* Modal with blur effect */}
-                    <div className="relative z-10 w-full">
-                      <div className="backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 p-6 max-w-[360px] mx-auto">
-                        <div className="flex justify-between items-center mb-3">
-                          <div className="text-2xl font-serif font-bold" style={{ letterSpacing: '-0.06em' }}>Upcoming Milestones</div>
-                          <button onClick={() => setShowMilestoneModal(false)} aria-label="Close" className="text-gray-500 hover:text-gray-800 text-xl font-bold">×</button>
-                        </div>
-                        <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                          {(() => {
-                            const milestoneTypes = [
-                              { type: 'interval', label: 'Numerical Milestone' },
-                              { type: 'palindrome', label: 'Palindrome Day' },
-                              { type: 'interesting', label: 'Interesting Number' },
-                              { type: 'cosmic', label: 'Cosmic (Solar Return or Special)' },
-                              { type: 'angel', label: 'Angel Number' },
-                            ];
-                            const milestoneByType = getNextMilestoneByType(bookmark.days, new Date(bookmark.birthDate));
-                            return milestoneTypes.map(({ type, label }) => {
-                              const m = milestoneByType[type];
-                              if (!m) return null;
-                              return (
-                                <div key={type} className="hover:bg-gray-50 p-2 rounded transition-colors">
-                                  <div className="font-mono text-xs uppercase tracking-widest text-gray-600 mb-1">{label}</div>
-                                  <MilestoneCard
-                                    number={m.cycles}
-                                    label={m.label}
-                                    emoji={m.emoji}
-                                    description={m.description}
-                                    daysToMilestone={m.daysToMilestone}
-                                    milestoneDate={m.milestoneDate}
-                                    variant="bookmark"
-                                  />
-                                </div>
-                              );
-                            });
-                          })()}
-                        </div>
-                        <div className="flex justify-end mt-6">
-                          <button className="px-6 py-2 border border-gray-400 bg-gray-100 text-gray-700 rounded-none uppercase tracking-widest font-mono text-sm hover:bg-gray-200 transition-colors" onClick={() => setShowMilestoneModal(false)}>CLOSE</button>
+  // Auto-switch to sol age if current tab is not available
+  useEffect(() => {
+    if (isDesktop && tab === 'sol vows') {
+      setTab('sol age');
+    }
+  }, [isDesktop, tab]);
+
+  return (
+    <div className="w-full flex justify-center">
+      <div className="max-w-mobile desktop:max-w-desktop-content w-full flex flex-col items-center sm:space-y-6 relative mt-24 px-4 desktop:px-8 h-full">
+        <div
+          className={`transition-all duration-300 w-full flex flex-col items-center ${
+            isScrolled ? 'space-y-1 py-2' : 'space-y-4 py-4'
+          }`}
+        >
+          <Image
+            src="/sunsun.png"
+            alt="Sun"
+            width={72}
+            height={72}
+            className={`object-contain mx-auto transition-all duration-300 ${
+              isScrolled ? 'w-12 h-12' : 'w-16 h-16 sm:w-20 sm:h-20'
+            }`}
+            style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }}
+            priority
+          />
+          <div className={`text-center transition-all duration-300 ${isScrolled ? 'opacity-0 h-0' : 'opacity-100'}`}>
+            <div className="text-xs font-mono tracking-widest text-gray-600 uppercase mb-2">WELCOME BACK TRAVELER...</div>
+            <div className="text-4xl sm:text-5xl font-serif font-extrabold tracking-tight text-black mb-1">{bookmark.days} <span className="font-serif">Sol Age</span></div>
+            <div className="text-xs font-mono text-gray-600 mb-2">+{sinceLastVisit} since your last visit</div>
+          </div>
+        </div>
+        
+        {/* Enhanced Tabs with better mobile support */}
+        <div className="flex w-full border-b border-gray-300 overflow-x-auto sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+          {availableTabs.map((tabName) => (
+            <button
+              key={tabName}
+              onClick={() => setTab(tabName as any)}
+              className={`flex-1 min-w-[100px] py-3 px-2 text-xs font-mono uppercase tracking-widest transition-colors duration-200 ${
+                tab === tabName 
+                  ? 'border-b-2 border-black font-bold' 
+                  : 'text-gray-600 hover:text-black'
+              }`}
+            >
+              {tabName.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content with improved mobile spacing */}
+        <div className="w-full overflow-y-auto flex-grow p-4" onScroll={handleScroll}>
+          {tab === 'sol age' && (
+            <div className="w-full text-sm font-mono space-y-3">
+              <div className="flex justify-between items-center p-2 hover:bg-gray-50 transition-colors">
+                <span className="text-gray-600">FROM BIRTH</span>
+                <span className="font-bold text-right">{bookmark.days.toLocaleString()} DAYS</span>
+              </div>
+              <div className="flex justify-between items-center p-2 hover:bg-gray-50 transition-colors">
+                <span className="text-gray-600">BIRTH DATE</span>
+                <span className="font-bold text-right">{bookmark.birthDate.replace(/-/g, ".")}</span>
+              </div>
+              <div className="flex justify-between items-center p-2 hover:bg-gray-50 transition-colors">
+                <span className="text-gray-600">NEXT MILESTONE</span>
+                <span className="font-bold text-right">{milestone.emoji} {milestone.label} <span className="font-normal">(in {daysToMilestone} days)</span></span>
+              </div>
+              
+              {/* Enhanced Milestone Card Section */}
+              {milestoneCard && (
+                <div className="w-full flex flex-col items-center my-4">
+                  {milestoneCard}
+                  <button
+                    className="mt-3 text-sm underline text-black hover:text-gray-800 font-mono font-semibold transition-colors duration-200"
+                    onClick={() => setShowMilestoneModal(true)}
+                  >
+                    View More Milestones ↗
+                  </button>
+                  
+                  {/* Enhanced Modal */}
+                  {showMilestoneModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                      {/* Sunrise gradient overlay */}
+                      <div className="absolute inset-0 bg-solara-sunrise" style={{ opacity: 0.6 }} />
+                      {/* Modal with blur effect */}
+                      <div className="relative z-10 w-full">
+                        <div className="backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 p-6 max-w-[360px] mx-auto">
+                          <div className="flex justify-between items-center mb-3">
+                            <div className="text-2xl font-serif font-bold" style={{ letterSpacing: '-0.06em' }}>Upcoming Milestones</div>
+                            <button onClick={() => setShowMilestoneModal(false)} aria-label="Close" className="text-gray-500 hover:text-gray-800 text-xl font-bold">×</button>
+                          </div>
+                          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                            {(() => {
+                              const milestoneTypes = [
+                                { type: 'interval', label: 'Numerical Milestone' },
+                                { type: 'palindrome', label: 'Palindrome Day' },
+                                { type: 'interesting', label: 'Interesting Number' },
+                                { type: 'cosmic', label: 'Cosmic (Solar Return or Special)' },
+                                { type: 'angel', label: 'Angel Number' },
+                              ];
+                              const milestoneByType = getNextMilestoneByType(bookmark.days, new Date(bookmark.birthDate));
+                              return milestoneTypes.map(({ type, label }) => {
+                                const m = milestoneByType[type];
+                                if (!m) return null;
+                                return (
+                                  <div key={type} className="hover:bg-gray-50 p-2 transition-colors">
+                                    <div className="font-mono text-xs uppercase tracking-widest text-gray-600 mb-1">{label}</div>
+                                    <MilestoneCard
+                                      number={m.cycles}
+                                      label={m.label}
+                                      emoji={m.emoji}
+                                      description={m.description}
+                                      daysToMilestone={m.daysToMilestone}
+                                      milestoneDate={m.milestoneDate}
+                                      variant="bookmark"
+                                    />
+                                  </div>
+                                );
+                              });
+                            })()}
+                          </div>
+                          <div className="flex justify-end mt-6">
+                            <button className="px-6 py-2 border border-gray-400 bg-gray-100 text-gray-700 uppercase tracking-widest font-mono text-sm hover:bg-gray-200 transition-colors" onClick={() => setShowMilestoneModal(false)}>CLOSE</button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {/* Enhanced Divider and Quote */}
-            <div className="border-t border-gray-300 my-4" />
-            <div className="text-xs font-sans text-gray-600 italic text-left p-2 bg-gray-50 rounded">
-              Your journey began {bookmark.days.toLocaleString()} days ago. Each rotation represents both repetition and change.
-            </div>
-
-            {/* Action Buttons */}
-            <div className="mt-6 space-y-2">
-              <div className="flex gap-2">
-                <SpinnerButton
-                  onClick={onShare}
-                  disabled={isSharing}
-                  className="flex-1 border border-black bg-transparent text-black uppercase tracking-widest font-mono py-3 px-2 text-sm transition-all duration-200 hover:bg-gray-100 rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSharing ? "SHARING..." : "SHARE SOL AGE"}
-                </SpinnerButton>
-                <SpinnerButton
-                  onClick={onRecalculate}
-                  disabled={isRecalculating}
-                  isSubmitting={isRecalculating}
-                  className="flex-1 border border-black bg-transparent text-black uppercase tracking-widest font-mono py-3 px-2 text-sm transition-all duration-200 hover:bg-gray-100 rounded-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  {isRecalculating ? "RECALCULATING..." : "RECALCULATE"}
-                </SpinnerButton>
-              </div>
-              <SpinnerButton
-                onClick={onClear}
-                className="w-full border border-red-800 bg-red-600 text-white uppercase tracking-widest font-mono py-3 px-2 text-sm transition-all duration-200 hover:bg-red-700 rounded-none"
-              >
-                CLEAR BOOKMARK
-              </SpinnerButton>
-            </div>
-          </div>
-        )}
-
-        {tab === 'sol vows' && (
-          isLoading ? (
-            <div className="w-full text-sm font-mono space-y-3 flex flex-col items-center text-center">
-              <PulsingStarSpinner />
-              <span className="font-mono text-xs text-gray-500">Fetching your Solar Vow...</span>
-            </div>
-          ) : (typeof vow === 'string' && vow.trim().length > 0) ? (
-            <div className="w-full text-sm font-mono space-y-3">
-              <div className="flex flex-col items-center text-center">
-                <div className="text-3xl mb-2">🌞</div>
-                <div className="text-lg font-bold mb-1">Your Solar Vow</div>
-                <div className="italic text-gray-700 border border-gray-200 rounded p-3 bg-white mb-4">{vow}</div>
-                {/* Green callout card below the vow text */}
-                <PledgeDetailsCard days={onChainPledge ? Number(onChainPledge.solarAge) : bookmark?.days} pledge={onChainPledge ? Number(onChainPledge.usdcPaid) / 1_000_000 : undefined} daysRemaining={daysRemaining} totalPooled={totalPooled} />
-              </div>
-            </div>
-          ) : (
-            <div className="w-full text-sm font-mono space-y-3 flex flex-col items-center text-center">
-              <div className="text-3xl mb-2">✍️</div>
-              <div className="text-lg font-bold mb-1">No Vow Yet</div>
-              <div className="text-gray-600 mb-4">You haven&apos;t made your Solar Vow. Make your pledge to join the convergence.</div>
-              <button
-                className="w-full py-3 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border border-black rounded hover:bg-[#e6c75a] transition-colors"
-                onClick={() => window.location.href = '/ceremony'}
-              >
-                Make Your Solar Vow
-              </button>
-            </div>
-          )
-        )}
-
-        {tab === 'journal' && (
-          <div className="w-full text-sm font-mono space-y-3">
-            <Journal solAge={bookmark.days} />
-          </div>
-        )}
-
-        {tab === 'swap' && (
-          <SwapInterface />
-        )}
-
-        {false && tab === 'swap' && (
-          <div className="w-full text-sm font-mono space-y-3">
-            <div className="flex flex-col items-center text-center mb-6">
-              <div className="text-4xl mb-3">�</div>
-              <div className="text-lg font-bold mb-2">Swap for $SOLAR</div>
-              <p className="text-gray-600 mb-4">
-                Exchange your tokens for $SOLAR and power your cosmic journey.
-              </p>
-            </div>
-            
-            {/* Swap Interface */}
-            <div className="border border-gray-300 p-4 bg-white/90">
-              <div className="text-xs font-mono text-gray-600 uppercase tracking-widest mb-3">Token Swap</div>
+                  )}
+                </div>
+              )}
               
-              {/* From Token */}
-              <div className="mb-4">
-                <label className="block text-xs font-mono text-gray-600 mb-2">FROM</label>
+              {/* Enhanced Divider and Quote */}
+              <div className="border-t border-gray-300 my-4" />
+              <div className="text-xs font-sans text-gray-600 italic text-left p-2 bg-gray-50">
+                Your journey began {bookmark.days.toLocaleString()} days ago. Each rotation represents both repetition and change.
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 space-y-2">
                 <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="0.0"
-                    className="flex-1 px-3 py-2 border border-gray-300 text-black font-mono bg-white focus:outline-none focus:ring-1 focus:ring-black"
-                    onChange={(e) => {
-                      const amount = e.target.value;
-                      const rate = 100; // 1 USDC = 100 $SOLAR
-                      const estimatedOutput = amount ? (parseFloat(amount) * rate).toFixed(2) : '';
-                      const outputField = e.target.closest('.border')?.querySelector('input[readonly]') as HTMLInputElement;
-                      if (outputField) outputField.value = estimatedOutput;
-                    }}
-                  />
-                  <select className="px-3 py-2 border border-gray-300 bg-white font-mono text-sm">
-                    <option value="USDC">USDC</option>
-                    <option value="ETH">ETH</option>
-                    <option value="WETH">WETH</option>
-                  </select>
+                  <SpinnerButton
+                    onClick={onShare}
+                    disabled={isSharing}
+                    className="flex-1 border border-black bg-transparent text-black uppercase tracking-widest font-mono py-3 px-2 text-sm transition-all duration-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSharing ? "SHARING..." : "SHARE SOL AGE"}
+                  </SpinnerButton>
+                  <SpinnerButton
+                    onClick={onRecalculate}
+                    disabled={isRecalculating}
+                    isSubmitting={isRecalculating}
+                    className="flex-1 border border-black bg-transparent text-black uppercase tracking-widest font-mono py-3 px-2 text-sm transition-all duration-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  >
+                    {isRecalculating ? "RECALCULATING..." : "RECALCULATE"}
+                  </SpinnerButton>
+                </div>
+                <SpinnerButton
+                  onClick={onClear}
+                  className="w-full border border-red-800 bg-red-600 text-white uppercase tracking-widest font-mono py-3 px-2 text-sm transition-all duration-200 hover:bg-red-700"
+                >
+                  CLEAR BOOKMARK
+                </SpinnerButton>
+              </div>
+            </div>
+          )}
+
+          {tab === 'sol vows' && !isDesktop && (
+            isLoading ? (
+              <div className="w-full text-sm font-mono space-y-3 flex flex-col items-center text-center">
+                <PulsingStarSpinner />
+                <span className="font-mono text-xs text-gray-500">Fetching your Solar Vow...</span>
+              </div>
+            ) : (typeof vow === 'string' && vow.trim().length > 0) ? (
+              <div className="w-full text-sm font-mono space-y-3">
+                <div className="flex flex-col items-center text-center">
+                  <div className="text-3xl mb-2">🌞</div>
+                  <div className="text-lg font-bold mb-1">Your Solar Vow</div>
+                  <div className="italic text-gray-700 border border-gray-200 p-3 bg-white mb-4">{vow}</div>
+                  {/* Green callout card below the vow text */}
+                  <PledgeDetailsCard days={onChainPledge ? Number(onChainPledge.solarAge) : bookmark?.days} pledge={onChainPledge ? Number(onChainPledge.usdcPaid) / 1_000_000 : undefined} daysRemaining={daysRemaining} totalPooled={totalPooled} />
                 </div>
               </div>
-
-              {/* Swap Arrow */}
-              <div className="flex justify-center mb-4">
-                <button className="text-2xl hover:text-[#d4af37] transition-colors cursor-pointer" title="Reverse tokens">
-                  ↓
+            ) : (
+              <div className="w-full text-sm font-mono space-y-3 flex flex-col items-center text-center">
+                <div className="text-3xl mb-2">✍️</div>
+                <div className="text-lg font-bold mb-1">No Vow Yet</div>
+                <div className="text-gray-600 mb-4">You haven&apos;t made your Solar Vow. Make your pledge to join the community.</div>
+                <button
+                  className="w-full py-3 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border border-black hover:bg-[#e6c75a] transition-colors"
+                  onClick={() => window.location.href = '/ceremony'}
+                >
+                  Make Your Solar Vow
                 </button>
               </div>
+            )
+          )}
 
-              {/* To Token */}
-              <div className="mb-4">
-                <label className="block text-xs font-mono text-gray-600 mb-2">TO</label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="0.0"
-                    className="flex-1 px-3 py-2 border border-gray-300 text-black font-mono bg-white focus:outline-none focus:ring-1 focus:ring-black"
-                    readOnly
-                  />
-                  <div className="px-3 py-2 border border-gray-300 bg-gray-50 font-mono text-sm">$SOLAR</div>
-                </div>
-              </div>
-
-              {/* Swap Button */}
-              <button 
-                className="w-full py-3 bg-[#d4af37] text-black font-mono text-sm tracking-widest uppercase border border-black hover:bg-[#e6c75a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={() => {
-                  // Mock swap functionality
-                  alert('Swap functionality will be available once $SOLAR token contracts are deployed. Stay tuned!');
-                }}
-              >
-                SWAP TOKENS
-              </button>
-
-              {/* Swap Info */}
-              <div className="mt-4 text-xs font-mono text-gray-500">
-                <div className="flex justify-between">
-                  <span>Rate:</span>
-                  <span>1 USDC = 100 $SOLAR</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Fee:</span>
-                  <span>0.3%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Slippage:</span>
-                  <span>0.5%</span>
-                </div>
-              </div>
+          {tab === 'journal' && (
+            <div className="w-full text-sm font-mono space-y-3">
+              <Journal solAge={bookmark.days} />
             </div>
+          )}
 
-            {/* Swap Notice */}
-            <div className="text-xs font-sans text-gray-600 italic text-left p-3 bg-gray-50">
-              $SOLAR tokens power the Solara ecosystem. Use them for enhanced features, ceremony sponsorship, and cosmic rewards.
-            </div>
-          </div>
-        )}
+          {tab === 'swap' && (
+            <SwapInterface />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -842,53 +765,72 @@ export default function SunCycleAge({ initialConsentData }: SunCycleAgeProps) {
   }
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col items-center bg-white">
-      {/* Top Section: Solar System + Tagline with off-white background */}
+    <div className="relative w-full min-h-screen flex flex-col bg-white">
+      {/* Top Section: Solar System + Tagline with off-white background - full width */}
       <div className="w-full flex flex-col items-center" style={{ background: 'rgba(255,252,242,0.5)' }}>
-        <div className="w-full flex justify-center mb-8 mt-28">
-          <div className="mx-auto" style={{ maxWidth: 360, width: '100%' }}>
-            <SolarSystemGraphic />
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8">
+          <div className="w-full flex justify-center mb-8 mt-28">
+            <div className="mx-auto" style={{ maxWidth: 360, width: '100%' }}>
+              <SolarSystemGraphic />
+            </div>
           </div>
-        </div>
-        {/* Tagline and Tooltip Trigger as 3-column layout */}
-        <div className="w-full flex flex-row items-center justify-between px-4 mb-10 max-w-md mx-auto" style={{ minHeight: 56 }}>
-          <div className="flex-1" />
-          <div className="flex-[4] flex items-center justify-center">
-            <span
-              className="block text-center"
-              style={{
-                fontFamily: 'GT Alpina, serif',
-                fontWeight: 100,
-                fontSize: '26pt',
-                lineHeight: '24pt',
-                letterSpacing: '-0.06em',
-                color: '#222'
-              }}
-            >
-              measure your age in<br />solar rotations*
-            </span>
-          </div>
-          <div className="flex-1 flex justify-end">
-            <button
-              aria-label="Solara explained"
-              onClick={() => setShowTooltip(true)}
-              className="w-10 h-10 flex items-center justify-center bg-white focus:outline-none transition-colors ml-4"
-              style={{ border: 'none', borderRadius: 0, padding: 0, fontFamily: 'Geist Mono, monospace', fontWeight: 400 }}
-            >
-              <Image src="/asterisk_icon.svg" alt="*" width={32} height={32} style={{ display: 'block', width: 32, height: 32 }} />
-            </button>
+          {/* Tagline and Tooltip Trigger as 3-column layout */}
+          <div className="w-full flex flex-row items-center justify-between mb-10 max-w-md mx-auto" style={{ minHeight: 56 }}>
+            <div className="flex-1" />
+            <div className="flex-[4] flex items-center justify-center">
+              <span
+                className="block text-center"
+                style={{
+                  fontFamily: 'GT Alpina, serif',
+                  fontWeight: 100,
+                  fontSize: '26pt',
+                  lineHeight: '24pt',
+                  letterSpacing: '-0.06em',
+                  color: '#222'
+                }}
+              >
+                measure your age in<br />solar rotations*
+              </span>
+            </div>
+            <div className="flex-1 flex justify-end">
+              <button
+                aria-label="Solara explained"
+                onClick={() => setShowTooltip(true)}
+                className="w-10 h-10 flex items-center justify-center bg-white focus:outline-none transition-colors ml-4"
+                style={{ border: 'none', borderRadius: 0, padding: 0, fontFamily: 'Geist Mono, monospace', fontWeight: 400 }}
+              >
+                <Image src="/asterisk_icon.svg" alt="*" width={32} height={32} style={{ display: 'block', width: 32, height: 32 }} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
-      {/* Divider line between sections */}
-      <div className="w-full h-px bg-gray-200" style={{ margin: 0 }} />
-      {/* Add more space between divider and form */}
-      <div style={{ height: 24 }} />
       
-      {/* Show the form */}
-      <div className="w-full flex flex-col items-center pb-0 px-2 max-w-[390px] mx-auto bg-white mb-0">
-        <FormSection birthDate={birthDate} setBirthDate={setBirthDate} calculateAge={calculateAge} />
+      {/* Divider line between sections - full width */}
+      <div className="w-full h-px bg-gray-200" style={{ margin: 0 }} />
+      
+      {/* White section with form - full width background, centered content */}
+      <div className="w-full bg-white flex flex-col items-center py-6">
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8">
+          <div className="w-full flex flex-col items-center">
+            <div className="w-full max-w-[390px]">
+              <FormSection birthDate={birthDate} setBirthDate={setBirthDate} calculateAge={calculateAge} />
+            </div>
+          </div>
+        </div>
       </div>
+      
+      {/* Footer - full width background, centered content */}
+      <footer className="w-full border-t border-gray-200 bg-white pt-2 pb-2">
+        <div className="w-full max-w-mobile desktop:max-w-desktop-content lg-desktop:max-w-desktop-wide px-4 desktop:px-8 mx-auto">
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-sm font-mono text-gray-500 text-center">
+              Solara is made for <a href="https://farcaster.xyz/~/channel/occulture" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">/occulture</a> <br />
+              built by <a href="https://farcaster.xyz/sirsu.eth" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">sirsu</a>
+            </div>
+          </div>
+        </div>
+      </footer>
       
       {/* Tooltip Modal and Gradient Overlay */}
       {showTooltip && (
@@ -936,15 +878,7 @@ export default function SunCycleAge({ initialConsentData }: SunCycleAgeProps) {
           </div>
         </div>
       )}
-      {/* Footer - close to form, not at bottom */}
-      <footer className="w-full border-t border-gray-200 bg-transparent pt-2 pb-2">
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-sm font-mono text-gray-500 text-center">
-            Solara is made for <a href="https://farcaster.xyz/~/channel/occulture" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">/occulture</a> <br />
-            built by <a href="https://farcaster.xyz/sirsu.eth" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">sirsu</a>
-          </div>
-        </div>
-      </footer>
+      
       {/* Clear bookmark confirmation modal */}
       {showConfirmClear && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -960,13 +894,13 @@ export default function SunCycleAge({ initialConsentData }: SunCycleAgeProps) {
               <div className="text-xs font-mono text-gray-500 mb-5 tracking-widest uppercase">Are you sure you want to clear your bookmark?</div>
               <div className="flex justify-between gap-4 mt-6">
                 <button
-                  className="flex-1 px-6 py-3 border border-gray-400 bg-gray-100 text-gray-700 rounded-none uppercase tracking-widest font-mono text-base hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-6 py-3 border border-gray-400 bg-gray-100 text-gray-700 uppercase tracking-widest font-mono text-base hover:bg-gray-200 transition-colors"
                   onClick={() => setShowConfirmClear(false)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="flex-1 px-6 py-3 border border-red-500 bg-red-100 text-red-700 rounded-none uppercase tracking-widest font-mono text-base hover:bg-red-200 transition-colors"
+                  className="flex-1 px-6 py-3 border border-red-500 bg-red-100 text-red-700 uppercase tracking-widest font-mono text-base hover:bg-red-200 transition-colors"
                   onClick={() => { handleClearBookmark(); setShowConfirmClear(false); }}
                 >
                   Clear
