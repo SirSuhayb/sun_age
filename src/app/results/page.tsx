@@ -109,16 +109,16 @@ export default function ResultsPage() {
             <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">SOLAR ROTATIONS SINCE {birthDate.replace(/-/g, ".")}</div>
             <div className="text-lg font-serif italic text-gray-700 text-center mb-0">~ {approxYears} years old</div>
           </div>
-          {/* Cosmic Convergence Callout Card */}
-          <div className="w-full flex flex-col items-center border border-gray-500 bg-white rounded-none p-4 mb-4 shadow mx-6" style={{ marginLeft: 0, marginRight: 0 }}>
-            <Image src="/cosmicConverge_small.svg" alt="Cosmic Convergence" width={80} height={40} className="mb-2" />
-            <div className="font-mono font-base text-sm text-gray-900 uppercase tracking-base text-center mb-3">THE COSMIC CONVERGENCE APPROACHES IN</div>
+          {/* Solar Journey Callout Card */}
+          <div className="w-full flex flex-col items-center border border-gray-500 bg-white p-4 mb-4 shadow mx-6" style={{ marginLeft: 0, marginRight: 0 }}>
+            <div className="text-4xl mb-2">🌞</div>
+            <div className="font-mono font-base text-sm text-gray-900 uppercase tracking-base text-center mb-3">YOUR SOLAR JOURNEY CONTINUES</div>
             <div className="flex items-center justify-center gap-2 text-2xl font-serif font-light text-black mb-2">
               <span role="img" aria-label="star">⭐</span>
-              {daysRemaining !== undefined ? `${daysRemaining} days` : '...'}
+              INFINITE
               <span role="img" aria-label="star">⭐</span>
             </div>
-            <div className="text-yellow-700 font-mono text-sm font-semibold mt-2 text-center">Your {days.toLocaleString()} rotations qualify <br /> for $SOLAR tokens</div>
+            <div className="text-yellow-700 font-mono text-sm font-semibold mt-2 text-center">Your {days.toLocaleString()} rotations represent <br /> your cosmic evolution</div>
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function ResultsPage() {
               className="w-full py-4 mb-4 bg-[#d4af37] text-black font-mono text-medium tracking-base uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors"
               onClick={() => setShowCeremonyModal(true)}
             >
-              COMMIT TO COSMIC CONVERGENCE
+              MAKE YOUR SOLAR VOW
             </button>
           )}
           <div className="flex w-full justify-between items-center mt-2 mb-6">
@@ -154,11 +154,11 @@ export default function ResultsPage() {
             >
               ×
             </button>
-            <Image src="/cosmicConverge_large.svg" alt="Cosmic Convergence" width={120} height={60} className="mb-4" />
-            <div className="text-2xl font-serif font-bold text-center mb-2">The Cosmic Convergence</div>
+            <div className="text-4xl mb-4">🌞</div>
+            <div className="text-2xl font-serif font-bold text-center mb-2">Your Solar Vow</div>
             <div className="text-xs font-mono text-center text-gray-600 mb-4 tracking-normal uppercase">THE BEGINNING TO YOUR BRIGHTEST SELF.<br />A PLEDGE TO BECOME BETTER, TOGETHER.</div>
             <div className="text-base text-gray-800 font-sans text-left mb-6">
-              The Cosmic Convergence is a ceremony where accumulated rotations around our star crystallize into $SOLAR tokens. Only committed cosmic travelers who inscribe a Solar Vow will receive stellar essence based on their journey&apos;s length.<br /><br />
+              A Solar Vow is a sacred commitment to your cosmic journey, inscribed permanently in the celestial record. Share your journey with the community and track your progress through infinite rotations.<br /><br />
               Or you can simply bookmark and keep tabs on your Sol Age as you reach new milestones in your own cosmic journey.
             </div>
             <button

@@ -288,11 +288,11 @@ export default function CeremonyStepper() {
                 <Image src="/battery.png" alt="Battery" width={150} height={150} className="mb-6 self-center" style={{ filter: 'drop-shadow(0 0 60px #FFD700cc) drop-shadow(0 0 32px #FFB30099)' }} />
                 <div className="text-2xl font-serif font-bold mb-2 w-full text-center">Empower Your Solar Vow</div>
                 <div className="text-xs font-mono text-gray-500 mb-6 uppercase tracking-widest w-full text-center">A measure of strength through collective energy</div>
-                {/* Cosmic Convergence Callout */}
-                <div className="w-full border border-blue-200 bg-[#F2F7FF] rounded-none p-3 font-mono text-sm text-left mb-4" style={{ color: '#2563eb', fontFamily: 'Geist Mono, monospace' }}>
-                  <span className="font-bold uppercase tracking-widest">COSMIC CONVERGENCE | EPOCH 0</span><br />
+                {/* Solar Community Stats */}
+                <div className="w-full border border-blue-200 bg-[#F2F7FF] p-3 font-mono text-sm text-left mb-4" style={{ color: '#2563eb', fontFamily: 'Geist Mono, monospace' }}>
+                  <span className="font-bold uppercase tracking-widest">SOLAR COMMUNITY STATS</span><br />
                   <span className="text-xs font-mono" style={{ color: '#2563eb' }}>
-                    {numVows !== undefined ? numVows : '...'} vows committed • ${totalPooled !== undefined ? totalPooled.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '...'} pooled • {daysRemaining !== undefined ? daysRemaining : '...'} days remaining
+                    {numVows !== undefined ? numVows : '...'} vows inscribed • ${totalPooled !== undefined ? totalPooled.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '...'} total pledged • Growing stronger daily
                   </span>
                 </div>
                 {/* Solar Energy Level Card */}
@@ -365,19 +365,19 @@ export default function CeremonyStepper() {
                     <div className="text-right font-bold">2</div>
                     <div className="text-left">COMMUNITY CONSTELLATION:</div>
                     <div className="text-right font-bold">${pledge - 1} TO GENESIS POOL</div>
-                    <div className="text-left">COSMIC CONVERGENCE:</div>
-                    <div className="text-right font-bold">30 DAYS</div>
+                    <div className="text-left">STATUS:</div>
+                    <div className="text-right font-bold">ACTIVE VOW</div>
                   </div>
                 </div>
-                {/* Cosmic Convergence Callout */}
-                <div className="w-full border border-gray-300 rounded-none p-4 mb-4 bg-transparent text-left">
-                  <div className="font-mono font-normal mb-2 uppercase">THE COSMIC CONVERGENCE AWAITS</div>
-                  <ul className="list-none ml-0 mt-1 font-sans text-sm text-gray-700">
-                    <li className="mb-1">✨ Your solar journey is permanently inscribed in starlight</li>
-                    <li className="mb-1">🌟 Stellar rewards will manifest when Genesis arrives</li>
-                    <li>💫 Your cosmic signature will evolve through your vow&apos;s power</li>
-                  </ul>
-                </div>
+                                  {/* Solar Community Benefits */}
+                  <div className="w-full border border-gray-300 p-4 mb-4 bg-transparent text-left">
+                    <div className="font-mono font-normal mb-2 uppercase">YOUR SOLAR COMMUNITY AWAITS</div>
+                    <ul className="list-none ml-0 mt-1 font-sans text-sm text-gray-700">
+                      <li className="mb-1">✨ Your solar journey is permanently inscribed in the cosmic ledger</li>
+                      <li className="mb-1">🌟 Join a growing community of cosmic travelers</li>
+                      <li>💫 Your vow strengthens the entire solar network</li>
+                    </ul>
+                  </div>
                 {/* Vow Quote Callout */}
                 <div className="w-full rounded-none p-4 mb-6 text-center italic font-serif border border-gray-300" style={{ background: 'rgba(255,255,255,0.4)' }}>
                   &quot;Your vow echoes through the cosmos, binding your present self to all the futures you will become. You are now part of something infinite.&quot;

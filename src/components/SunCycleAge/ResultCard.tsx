@@ -168,16 +168,16 @@ const ResultCard: React.FC<ResultCardProps> = (props) => {
         {/* Milestone card with animation */}
         <div className="w-full flex justify-center mb-8">
           <div className="w-full max-w-sm min-h-[136px] bg-white/90 dark:bg-neutral-900 border border-gray-400 rounded-none p-4 flex flex-col items-center text-center">
-            <div className="font-mono text-sm font-medium tracking-normal text-black dark:text-gray-200 mb-2" style={{ fontFamily: 'Geist Mono, monospace', letterSpacing: '-0.01em' }}>THE COSMIC CONVERGENCE APPROACHES IN</div>
+            <div className="font-mono text-sm font-medium tracking-normal text-black dark:text-gray-200 mb-2" style={{ fontFamily: 'Geist Mono, monospace', letterSpacing: '-0.01em' }}>YOUR SOLAR JOURNEY CONTINUES</div>
             <div className="flex items-center justify-center gap-2 text-2xl font-serif font-light text-black dark:text-yellow-400 mb-2" style={{ fontFamily: 'GT Alpina, serif' }}>
               <span role="img" aria-label="star">⭐</span>
-              {daysLeft} days
+              INFINITE
               <span role="img" aria-label="star">⭐</span>
             </div>
             {(context?.user?.fid || props.onCommit) ? (
-              <div className="text-xs font-mono font-semibold text-yellow-700 dark:text-yellow-300 mt-1" style={{ fontFamily: 'Geist Mono, monospace' }}>Your {days.toLocaleString()} rotations qualify for $SOLAR tokens</div>
+              <div className="text-xs font-mono font-semibold text-yellow-700 dark:text-yellow-300 mt-1" style={{ fontFamily: 'Geist Mono, monospace' }}>Your {days.toLocaleString()} rotations represent your cosmic evolution</div>
             ) : (
-              <div className="text-xs font-mono font-semibold text-yellow-700 dark:text-yellow-300 mt-1" style={{ fontFamily: 'Geist Mono, monospace' }}>Connect via Farcaster to participate in stellar recognition</div>
+              <div className="text-xs font-mono font-semibold text-yellow-700 dark:text-yellow-300 mt-1" style={{ fontFamily: 'Geist Mono, monospace' }}>Connect to bookmark and share your solar age</div>
             )}
           </div>
         </div>
@@ -210,7 +210,7 @@ const ResultCard: React.FC<ResultCardProps> = (props) => {
             }}
             className="font-mono font-medium text-sm uppercase tracking-widest py-3 px-2 w-full rounded-none border border-yellow-500 dark:border-yellow-400 bg-yellow-400 dark:bg-yellow-500 text-black transition-colors hover:bg-yellow-300 dark:hover:bg-yellow-600"
           >
-            COMMIT TO COSMIC CONVERGENCE
+            MAKE YOUR SOLAR VOW
           </SpinnerButton>
         ) : (
           <>
@@ -227,7 +227,7 @@ const ResultCard: React.FC<ResultCardProps> = (props) => {
               }}
               className="font-mono font-medium text-sm uppercase tracking-widest py-3 px-2 w-full rounded-none border border-yellow-500 dark:border-yellow-400 bg-yellow-400 dark:bg-yellow-500 text-black transition-colors hover:bg-yellow-300 dark:hover:bg-yellow-600"
             >
-              CONNECT FOR COSMIC CONVERGENCE
+              CONNECT WALLET
             </SpinnerButton>
             <SpinnerButton
               onClick={handleBookmark}

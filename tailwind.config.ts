@@ -8,6 +8,12 @@ export default {
   ],
   theme: {
   	extend: {
+      screens: {
+        'xs': '475px',
+        'desktop': '768px',
+        'lg-desktop': '1024px',
+        'xl-desktop': '1280px',
+      },
   		colors: {
   			background: 'var(--background)',
   			foreground: 'var(--foreground)',
@@ -27,6 +33,11 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+      maxWidth: {
+        'mobile': '400px',
+        'desktop-content': '800px',
+        'desktop-wide': '1200px',
+      },
   		keyframes: {
   			'accordion-down': {
   				from: {

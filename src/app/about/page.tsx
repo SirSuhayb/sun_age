@@ -139,15 +139,15 @@ export default function AboutSolara() {
             </div>
             {/* Divider */}
             <div className="w-full h-px bg-gray-400 mb-6" />
-            {/* Cosmic Convergence Callout */}
-            <div className="bg-[#F2F3F6] border border-gray-300 rounded-none p-6 mb-6 text-center">
-              <div className="font-mono text-base text-gray-700 mb-2 tracking-widest uppercase">THE COSMIC CONVERGENCE APPROACHES IN</div>
+            {/* Solar Community Callout */}
+            <div className="bg-[#F2F3F6] border border-gray-300 p-6 mb-6 text-center">
+              <div className="font-mono text-base text-gray-700 mb-2 tracking-widest uppercase">JOIN THE SOLAR COMMUNITY</div>
               <div className="flex items-center justify-center gap-4 mb-2">
                 <span className="text-3xl">⭐️</span>
-                <span className="font-serif text-3xl text-gray-900">30 days</span>
+                <span className="font-serif text-3xl text-gray-900">Growing Daily</span>
                 <span className="text-3xl">⭐️</span>
               </div>
-              <div className="font-mono text-sm text-gray-600">$SOLAR FLARE [AIRDROP]</div>
+              <div className="font-mono text-sm text-gray-600">COSMIC TRAVELERS UNITE</div>
             </div>
             {/* Buttons row */}
             <div className="flex gap-4">

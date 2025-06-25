@@ -69,14 +69,13 @@ body {
         --border: 240 5.9% 90%;
         --input: 240 5.9% 90%;
         --ring: 240 5.9% 10%;
-        --radius: 0.75rem;
+        --radius: 0px; /* Sharp corners - no radius */
         --chart-1: 12 76% 61%;
         --chart-2: 173 58% 39%;
         --chart-3: 197 37% 24%;
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
 
-        --radius: 0.5rem;
         --sidebar-background: 0 0% 98%;
         --sidebar-foreground: 240 5.3% 26.1%;
         --sidebar-primary: 240 5.9% 10%;
@@ -86,6 +85,11 @@ body {
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
     }
+}
+
+/* Enforce sharp corners globally */
+*, *::before, *::after {
+  border-radius: 0 !important;
 }
 
 /* Sunrise gradient background for Solara */
@@ -115,4 +119,22 @@ body {
 }
 .spin-slow {
   animation: spin-slow 8s linear infinite;
+}
+
+/* Desktop-specific styles */
+@media (min-width: 768px) {
+  .desktop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  
+  .desktop-spacing {
+    padding: 2rem;
+  }
+}
+
+/* Ensure consistent sharp corners for form elements */
+input, select, button, textarea {
+  border-radius: 0 !important;
 }

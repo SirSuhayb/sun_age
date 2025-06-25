@@ -59,7 +59,7 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
   isLoading?: boolean;
   onChainPledge?: Pledge;
 }) {
-  const [tab, setTab] = useState<'sol age' | 'sol vows' | 'journal' | 'sol sign'>(initialTab || 'sol age');
+  const [tab, setTab] = useState<'sol age' | 'sol vows' | 'journal' | 'swap'>(initialTab || 'sol age');
   const { context } = useFrameSDK();
   const { daysRemaining, totalPooled } = useConvergenceStats();
   const [isSigning, setIsSigning] = useState(false);
@@ -105,7 +105,7 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
   }, [tab, onSolVowsTab]);
 
   return (
-    <div className="max-w-md w-full flex flex-col items-center sm:space-y-6 relative mt-24 px-0 sm:px-0 h-full">
+    <div className="max-w-mobile desktop:max-w-desktop-content w-full flex flex-col items-center sm:space-y-6 relative mt-24 px-0 sm:px-0 h-full">
       <div
         className={`transition-all duration-300 w-full flex flex-col items-center ${
           isScrolled ? 'space-y-1 py-2' : 'space-y-4 py-4'
@@ -131,7 +131,7 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
       
       {/* Enhanced Tabs with better mobile support */}
       <div className="flex w-full border-b border-gray-300 overflow-x-auto sticky top-0 bg-white/80 backdrop-blur-sm z-10">
-        {['sol age', 'sol vows', 'journal', 'sol sign'].map((tabName) => (
+        {['sol age', 'sol vows', 'journal', 'swap'].map((tabName) => (
           <button
             key={tabName}
             onClick={() => setTab(tabName as any)}
@@ -158,7 +158,7 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
               <span className="text-gray-600">BIRTH DATE</span>
               <span className="font-bold text-right">{bookmark.birthDate.replace(/-/g, ".")}</span>
             </div>
-            <div className="flex justify-between items-center p-2 hover:bg-gray-50 rounded transition-colors">
+            <div className="flex justify-between items-center p-2 hover:bg-gray-50 transition-colors">
               <span className="text-gray-600">NEXT MILESTONE</span>
               <span className="font-bold text-right">{milestone.emoji} {milestone.label} <span className="font-normal">(in {daysToMilestone} days)</span></span>
             </div>
@@ -298,13 +298,97 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
           </div>
         )}
 
-        {tab === 'sol sign' && (
-          <div className="w-full text-sm font-mono space-y-3 flex flex-col items-center text-center">
-            <div className="text-4xl mb-3">🪐</div>
-            <div className="text-lg font-bold mb-2">Coming Soon</div>
-            <p className="text-gray-600">
-              NFT signatures and collectibles will be available here soon. Stay tuned!
-            </p>
+        {tab === 'swap' && (
+          <div className="w-full text-sm font-mono space-y-3">
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="text-4xl mb-3">�</div>
+              <div className="text-lg font-bold mb-2">Swap for $SOLAR</div>
+              <p className="text-gray-600 mb-4">
+                Exchange your tokens for $SOLAR and power your cosmic journey.
+              </p>
+            </div>
+            
+            {/* Swap Interface */}
+            <div className="border border-gray-300 p-4 bg-white/90">
+              <div className="text-xs font-mono text-gray-600 uppercase tracking-widest mb-3">Token Swap</div>
+              
+              {/* From Token */}
+              <div className="mb-4">
+                <label className="block text-xs font-mono text-gray-600 mb-2">FROM</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="0.0"
+                    className="flex-1 px-3 py-2 border border-gray-300 text-black font-mono bg-white focus:outline-none focus:ring-1 focus:ring-black"
+                    onChange={(e) => {
+                      const amount = e.target.value;
+                      const rate = 100; // 1 USDC = 100 $SOLAR
+                      const estimatedOutput = amount ? (parseFloat(amount) * rate).toFixed(2) : '';
+                      const outputField = e.target.closest('.border')?.querySelector('input[readonly]') as HTMLInputElement;
+                      if (outputField) outputField.value = estimatedOutput;
+                    }}
+                  />
+                  <select className="px-3 py-2 border border-gray-300 bg-white font-mono text-sm">
+                    <option value="USDC">USDC</option>
+                    <option value="ETH">ETH</option>
+                    <option value="WETH">WETH</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Swap Arrow */}
+              <div className="flex justify-center mb-4">
+                <button className="text-2xl hover:text-[#d4af37] transition-colors cursor-pointer" title="Reverse tokens">
+                  ↓
+                </button>
+              </div>
+
+              {/* To Token */}
+              <div className="mb-4">
+                <label className="block text-xs font-mono text-gray-600 mb-2">TO</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="0.0"
+                    className="flex-1 px-3 py-2 border border-gray-300 text-black font-mono bg-white focus:outline-none focus:ring-1 focus:ring-black"
+                    readOnly
+                  />
+                  <div className="px-3 py-2 border border-gray-300 bg-gray-50 font-mono text-sm">$SOLAR</div>
+                </div>
+              </div>
+
+              {/* Swap Button */}
+              <button 
+                className="w-full py-3 bg-[#d4af37] text-black font-mono text-sm tracking-widest uppercase border border-black hover:bg-[#e6c75a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => {
+                  // Mock swap functionality
+                  alert('Swap functionality will be available once $SOLAR token contracts are deployed. Stay tuned!');
+                }}
+              >
+                SWAP TOKENS
+              </button>
+
+              {/* Swap Info */}
+              <div className="mt-4 text-xs font-mono text-gray-500">
+                <div className="flex justify-between">
+                  <span>Rate:</span>
+                  <span>1 USDC = 100 $SOLAR</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Fee:</span>
+                  <span>0.3%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Slippage:</span>
+                  <span>0.5%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Swap Notice */}
+            <div className="text-xs font-sans text-gray-600 italic text-left p-3 bg-gray-50">
+              $SOLAR tokens power the Solara ecosystem. Use them for enhanced features, ceremony sponsorship, and cosmic rewards.
+            </div>
           </div>
         )}
       </div>
@@ -342,8 +426,8 @@ function PledgeDetailsCard({ days, pledge, daysRemaining, totalPooled }) {
         <div className="text-right font-bold">2</div>
         <div className="text-left">COMMUNITY CONSTELLATION:</div>
         <div className="text-right font-bold">{totalPooled !== undefined ? `$${totalPooled.toLocaleString(undefined, { maximumFractionDigits: 2 })} POOLED` : '—'}</div>
-        <div className="text-left">COSMIC CONVERGENCE:</div>
-        <div className="text-right font-bold">{daysRemaining !== undefined ? `${daysRemaining} DAYS LEFT` : '...'}</div>
+        <div className="text-left">STATUS:</div>
+        <div className="text-right font-bold">ACTIVE VOW</div>
       </div>
     </div>
   );
