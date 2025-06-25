@@ -214,7 +214,7 @@ export function SwapInterface({ className = "" }: SwapInterfaceProps) {
         {isInFrame ? (
           <>$SOLAR tokens power the Solara ecosystem. Use them for enhanced features, ceremony sponsorship, and cosmic rewards.</>
         ) : (
-          <>You'll be redirected to Uniswap to complete the swap. Make sure you're connected to Base network with $SOLAR token address: 0x746042147240304098C837563aAEc0F671881B07</>
+          <>You&apos;ll be redirected to Uniswap to complete the swap. Make sure you&apos;re connected to Base network with $SOLAR token address: 0x746042147240304098C837563aAEc0F671881B07</>
         )}
       </div>
     </div>

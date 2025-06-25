@@ -69,29 +69,32 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish }: Jour
   }, [entry]);
 
   // Auto-save functionality with debounce
-  const autoSave = useCallback(
-    debounce(async (contentToSave: string) => {
-      if (contentToSave.trim() === '') return;
-      
-      setIsAutoSaving(true);
-      try {
-        await onAutoSave({ id: entry.id, content: contentToSave });
-        setLastSaved(new Date());
-      } catch (err) {
-        console.error('Auto-save failed:', err);
-      } finally {
-        setIsAutoSaving(false);
-      }
-    }, 2000), // 2 second debounce
-    [entry.id, onAutoSave]
+  const autoSave = useCallback(async (contentToSave: string) => {
+    if (contentToSave.trim() === '') return;
+    
+    setIsAutoSaving(true);
+    try {
+      await onAutoSave({ id: entry.id, content: contentToSave });
+      setLastSaved(new Date());
+    } catch (err) {
+      console.error('Auto-save failed:', err);
+    } finally {
+      setIsAutoSaving(false);
+    }
+  }, [entry.id, onAutoSave]);
+
+  // Debounced version of autoSave
+  const debouncedAutoSave = useCallback(
+    debounce(autoSave, 2000), // 2 second debounce
+    [autoSave]
   );
 
   // Trigger auto-save when content changes
   useEffect(() => {
     if (content !== entry.content) {
-      autoSave(content);
+      debouncedAutoSave(content);
     }
-  }, [content, entry.content, autoSave]);
+  }, [content, entry.content, debouncedAutoSave]);
 
   const handleSave = async () => {
     setIsSaving(true);

@@ -1,17 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import WagmiProvider from "~/components/providers/WagmiProvider";
 // import { useEffect, useState } from "react";
 // import posthog from "posthog-js";
 // import { PostHogProvider as PHProvider } from "posthog-js/react";
 // import { getUUID } from "~/lib/utils";
-
-const WagmiProvider = dynamic(
-  () => import("~/components/providers/WagmiProvider"),
-  { ssr: false }
-);
 
 // export function PostHogProvider({ children }: { children: React.ReactNode }) {
 //   useEffect(() => {
