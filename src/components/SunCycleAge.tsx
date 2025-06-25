@@ -18,6 +18,7 @@ import { useConvergenceStats } from '~/hooks/useConvergenceStats';
 import type { Pledge } from '~/hooks/useSolarPledge';
 import { Journal } from './Journal/Journal';
 import { PulsingStarSpinner } from "~/components/ui/PulsingStarSpinner";
+import { SwapInterface } from './SunCycleAge/SwapInterface';
 // import { revokeUserConsent } from "~/lib/consent";
 
 function WarpcastEmbed({ url }: { url: string }) {
@@ -299,6 +300,10 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
         )}
 
         {tab === 'swap' && (
+          <SwapInterface />
+        )}
+
+        {false && tab === 'swap' && (
           <div className="w-full text-sm font-mono space-y-3">
             <div className="flex flex-col items-center text-center mb-6">
               <div className="text-4xl mb-3">�</div>
