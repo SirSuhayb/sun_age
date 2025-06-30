@@ -176,11 +176,7 @@ export default function ResultsPage() {
           aria-hidden="true"
         />
         {/* Middle Layer: sol_constellation.png */}
-        <div
-          className="absolute inset-0 z-10"
-          style={{ background: 'url(/sol_constellation.png) center/cover no-repeat' }}
-          aria-hidden="true"
-        />
+        <div className="fixed inset-0 w-full h-full z-10 pointer-events-none" style={{ background: 'url(/sol_constellation.png) center/cover no-repeat' }} aria-hidden="true" />
         {/* Top Layer: #FFFCF2 at 10% opacity with more pronounced blur */}
         <div
           className="absolute inset-0 z-20 backdrop-blur"

@@ -43,12 +43,12 @@ export default function InterstitialPage() {
 
   // Power phrase mapping (core only for now)
   const powerPhrases: Record<string, string> = {
-    'Solar Innovator': "My innovative spirit transforms tomorrow's possibilities into today's breakthroughs.",
-    'Solar Nurturer': "My nurturing essence creates sanctuaries where every soul can flourish.",
-    'Solar Alchemist': "My alchemical power transforms every challenge into evolutionary fuel.",
-    'Solar Sage': "My wisdom essence expands consciousness through fearless truth-seeking.",
-    'Solar Builder': "My building essence creates lasting structures that elevate collective achievement.",
-    'Solar Artist': "My artistic essence weaves beauty and harmony into the fabric of existence.",
+    'Sol Innovator': "My innovative spirit transforms tomorrow's possibilities into today's breakthroughs.",
+    'Sol Nurturer': "My nurturing essence creates sanctuaries where every soul can flourish.",
+    'Sol Alchemist': "My alchemical power transforms every challenge into evolutionary fuel.",
+    'Sol Sage': "My wisdom essence expands consciousness through fearless truth-seeking.",
+    'Sol Builder': "My building essence creates lasting structures that elevate collective achievement.",
+    'Sol Artist': "My artistic essence weaves beauty and harmony into the fabric of existence.",
   };
 
   // Use bookmark data if returning user, else use params
@@ -88,7 +88,7 @@ export default function InterstitialPage() {
         {/* Bottom Layer: #FFFCF2 at 50% opacity */}
         <div className="absolute inset-0 z-0" style={{ background: '#FFFCF2', opacity: 0.5 }} aria-hidden="true" />
         {/* Middle Layer: sol_constellation.png */}
-        <div className="absolute inset-0 z-10" style={{ background: 'url(/sol_constellation.png) center/cover no-repeat' }} aria-hidden="true" />
+        <div className="fixed inset-0 w-full h-full z-10 pointer-events-none" style={{ background: 'url(/sol_constellation.png) center/cover no-repeat' }} aria-hidden="true" />
         {/* Top Layer: #FFFCF2 at 10% opacity with blur */}
         <div className="absolute inset-0 z-20 backdrop-blur" style={{ background: '#FFFCF2', opacity: 0.5, filter: 'blur(10px)' }} aria-hidden="true" />
 
