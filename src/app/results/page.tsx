@@ -177,12 +177,12 @@ export default function ResultsPage() {
             <div className="text-lg font-serif italic text-gray-700 text-center mb-0 mt-1">~ {approxYears} years old</div>
           </div>
           {/* Solar Identity Card */}
-          <div className="w-full flex flex-col items-center border border-[#e6d8b4] bg-[#fcf7e8] rounded-none p-6 mb-4 shadow mx-0" style={{ marginLeft: 0, marginRight: 0 }}>
+          <div className="w-full flex flex-col items-center border border-[#e6d8b4] bg-[#fcf7e8] rounded-none p-6 mb-4 mx-0" style={{ marginLeft: 0, marginRight: 0 }}>
             <div className="text-center text-base font-mono text-[#bfa12e] uppercase tracking-widest mb-2 font-semibold">your solar identity is</div>
             <div className="text-2xl font-serif font-bold text-black text-center mb-3 flex items-center justify-center gap-2">
-              <span role="img" aria-label="sun">🌞</span>
+              <Image src="/sun-face.png" alt="Sun" width={32} height={32} className="w-8 h-8 object-contain" />
               {solarIdentity}
-              <span role="img" aria-label="sun">🌞</span>
+              <Image src="/sun-face.png" alt="Sun" width={32} height={32} className="w-8 h-8 object-contain" />
             </div>
             <div className="w-full border border-gray-400 bg-white rounded-none p-4 my-2 shadow text-center">
               <div
@@ -193,7 +193,7 @@ export default function ResultsPage() {
               </div>
             </div>
             {solarRadiates && (
-              <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-4 text-center w-full">{solarRadiates}</div>
+              <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-4 text-center w-full">{solarRadiates.replace(/^Their /, 'Your ')}</div>
             )}
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function ResultsPage() {
           <button
             onClick={handleShareInternal}
             className="flex-1 h-16 py-0 px-0 bg-white text-black font-mono text-base tracking-widest uppercase border border-black rounded-none hover:bg-[#f5e7b2] transition-colors flex items-center justify-center"
-            style={{ borderWidth: 2, borderColor: '#d4af37', minWidth: 0 }}
+            style={{ minWidth: 0 }}
           >
             SHARE SOL AGE
           </button>
