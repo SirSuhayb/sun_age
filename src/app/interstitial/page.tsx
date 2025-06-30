@@ -133,7 +133,7 @@ export default function InterstitialPage() {
             <div className="text-sm font-mono text-gray-500 uppercase tracking-widest text-center mb-6 mt-2" style={{letterSpacing: '0.08em'}}>How do you want to channel this energy?</div>
           </div>
           {/* Options */}
-          <div className="w-full max-w-sm mx-auto flex flex-col gap-4 px-2 pb-8">
+          <div className="w-full max-w-sm mx-auto flex flex-col gap-2 px-0 pb-8">
             {/* 1. Dive into your inner sol */}
             <button
               className="w-full border border-gray-300 px-4 py-6 text-center rounded-none flex items-center gap-4 transition-colors duration-150 hover:brightness-90 active:brightness-75"
