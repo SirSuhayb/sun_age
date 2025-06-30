@@ -31,7 +31,8 @@ export async function composeWithBotReference(options: ShareOptions) {
       finalEmbeds.push(botCastUrl);
       console.log(`[composeWithBotReference] Added bot cast as embed:`, botCastUrl);
     } else {
-      // If we're at the limit, replace the last embed with the bot cast
+      // If we're at the limit, replace the last embed (mini app URL) with the bot cast
+      // Keep the first embed (frame URL) as it's more important for visual experience
       finalEmbeds[finalEmbeds.length - 1] = botCastUrl;
       console.log(`[composeWithBotReference] Replaced last embed with bot cast:`, botCastUrl);
     }
@@ -68,15 +69,21 @@ export async function shareSolAge(
 ) {
   const url = process.env.NEXT_PUBLIC_URL || window.location.origin;
   const baseUrl = url.endsWith('/') ? url.slice(0, -1) : url;
-  const ogImageUrl = `${baseUrl}/api/og/solage?solAge=${days}` +
-    (archetype ? `&archetype=${encodeURIComponent(archetype)}` : '') +
-    (quote ? `&quote=${encodeURIComponent(quote)}` : '');
+  
+  // Create the shared URL with encoded parameters (this route has fc:frame metadata)
+  const shareParams = new URLSearchParams({
+    solAge: days.toString(),
+    ...(archetype && { archetype }),
+    ...(quote && { quote })
+  });
+  const sharedUrl = `${baseUrl}/solage/shared/${encodeURIComponent(shareParams.toString())}`;
+  
   const miniAppUrl = 'https://www.solara.fyi';
   const message = `I'm a ${archetype || 'Solar Being'} powered by ${days} days of pure sunlight ☀️\n\nDiscover your Solar Identity: https://www.solara.fyi`;
   
   return await composeWithBotReference({
     text: message,
-    embeds: [ogImageUrl, miniAppUrl],
+    embeds: [sharedUrl, miniAppUrl], // Shared URL (with fc:frame) + mini app URL (2 embeds max)
     botPostType: 'sol_age_prompt',
     sdk,
     isInFrame
