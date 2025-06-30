@@ -7,7 +7,7 @@ import { useFrameSDK } from '~/hooks/useFrameSDK';
 import Image from 'next/image';
 import { useConvergenceStats } from '~/hooks/useConvergenceStats';
 import { SpinnerButton } from "~/components/ui/SpinnerButton";
-import { showScreenshotPrompt } from '~/lib/screenshot';
+// import { showScreenshotPrompt } from '~/lib/screenshot';
 import Link from 'next/link';
 import { getSolarArchetype, solarArchetypeCoreQuotes, solarArchetypeRadiatesWith } from '~/lib/solarIdentity';
 
@@ -50,18 +50,6 @@ export default function ResultsPage() {
   const solarIdentity = birthDate ? getSolarArchetype(birthDate) : null;
   const solarQuote = solarIdentity ? solarArchetypeCoreQuotes[solarIdentity] : null;
   const solarRadiates = solarIdentity ? solarArchetypeRadiatesWith[solarIdentity] : null;
-
-  // Show screenshot prompt when user sees their Sol Age
-  useEffect(() => {
-    if (days && birthDate) {
-      // Show screenshot prompt after a short delay
-      const timer = setTimeout(() => {
-        showScreenshotPrompt();
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [days, birthDate]);
 
   // New combined handler for save and share
   const MINI_APP_LINK = "https://www.solara.fyi";
@@ -238,14 +226,14 @@ export default function ResultsPage() {
         <div className="max-w-md mx-auto w-full px-6 flex flex-row items-center gap-4">
           <button
             onClick={() => router.push(`/interstitial?days=${days}&approxYears=${approxYears}&birthDate=${birthDate}`)}
-            className="flex-1 h-16 py-0 px-0 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors flex items-center justify-center"
+            className="flex-1 h-16 py-0 px-0 bg-[#d4af37] text-black font-mono text-base tracking-tight uppercase border border-black rounded-none hover:bg-[#e6c75a] transition-colors flex items-center justify-center"
             style={{ minWidth: 0 }}
           >
             EXPLORE YOUR INNER SOL
           </button>
           <button
             onClick={handleShareInternal}
-            className="flex-1 h-16 py-0 px-0 bg-white text-black font-mono text-base tracking-widest uppercase border border-black rounded-none hover:bg-[#f5e7b2] transition-colors flex items-center justify-center"
+            className="flex-1 h-16 py-0 px-0 bg-white text-black font-mono text-base tracking-tight uppercase border border-black rounded-none hover:bg-[#f5e7b2] transition-colors flex items-center justify-center"
             style={{ minWidth: 0 }}
           >
             SHARE SOL AGE
