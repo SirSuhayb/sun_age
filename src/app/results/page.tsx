@@ -165,41 +165,80 @@ export default function ResultsPage() {
 
   // --- NEW RESULTS PAGE DESIGN ---
   return (
-    <div className="w-full min-h-screen flex flex-col items-center bg-white relative z-20">
-      <div className="w-full flex flex-col items-center justify-center" style={{ background: 'rgba(255,252,242,0.5)', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
-        <div className="max-w-md mx-auto w-full px-6 pt-8 pb-6 min-h-[60vh]">
-          {/* Sol Age Stats Section */}
-          <div className="flex flex-col items-center mb-8 mt-24">
-            <Image src="/sunsun.png" alt="Sun" width={120} height={120} className="w-28 h-28 object-contain mb-4" style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }} />
-            <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">DEAR TRAVELER, YOU HAVE MADE</div>
-            <div className="text-7xl font-serif font-light tracking-tight text-black text-center mb-0 leading-none">{days.toLocaleString()}</div>
-            <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2 mt-2">SOLAR ROTATIONS SINCE {birthDate.replace(/-/g, ".")}</div>
-            <div className="text-lg font-serif italic text-gray-700 text-center mb-0 mt-1">~ {approxYears} years old</div>
-          </div>
-          {/* Solar Identity Card */}
-          <div className="w-full flex flex-col items-center border border-[#e6d8b4] bg-[#fcf7e8] rounded-none p-6 mb-4 mx-0" style={{ marginLeft: 0, marginRight: 0 }}>
-            <div className="text-center text-base font-mono text-[#bfa12e] uppercase tracking-widest mb-2 font-semibold">your solar identity is</div>
-            <div className="text-2xl font-serif font-bold text-black text-center mb-3 flex items-center justify-center gap-2">
-              <Image src="/sun-face.png" alt="Sun" width={32} height={32} className="w-8 h-8 object-contain" />
-              {solarIdentity}
-              <Image src="/sun-face.png" alt="Sun" width={32} height={32} className="w-8 h-8 object-contain" />
-            </div>
-            <div className="w-full border border-gray-400 bg-white rounded-none p-4 my-2 shadow text-center">
-              <div
-                className="font-serif italic text-black mb-0"
-                style={{ fontSize: '23px', lineHeight: '23px', letterSpacing: '-0.02em' }}
-              >
-                {solarQuote}
+    <>
+      {/* Results background and content section */}
+      <div className="w-full relative overflow-hidden results-bg-section">
+        {/* --- BACKGROUND LAYERS --- */}
+        {/* Bottom Layer: #FFFCF2 at 50% opacity */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{ background: '#FFFCF2', opacity: 0.5 }}
+          aria-hidden="true"
+        />
+        {/* Middle Layer: sol_constellation.png */}
+        <div
+          className="absolute inset-0 z-10"
+          style={{ background: 'url(/sol_constellation.png) center/cover no-repeat' }}
+          aria-hidden="true"
+        />
+        {/* Top Layer: #FFFCF2 at 10% opacity with more pronounced blur */}
+        <div
+          className="absolute inset-0 z-20 backdrop-blur"
+          style={{ background: '#FFFCF2', opacity: 0.1, backdropFilter: 'blur(10px)' }}
+          aria-hidden="true"
+        />
+
+        {/* --- FADE-IN ANIMATION FOR CONTENT --- */}
+        <div
+          className="w-full flex flex-col items-center relative z-30 animate-fadein"
+          style={{ animation: 'fadein 1.2s cubic-bezier(0.4,0,0.2,1)' }}
+        >
+          <div className="w-full flex flex-col items-center justify-center" style={{ background: 'rgba(255,252,242,0.5)', borderTop: '1px solid #9CA3AF', borderBottom: '1px solid #9CA3AF' }}>
+            <div className="max-w-md mx-auto w-full px-6 pt-8 pb-6 min-h-[60vh]">
+              {/* Sol Age Stats Section */}
+              <div className="flex flex-col items-center mb-8 mt-24">
+                <Image src="/sunsun.png" alt="Sun" width={120} height={120} className="w-28 h-28 object-contain mb-4" style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }} />
+                <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">DEAR TRAVELER, YOU HAVE MADE</div>
+                <div className="text-7xl font-serif font-light tracking-tight text-black text-center mb-0 leading-none">{days.toLocaleString()}</div>
+                <div className="text-center text-xs font-mono text-gray-500 uppercase tracking-widest mb-2 mt-2">SOLAR ROTATIONS SINCE {birthDate.replace(/-/g, ".")}</div>
+                <div className="text-lg font-serif italic text-gray-700 text-center mb-0 mt-1">~ {approxYears} years old</div>
+              </div>
+              {/* Solar Identity Card */}
+              <div className="w-full flex flex-col items-center border border-[#e6d8b4] bg-[#fcf7e8] rounded-none p-6 mb-4 mx-0" style={{ marginLeft: 0, marginRight: 0 }}>
+                <div className="text-center text-base font-mono text-[#bfa12e] uppercase tracking-widest mb-2 font-semibold">your solar identity is</div>
+                <div className="text-2xl font-serif font-bold text-black text-center mb-3 flex items-center justify-center gap-2">
+                  <Image src="/sun-face.png" alt="Sun" width={32} height={32} className="w-8 h-8 object-contain" />
+                  {solarIdentity}
+                  <Image src="/sun-face.png" alt="Sun" width={32} height={32} className="w-8 h-8 object-contain" />
+                </div>
+                <div className="w-full border border-gray-400 bg-white rounded-none p-4 my-2 text-center">
+                  <div
+                    className="font-serif italic text-black mb-0"
+                    style={{ fontSize: '23px', lineHeight: '23px', letterSpacing: '-0.02em' }}
+                  >
+                    {solarQuote}
+                  </div>
+                </div>
+                {solarRadiates && (
+                  <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-4 text-center w-full">{solarRadiates.replace(/^Their /, 'Your ')}</div>
+                )}
               </div>
             </div>
-            {solarRadiates && (
-              <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-4 text-center w-full">{solarRadiates.replace(/^Their /, 'Your ')}</div>
-            )}
           </div>
         </div>
+        {/* --- FADE-IN KEYFRAMES --- */}
+        <style jsx global>{`
+          @keyframes fadein {
+            0% { opacity: 0; transform: translateY(32px); }
+            100% { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fadein {
+            animation: fadein 1.2s cubic-bezier(0.4,0,0.2,1);
+          }
+        `}</style>
       </div>
-      {/* CTA section below main content, on white */}
-      <div className="w-full bg-white flex flex-col items-center pt-6 pb-4">
+      {/* Footer/CTA section below main content, on white */}
+      <div className="w-full bg-white flex flex-col items-center pt-6 pb-4 z-40">
         <div className="max-w-md mx-auto w-full px-6 flex flex-row items-center gap-4">
           <button
             onClick={() => router.push(`/interstitial?days=${days}&approxYears=${approxYears}&birthDate=${birthDate}`)}
@@ -363,7 +402,7 @@ export default function ResultsPage() {
         )}
       </div>
       {/* Local Footer (copied from main page) */}
-      <footer className="w-full border-t border-gray-200 bg-white pt-2 pb-12">
+      <footer className="w-full border-t border-gray-200 bg-white pt-2 pb-12 z-40">
         <div className="flex flex-col items-center justify-center">
           <div className="text-sm font-mono text-black text-center">
             Solara is made for <a href="https://farcaster.xyz/~/channel/occulture" className="underline transition-colors hover:text-[#D6AD30] active:text-[#D6AD30] focus:text-[#D6AD30]" target="_blank" rel="noopener noreferrer">/occulture</a> <br />
@@ -371,6 +410,6 @@ export default function ResultsPage() {
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 } 

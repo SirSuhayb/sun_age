@@ -34,41 +34,41 @@ export function getSunSign(birthDate: string): string {
 }
 
 export const sunSignToArchetype: Record<string, string> = {
-  'Aries': 'Solar Innovator',
-  'Leo': 'Solar Artist',
-  'Sagittarius': 'Solar Sage',
-  'Taurus': 'Solar Nurturer',
-  'Virgo': 'Solar Builder',
-  'Capricorn': 'Solar Builder',
-  'Gemini': 'Solar Innovator',
-  'Libra': 'Solar Artist',
-  'Aquarius': 'Solar Innovator',
-  'Cancer': 'Solar Nurturer',
-  'Scorpio': 'Solar Alchemist',
-  'Pisces': 'Solar Alchemist',
+  'Aries': 'Sol Innovator',
+  'Leo': 'Sol Artist',
+  'Sagittarius': 'Sol Sage',
+  'Taurus': 'Sol Nurturer',
+  'Virgo': 'Sol Builder',
+  'Capricorn': 'Sol Builder',
+  'Gemini': 'Sol Innovator',
+  'Libra': 'Sol Artist',
+  'Aquarius': 'Sol Innovator',
+  'Cancer': 'Sol Nurturer',
+  'Scorpio': 'Sol Alchemist',
+  'Pisces': 'Sol Alchemist',
 };
 
 export function getSolarArchetype(birthDate: string): string {
   const sunSign = getSunSign(birthDate);
-  return sunSignToArchetype[sunSign] || 'Solar Traveler';
+  return sunSignToArchetype[sunSign] || 'Sol Traveler';
 }
 
 export const solarArchetypeCoreQuotes: Record<string, string> = {
-  'Solar Innovator': "I channel tomorrow's dreams into today's reality",
-  'Solar Nurturer': "I create sacred spaces where souls can grow",
-  'Solar Alchemist': "I transform darkness into golden wisdom",
-  'Solar Sage': "I expand consciousness through adventurous wisdom-seeking",
-  'Solar Builder': "I construct lasting foundations that support collective achievement",
-  'Solar Artist': "I weave beauty and harmony into the fabric of human connection",
-  'Solar Traveler': "You are a child of the cosmos, a way for the universe to know itself.",
+  'Sol Innovator': "I channel tomorrow's dreams into today's reality",
+  'Sol Nurturer': "I create sacred spaces where souls can grow",
+  'Sol Alchemist': "I transform darkness into golden wisdom",
+  'Sol Sage': "I expand consciousness through adventurous wisdom-seeking",
+  'Sol Builder': "I construct lasting foundations that support collective achievement",
+  'Sol Artist': "I weave beauty and harmony into the fabric of human connection",
+  'Sol Traveler': "You are a child of the cosmos, a way for the universe to know itself.",
 };
 
 export const solarArchetypeRadiatesWith: Record<string, string> = {
-  'Solar Innovator': 'Their inner Sol radiates with electric creativity and humanitarian vision.',
-  'Solar Nurturer': 'Their inner Sol radiates with nurturing care and the power to help others grow.',
-  'Solar Alchemist': 'Their inner Sol radiates with transformative wisdom and the courage to turn darkness into light.',
-  'Solar Sage': 'Their inner Sol radiates with adventurous wisdom and a quest to expand consciousness.',
-  'Solar Builder': 'Their inner Sol radiates with steadfast dedication and the ability to create lasting foundations.',
-  'Solar Artist': 'Their inner Sol radiates with beauty, harmony, and the gift of inspiring human connection.',
-  'Solar Traveler': 'Their inner Sol radiates with curiosity and cosmic wonder.'
+  'Sol Innovator': 'Their inner Sol radiates with electric creativity and humanitarian vision.',
+  'Sol Nurturer': 'Their inner Sol radiates with nurturing care and the power to help others grow.',
+  'Sol Alchemist': 'Their inner Sol radiates with transformative wisdom and the courage to turn darkness into light.',
+  'Sol Sage': 'Their inner Sol radiates with adventurous wisdom and a quest to expand consciousness.',
+  'Sol Builder': 'Their inner Sol radiates with steadfast dedication and the ability to create lasting foundations.',
+  'Sol Artist': 'Their inner Sol radiates with beauty, harmony, and the gift of inspiring human connection.',
+  'Sol Traveler': 'Their inner Sol radiates with curiosity and cosmic wonder.'
 }; 

@@ -161,7 +161,7 @@ export default function InterstitialPage() {
               <Image src="/tabIcons/outstar.svg" alt="Outstar" width={40} height={40} className="object-contain" />
               <div className="text-left">
                 <div className="font-serif font-bold text-lg text-black mb-2">Track your milestones</div>
-                <div className="font-mono text-sm uppercase text-gray-600 leading-tight">THE COSMOS KNOWS WHERE YOU'RE HEADED. FOLLOW YOUR THREADS IN THE STARS.</div>
+                <div className="font-mono text-sm uppercase text-gray-600 leading-tight">THE COSMOS KNOWS WHERE YOU&#39;RE HEADED. FOLLOW YOUR THREADS IN THE STARS.</div>
               </div>
             </button>
             {/* 3. Inscribe what inspires you */}
