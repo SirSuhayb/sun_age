@@ -18,32 +18,56 @@ export default function InterstitialPage() {
 
   useEffect(() => {
     let birth: Date | null = null;
-    let updatedBookmark: any = null;
+    let existingBookmark: any = null;
+    
+    // Check for existing bookmark first
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('sunCycleBookmark');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (parsed.birthDate) {
+            existingBookmark = parsed;
             birth = new Date(parsed.birthDate);
-            updatedBookmark = parsed;
           }
         } catch {}
       }
     }
+    
+    // If no existing bookmark, use URL params
     if (!birth && birthDate) {
       birth = new Date(birthDate);
     }
+    
     if (birth) {
       const now = new Date();
       const msPerDay = 1000 * 60 * 60 * 24;
       const totalDays = Math.floor((now.getTime() - birth.getTime()) / msPerDay);
       setTodayDays(totalDays);
-      // Update bookmark in localStorage if it exists
-      if (updatedBookmark) {
-        updatedBookmark.days = totalDays;
-        updatedBookmark.lastVisitDays = totalDays;
+      
+      // Determine if this is a returning user
+      if (existingBookmark) {
+        setReturningUser(true);
+        setBookmark(existingBookmark);
+        
+        // Calculate rotations since last visit
+        const lastVisitDays = existingBookmark.lastVisitDays || existingBookmark.days;
+        const rotationsSinceLastVisit = totalDays - lastVisitDays;
+        setLastVisitRotations(rotationsSinceLastVisit);
+        
+        // Update the bookmark with new days but preserve lastVisitDays for comparison
+        const updatedBookmark = {
+          ...existingBookmark,
+          days: totalDays,
+          lastVisitDays: lastVisitDays, // Keep the old lastVisitDays for comparison
+          lastVisitDate: existingBookmark.lastVisitDate // Keep the old lastVisitDate
+        };
         localStorage.setItem('sunCycleBookmark', JSON.stringify(updatedBookmark));
+      } else {
+        // First time user - show the "solar power awaits" version
+        setReturningUser(false);
+        setBookmark(null);
+        setLastVisitRotations(null);
       }
     }
   }, [birthDate]);
@@ -80,7 +104,7 @@ export default function InterstitialPage() {
         days: Number(days),
         approxYears: Number(approxYears),
         birthDate,
-        lastVisitDays: Number(days),
+        lastVisitDays: Number(days), // This will be the baseline for future visits
         lastVisitDate: now.toISOString(),
       };
       localStorage.setItem('sunCycleBookmark', JSON.stringify(data));

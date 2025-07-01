@@ -20,6 +20,16 @@ CREATE TABLE IF NOT EXISTS journal_shares (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Profiles table for Farcaster user data
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  fid INTEGER NOT NULL UNIQUE,
+  username TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
 -- Token claims table
 CREATE TABLE IF NOT EXISTS token_claims (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -90,6 +100,7 @@ CREATE INDEX IF NOT EXISTS idx_journal_entries_sol_day ON journal_entries(sol_da
 CREATE INDEX IF NOT EXISTS idx_journal_entries_created_at ON journal_entries(created_at);
 CREATE INDEX IF NOT EXISTS idx_journal_shares_entry_id ON journal_shares(entry_id);
 CREATE INDEX IF NOT EXISTS idx_journal_shares_user_fid ON journal_shares(user_fid);
+CREATE INDEX IF NOT EXISTS idx_profiles_fid ON profiles(fid);
 CREATE INDEX IF NOT EXISTS idx_token_claims_user_fid ON token_claims(user_fid);
 CREATE INDEX IF NOT EXISTS idx_claim_notifications_user_fid ON claim_notifications(user_fid);
 CREATE INDEX IF NOT EXISTS idx_user_notification_details_fid ON user_notification_details(fid);
@@ -100,6 +111,7 @@ CREATE INDEX IF NOT EXISTS idx_wisdom_extracts_sol_day ON wisdom_extracts(sol_da
 -- Add RLS (Row Level Security) policies
 ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE journal_shares ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE token_claims ENABLE ROW LEVEL SECURITY;
 ALTER TABLE claim_notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_notification_details ENABLE ROW LEVEL SECURITY;
@@ -183,4 +195,18 @@ CREATE POLICY "Users can insert their own wisdom progress" ON user_wisdom_progre
   FOR INSERT WITH CHECK (user_fid = auth.jwt() ->> 'sub'::integer);
 
 CREATE POLICY "Users can update their own wisdom progress" ON user_wisdom_progress
-  FOR UPDATE USING (user_fid = auth.jwt() ->> 'sub'::integer); 
+  FOR UPDATE USING (user_fid = auth.jwt() ->> 'sub'::integer);
+
+-- Profiles policies
+CREATE POLICY "Users can view their own profile" ON profiles
+  FOR SELECT USING (fid = auth.jwt() ->> 'sub'::integer);
+
+CREATE POLICY "Users can insert their own profile" ON profiles
+  FOR INSERT WITH CHECK (fid = auth.jwt() ->> 'sub'::integer);
+
+CREATE POLICY "Users can update their own profile" ON profiles
+  FOR UPDATE USING (fid = auth.jwt() ->> 'sub'::integer);
+
+-- Allow service role to manage all profiles (for sync-profiles API)
+CREATE POLICY "Service role can manage all profiles" ON profiles
+  FOR ALL USING (auth.role() = 'service_role'); 
