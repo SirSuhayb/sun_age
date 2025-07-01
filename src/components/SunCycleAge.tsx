@@ -325,7 +325,15 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
               <div className="text-gray-600 mb-4">You haven&apos;t made your Solar Vow. Make your pledge to join the convergence.</div>
               <button
                 className="w-full py-3 bg-[#d4af37] text-black font-mono text-base tracking-widest uppercase border border-black rounded hover:bg-[#e6c75a] transition-colors"
-                onClick={() => window.location.href = '/ceremony'}
+                onClick={() => {
+                  // Pass bookmark data as URL parameters to ceremony
+                  const params = new URLSearchParams({
+                    days: bookmark.days.toString(),
+                    birthDate: bookmark.birthDate,
+                    approxYears: bookmark.approxYears.toString()
+                  });
+                  window.location.href = `/ceremony?${params.toString()}`;
+                }}
               >
                 Make Your Solar Vow
               </button>

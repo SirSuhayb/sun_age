@@ -205,7 +205,13 @@ export default function InterstitialPage() {
               style={{ backgroundColor: '#D6FFE6' }}
               onClick={() => {
                 handleBookmark();
-                router.push('/soldash?tab=sol%20vows');
+                // Route directly to ceremony with proper parameters
+                if (days && birthDate && approxYears) {
+                  router.push(`/ceremony?days=${days}&birthDate=${birthDate}&approxYears=${approxYears}`);
+                } else {
+                  // Fallback to soldash if no data available
+                  router.push('/soldash?tab=sol%20vows');
+                }
               }}
             >
               <Image src="/tabIcons/starburst.svg" alt="Starburst" width={40} height={40} className="object-contain" />
