@@ -17,29 +17,36 @@ export default function InterstitialPage() {
   const [todayDays, setTodayDays] = useState<number | null>(null);
 
   useEffect(() => {
+    let birth: Date | null = null;
+    let updatedBookmark: any = null;
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('sunCycleBookmark');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setBookmark(parsed);
-          if (parsed.lastVisitDate && parsed.birthDate) {
-            const lastVisit = new Date(parsed.lastVisitDate);
-            const now = new Date();
-            const msPerDay = 1000 * 60 * 60 * 24;
-            const rotationsSinceLast = Math.floor((now.getTime() - lastVisit.getTime()) / msPerDay);
-            setLastVisitRotations(rotationsSinceLast);
-            // Calculate total days since birthDate to today
-            const birth = new Date(parsed.birthDate);
-            const totalDays = Math.floor((now.getTime() - birth.getTime()) / msPerDay);
-            setTodayDays(totalDays);
-            // Always mark as returning user if bookmark exists
-            setReturningUser(true);
+          if (parsed.birthDate) {
+            birth = new Date(parsed.birthDate);
+            updatedBookmark = parsed;
           }
         } catch {}
       }
     }
-  }, []);
+    if (!birth && birthDate) {
+      birth = new Date(birthDate);
+    }
+    if (birth) {
+      const now = new Date();
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const totalDays = Math.floor((now.getTime() - birth.getTime()) / msPerDay);
+      setTodayDays(totalDays);
+      // Update bookmark in localStorage if it exists
+      if (updatedBookmark) {
+        updatedBookmark.days = totalDays;
+        updatedBookmark.lastVisitDays = totalDays;
+        localStorage.setItem('sunCycleBookmark', JSON.stringify(updatedBookmark));
+      }
+    }
+  }, [birthDate]);
 
   // Power phrase mapping (core only for now)
   const powerPhrases: Record<string, string> = {

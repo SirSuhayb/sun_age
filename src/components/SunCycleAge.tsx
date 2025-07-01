@@ -885,7 +885,7 @@ export default function SunCycleAge() {
                 color: '#222'
               }}
             >
-              measure your age in<br />solar rotations*
+              measure your age<br />in solar rotations*
             </span>
           </div>
           <div className="flex-1 flex justify-end">
