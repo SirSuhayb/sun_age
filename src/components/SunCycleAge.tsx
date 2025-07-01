@@ -145,17 +145,24 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
           isScrolled ? 'space-y-1 py-2' : 'space-y-4 py-4'
         }`}
       >
-        <Image
-          src="/sunsun.png"
-          alt="Sun"
-          width={72}
-          height={72}
-          className={`object-contain mx-auto transition-all duration-300 ${
-            isScrolled ? 'w-12 h-12' : 'w-16 h-16 sm:w-20 sm:h-20'
-          }`}
-          style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }}
-          priority
-        />
+        <div className="relative flex flex-col items-center justify-center">
+          {/* Pulsating blur */}
+          <div className="absolute inset-0 flex items-center justify-center z-0">
+            <div className="pulsing-blur" />
+          </div>
+          {/* Sun image */}
+          <Image
+            src="/sunsun.png"
+            alt="Sun"
+            width={72}
+            height={72}
+            className={`object-contain mx-auto transition-all duration-300 z-10 ${
+              isScrolled ? 'w-12 h-12' : 'w-16 h-16 sm:w-20 sm:h-20'
+            }`}
+            style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }}
+            priority
+          />
+        </div>
         <div className={`text-center transition-all duration-300 ${isScrolled ? 'opacity-0 h-0' : 'opacity-100'}`}>
           <div className="text-xs font-mono tracking-widest text-gray-600 uppercase mb-2">WELCOME BACK TRAVELER...</div>
           <div className="text-4xl sm:text-5xl font-serif font-extrabold tracking-tight text-black mb-1">{bookmark.days} <span className="font-serif">Sol Age</span></div>
@@ -989,6 +996,22 @@ export default function SunCycleAge() {
           </div>
         </div>
       )}
+      <style jsx>{`
+        .pulsing-blur {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          background: #ffe066;
+          filter: blur(32px);
+          opacity: 0.7;
+          animation: pulse-blur 2.2s infinite cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes pulse-blur {
+          0% { transform: scale(1); opacity: 0.7; filter: blur(32px);}
+          50% { transform: scale(1.18); opacity: 1; filter: blur(48px);}
+          100% { transform: scale(1); opacity: 0.7; filter: blur(32px);}
+        }
+      `}</style>
     </div>
   );
 }
