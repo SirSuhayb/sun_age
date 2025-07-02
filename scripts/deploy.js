@@ -40,20 +40,30 @@ async function main() {
     const stakingAddress = await solarStaking.getAddress();
     console.log("✅ SolarStaking deployed to:", stakingAddress);
     
-    // Deploy MorphoTreasury (using utility and staking as initial contract addresses)
-    console.log("\n💰 3. Deploying MorphoTreasury...");
+    // Deploy MorphoTreasury (holder benefits treasury)
+    console.log("\n💰 3. Deploying MorphoTreasury (Holder Benefits)...");
     const MorphoTreasury = await ethers.getContractFactory("contracts/deployment/MorphoTreasury.sol:MorphoTreasury");
-    const morphoTreasury = await MorphoTreasury.deploy(utilityAddress, stakingAddress);
+    // For now, use staking contract for all holder benefit addresses (can be updated later)
+    const morphoTreasury = await MorphoTreasury.deploy(
+        stakingAddress,   // staking contract (40% of yield)
+        deployer.address, // burn address (30% of yield) - owner can handle burns
+        deployer.address, // airdrop address (20% of yield) - owner can handle airdrops  
+        deployer.address  // development fund (10% of yield) - owner can allocate
+    );
     await morphoTreasury.waitForDeployment();
     const treasuryAddress = await morphoTreasury.getAddress();
-    console.log("✅ MorphoTreasury deployed to:", treasuryAddress);
+    console.log("✅ MorphoTreasury (Holder Benefits) deployed to:", treasuryAddress);
     
-    console.log("\n🔗 4. Linking contracts...");
+    console.log("\n🔗 4. Linking contracts for 50/50 revenue split...");
     
-    // Link SolarUtility to MorphoTreasury
-    console.log("Linking utility contract to treasury...");
-    await solarUtility.setTreasuryContract(treasuryAddress);
-    console.log("✅ Treasury contract linked to utility");
+    // Set up 50/50 revenue split in SolarUtility
+    console.log("Setting up Morpho treasury (holder benefits - 50%)...");
+    await solarUtility.setMorphoTreasuryContract(treasuryAddress);
+    console.log("✅ Morpho treasury linked (50% of revenue for holder benefits)");
+    
+    console.log("Setting up company treasury (business revenue - 50%)...");
+    await solarUtility.setCompanyTreasuryContract(deployer.address); // Owner address as company treasury for now
+    console.log("✅ Company treasury linked (50% of revenue for business operations)");
     
     // Fund staking contract with initial rewards (500K SOLAR)
     console.log("Funding staking rewards pool...");
@@ -95,8 +105,11 @@ async function main() {
     console.log("✅ Premium Features (50M-500M SOLAR tiers)");
     console.log("✅ Strategic Burns (2B SOLAR burned)");
     console.log("✅ Quarterly Revenue Burns");
+    console.log("✅ 50/50 Revenue Split (Holders vs Company)");
+    console.log("✅ Morpho Treasury (50% → Holder Benefits)");
+    console.log("✅ Company Treasury (50% → Business Revenue)");
+    console.log("✅ Holder Yield Distribution (40% Staking, 30% Burns, 20% Airdrops, 10% Development)");
     console.log("✅ Staking Rewards (4 tiers: 10M/100M/500M/1B SOLAR)");
-    console.log("✅ Morpho Treasury Integration");
     console.log("✅ 50K/month emission schedule (2% monthly reduction)");
     
     console.log("\n🔍 Contract Verification Commands:");
@@ -149,7 +162,19 @@ async function main() {
         contracts: {
             SolarUtility: utilityAddress,
             SolarStaking: stakingAddress,
-            MorphoTreasury: treasuryAddress
+            MorphoTreasury: treasuryAddress,
+            CompanyTreasury: deployer.address
+        },
+        revenueModel: {
+            split: "50/50",
+            morphoTreasury: "50% for holder benefits",
+            companyTreasury: "50% for business operations",
+            holderYieldDistribution: {
+                staking: "40%",
+                burns: "30%", 
+                airdrops: "20%",
+                development: "10%"
+            }
         },
         initialBurns: {
             burn1: {
@@ -167,7 +192,10 @@ async function main() {
             stakingRewards: true,
             morphoIntegration: true,
             quarterlyBurns: true,
-            emissionSchedule: true
+            emissionSchedule: true,
+            revenueSharing: true,
+            holderBenefits: true,
+            companyTreasury: true
         }
     };
     

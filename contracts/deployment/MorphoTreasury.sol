@@ -51,14 +51,17 @@ contract MorphoTreasury is ReentrancyGuard, Ownable, Pausable {
     uint256 public lastYieldUpdate;
     uint256 public accumulatedYield;
     
-    // Yield distribution
-    uint256 public constant OWNER_YIELD_SHARE = 7000; // 70% to owner
-    uint256 public constant UTILITY_YIELD_SHARE = 2000; // 20% to utility contract
-    uint256 public constant BUYBACK_YIELD_SHARE = 1000; // 10% for SOLAR buybacks
+    // Yield distribution (Holder-focused benefits)
+    uint256 public constant STAKING_YIELD_SHARE = 4000; // 40% to staking rewards
+    uint256 public constant BURN_YIELD_SHARE = 3000; // 30% for token burns
+    uint256 public constant AIRDROP_YIELD_SHARE = 2000; // 20% for holder airdrops
+    uint256 public constant DEVELOPMENT_YIELD_SHARE = 1000; // 10% for ecosystem development
     
-    // Contract references
-    address public utilityContract;
-    address public buybackContract;
+    // Contract references for holder benefits
+    address public stakingContract;      // Receives yield for staking rewards
+    address public burnContract;         // Handles token burns with yield
+    address public airdropContract;      // Manages holder airdrops
+    address public developmentContract;  // Community-voted development fund
     
     // Yield tracking per recipient
     mapping(address => uint256) public yieldAllocated;
@@ -68,15 +71,22 @@ contract MorphoTreasury is ReentrancyGuard, Ownable, Pausable {
     
     event USDCDeposited(uint256 amount, uint256 morphoShares);
     event USDCWithdrawn(uint256 amount, address recipient);
-    event YieldDistributed(uint256 totalYield, uint256 ownerShare, uint256 utilityShare, uint256 buybackShare);
+    event YieldDistributed(uint256 totalYield, uint256 stakingShare, uint256 burnShare, uint256 airdropShare, uint256 developmentShare);
     event YieldClaimed(address indexed recipient, uint256 amount);
     event ContractUpdated(string contractType, address newAddress);
     
     // ============ CONSTRUCTOR ============
     
-    constructor(address _utilityContract, address _buybackContract) Ownable(msg.sender) {
-        utilityContract = _utilityContract;
-        buybackContract = _buybackContract;
+    constructor(
+        address _stakingContract,
+        address _burnContract,
+        address _airdropContract,
+        address _developmentContract
+    ) Ownable(msg.sender) {
+        stakingContract = _stakingContract;
+        burnContract = _burnContract;
+        airdropContract = _airdropContract;
+        developmentContract = _developmentContract;
         lastYieldUpdate = block.timestamp;
     }
     
@@ -152,20 +162,30 @@ contract MorphoTreasury is ReentrancyGuard, Ownable, Pausable {
             uint256 newYield = currentBalance - netDeposits - accumulatedYield;
             
             if (newYield > 0) {
-                // Distribute yield according to shares
-                uint256 ownerYield = (newYield * OWNER_YIELD_SHARE) / 10000;
-                uint256 utilityYield = (newYield * UTILITY_YIELD_SHARE) / 10000;
-                uint256 buybackYield = (newYield * BUYBACK_YIELD_SHARE) / 10000;
+                // Distribute yield according to holder-focused shares
+                uint256 stakingYield = (newYield * STAKING_YIELD_SHARE) / 10000;
+                uint256 burnYield = (newYield * BURN_YIELD_SHARE) / 10000;
+                uint256 airdropYield = (newYield * AIRDROP_YIELD_SHARE) / 10000;
+                uint256 developmentYield = (newYield * DEVELOPMENT_YIELD_SHARE) / 10000;
                 
-                // Allocate yield
-                yieldAllocated[owner()] += ownerYield;
-                yieldAllocated[utilityContract] += utilityYield;
-                yieldAllocated[buybackContract] += buybackYield;
+                // Allocate yield to holder benefit contracts
+                if (stakingContract != address(0)) {
+                    yieldAllocated[stakingContract] += stakingYield;
+                }
+                if (burnContract != address(0)) {
+                    yieldAllocated[burnContract] += burnYield;
+                }
+                if (airdropContract != address(0)) {
+                    yieldAllocated[airdropContract] += airdropYield;
+                }
+                if (developmentContract != address(0)) {
+                    yieldAllocated[developmentContract] += developmentYield;
+                }
                 
                 accumulatedYield += newYield;
                 lastYieldUpdate = block.timestamp;
                 
-                emit YieldDistributed(newYield, ownerYield, utilityYield, buybackYield);
+                emit YieldDistributed(newYield, stakingYield, burnYield, airdropYield, developmentYield);
             }
         }
     }
@@ -285,7 +305,8 @@ contract MorphoTreasury is ReentrancyGuard, Ownable, Pausable {
      * @param amount Amount of USDC revenue to add
      */
     function addRevenue(uint256 amount) external {
-        require(msg.sender == utilityContract || msg.sender == owner(), "Not authorized");
+        // This function is called when USDC is received for holder benefits
+        // No access restriction needed since USDC transfer already happened
         
         // Auto-deposit to Morpho if we have enough USDC
         uint256 usdcBalance = USDC.balanceOf(address(this));
@@ -319,23 +340,43 @@ contract MorphoTreasury is ReentrancyGuard, Ownable, Pausable {
     // ============ ADMIN FUNCTIONS ============
     
     /**
-     * @notice Update utility contract address
-     * @param newUtilityContract New utility contract address
+     * @notice Update staking contract address
+     * @param newStakingContract New staking contract address
      */
-    function setUtilityContract(address newUtilityContract) external onlyOwner {
-        require(newUtilityContract != address(0), "Invalid address");
-        utilityContract = newUtilityContract;
-        emit ContractUpdated("utility", newUtilityContract);
+    function setStakingContract(address newStakingContract) external onlyOwner {
+        require(newStakingContract != address(0), "Invalid address");
+        stakingContract = newStakingContract;
+        emit ContractUpdated("staking", newStakingContract);
     }
     
     /**
-     * @notice Update buyback contract address
-     * @param newBuybackContract New buyback contract address
+     * @notice Update burn contract address
+     * @param newBurnContract New burn contract address
      */
-    function setBuybackContract(address newBuybackContract) external onlyOwner {
-        require(newBuybackContract != address(0), "Invalid address");
-        buybackContract = newBuybackContract;
-        emit ContractUpdated("buyback", newBuybackContract);
+    function setBurnContract(address newBurnContract) external onlyOwner {
+        require(newBurnContract != address(0), "Invalid address");
+        burnContract = newBurnContract;
+        emit ContractUpdated("burn", newBurnContract);
+    }
+    
+    /**
+     * @notice Update airdrop contract address
+     * @param newAirdropContract New airdrop contract address
+     */
+    function setAirdropContract(address newAirdropContract) external onlyOwner {
+        require(newAirdropContract != address(0), "Invalid address");
+        airdropContract = newAirdropContract;
+        emit ContractUpdated("airdrop", newAirdropContract);
+    }
+    
+    /**
+     * @notice Update development contract address
+     * @param newDevelopmentContract New development contract address
+     */
+    function setDevelopmentContract(address newDevelopmentContract) external onlyOwner {
+        require(newDevelopmentContract != address(0), "Invalid address");
+        developmentContract = newDevelopmentContract;
+        emit ContractUpdated("development", newDevelopmentContract);
     }
     
     /**

@@ -68,7 +68,9 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     event FeatureUsed(address indexed user, bytes32 indexed feature);
     event FeaturePurchased(address indexed user, bytes32 indexed feature, uint256 price, uint256 duration);
     event RevenueAdded(uint256 amount, address source);
-    event TreasuryDeposit(uint256 amount);
+    event MorphoTreasuryDeposit(uint256 amount);
+    event CompanyTreasuryDeposit(uint256 amount);
+    event TreasuryContractUpdated(string treasuryType, address newAddress);
     
     // ============ CONSTRUCTOR ============
     
@@ -185,45 +187,72 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     }
     
     /**
-     * @notice Internal function to check and execute treasury deposits
+     * @notice Internal function to check and execute 50/50 treasury deposits
      */
     function _checkTreasuryDeposit() internal {
-        if (treasuryContract != address(0)) {
-            uint256 balance = USDC.balanceOf(address(this));
-            if (balance >= TREASURY_THRESHOLD) {
-                // Deposit to treasury
-                USDC.transfer(treasuryContract, balance);
+        uint256 balance = USDC.balanceOf(address(this));
+        
+        if (balance >= TREASURY_THRESHOLD) {
+            // 50/50 split between holder benefits (Morpho) and company revenue
+            uint256 morphoShare = balance / 2;
+            uint256 companyShare = balance - morphoShare; // Handle any rounding
+            
+            // Send to Morpho Treasury (holder benefits)
+            if (morphoTreasuryContract != address(0)) {
+                USDC.transfer(morphoTreasuryContract, morphoShare);
+                morphoAllocatedRevenue += morphoShare;
                 
-                // Notify treasury of new revenue
-                (bool success,) = treasuryContract.call(
-                    abi.encodeWithSignature("addRevenue(uint256)", balance)
+                // Notify Morpho treasury
+                (bool success,) = morphoTreasuryContract.call(
+                    abi.encodeWithSignature("addRevenue(uint256)", morphoShare)
                 );
                 
                 if (success) {
-                    emit TreasuryDeposit(balance);
+                    emit MorphoTreasuryDeposit(morphoShare);
                 }
+            }
+            
+            // Send to Company Treasury (business revenue)
+            if (companyTreasuryContract != address(0)) {
+                USDC.transfer(companyTreasuryContract, companyShare);
+                companyAllocatedRevenue += companyShare;
+                
+                emit CompanyTreasuryDeposit(companyShare);
             }
         }
     }
     
     /**
-     * @notice Manual treasury deposit (owner only)
+     * @notice Manual 50/50 treasury deposit (owner only)
      */
-    function depositToTreasury() external onlyOwner {
-        require(treasuryContract != address(0), "Treasury not set");
-        
+    function depositToTreasuries() external onlyOwner {
         uint256 balance = USDC.balanceOf(address(this));
         require(balance > 0, "No USDC to deposit");
         
-        USDC.transfer(treasuryContract, balance);
+        // Force 50/50 split regardless of threshold
+        uint256 morphoShare = balance / 2;
+        uint256 companyShare = balance - morphoShare;
         
-        // Notify treasury
-        (bool success,) = treasuryContract.call(
-            abi.encodeWithSignature("addRevenue(uint256)", balance)
-        );
+        // Send to Morpho Treasury
+        if (morphoTreasuryContract != address(0) && morphoShare > 0) {
+            USDC.transfer(morphoTreasuryContract, morphoShare);
+            morphoAllocatedRevenue += morphoShare;
+            
+            (bool success,) = morphoTreasuryContract.call(
+                abi.encodeWithSignature("addRevenue(uint256)", morphoShare)
+            );
+            
+            if (success) {
+                emit MorphoTreasuryDeposit(morphoShare);
+            }
+        }
         
-        if (success) {
-            emit TreasuryDeposit(balance);
+        // Send to Company Treasury
+        if (companyTreasuryContract != address(0) && companyShare > 0) {
+            USDC.transfer(companyTreasuryContract, companyShare);
+            companyAllocatedRevenue += companyShare;
+            
+            emit CompanyTreasuryDeposit(companyShare);
         }
     }
     
@@ -404,13 +433,15 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     }
     
     /**
-     * @notice Get comprehensive stats
+     * @notice Get comprehensive stats including 50/50 revenue split
      * @return totalSupply Current SOLAR total supply
      * @return burnedAmount Total tokens burned
      * @return burnCount Number of burn events
      * @return revenueForBurns Total revenue accumulated for burns
      * @return nextBurnTime When next quarterly burn can be executed
      * @return usdcBalance Current USDC balance in contract
+     * @return morphoRevenue Total revenue allocated to Morpho treasury (holder benefits)
+     * @return companyRevenue Total revenue allocated to company treasury (business)
      */
     function getStats() external view returns (
         uint256 totalSupply,
@@ -418,7 +449,9 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
         uint256 burnCount,
         uint256 revenueForBurns,
         uint256 nextBurnTime,
-        uint256 usdcBalance
+        uint256 usdcBalance,
+        uint256 morphoRevenue,
+        uint256 companyRevenue
     ) {
         totalSupply = 100_000_000_000 * 1e18; // 100B SOLAR (static)
         burnedAmount = totalBurned;
@@ -426,6 +459,27 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
         revenueForBurns = totalRevenue;
         nextBurnTime = lastBurnTime + BURN_INTERVAL;
         usdcBalance = USDC.balanceOf(address(this));
+        morphoRevenue = morphoAllocatedRevenue;
+        companyRevenue = companyAllocatedRevenue;
+    }
+    
+    /**
+     * @notice Get revenue split information
+     * @return totalCollected Total USDC revenue collected
+     * @return morphoShare USDC allocated to holder benefits (50%)
+     * @return companyShare USDC allocated to business operations (50%)
+     * @return pendingBalance USDC pending split (below threshold)
+     */
+    function getRevenueSplit() external view returns (
+        uint256 totalCollected,
+        uint256 morphoShare,
+        uint256 companyShare,
+        uint256 pendingBalance
+    ) {
+        totalCollected = totalRevenue;
+        morphoShare = morphoAllocatedRevenue;
+        companyShare = companyAllocatedRevenue;
+        pendingBalance = USDC.balanceOf(address(this));
     }
     
     /**
@@ -469,11 +523,23 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     // ============ ADMIN FUNCTIONS ============
     
     /**
-     * @notice Set treasury contract address
-     * @param _treasuryContract Treasury contract address
+     * @notice Set Morpho treasury contract address (for holder benefits)
+     * @param _morphoTreasuryContract Morpho treasury contract address
      */
-    function setTreasuryContract(address _treasuryContract) external onlyOwner {
-        treasuryContract = _treasuryContract;
+    function setMorphoTreasuryContract(address _morphoTreasuryContract) external onlyOwner {
+        require(_morphoTreasuryContract != address(0), "Invalid address");
+        morphoTreasuryContract = _morphoTreasuryContract;
+        emit TreasuryContractUpdated("morpho", _morphoTreasuryContract);
+    }
+    
+    /**
+     * @notice Set company treasury contract address (for business revenue)
+     * @param _companyTreasuryContract Company treasury contract address
+     */
+    function setCompanyTreasuryContract(address _companyTreasuryContract) external onlyOwner {
+        require(_companyTreasuryContract != address(0), "Invalid address");
+        companyTreasuryContract = _companyTreasuryContract;
+        emit TreasuryContractUpdated("company", _companyTreasuryContract);
     }
     
     /**
