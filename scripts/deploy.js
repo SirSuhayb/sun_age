@@ -50,6 +50,11 @@ async function main() {
     
     console.log("\n🔗 4. Linking contracts...");
     
+    // Link SolarUtility to MorphoTreasury
+    console.log("Linking utility contract to treasury...");
+    await solarUtility.setTreasuryContract(treasuryAddress);
+    console.log("✅ Treasury contract linked to utility");
+    
     // Fund staking contract with initial rewards (500K SOLAR)
     console.log("Funding staking rewards pool...");
     const initialRewards = ethers.parseEther("500000"); // 500K SOLAR

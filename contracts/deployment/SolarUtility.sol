@@ -18,15 +18,22 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     // Existing SOLAR token contract
     IERC20 public constant SOLAR_TOKEN = IERC20(0x746042147240304098C837563aAEc0F671881B07);
     
+    // USDC token for payments
+    IERC20 public constant USDC = IERC20(0xa0b86a33e6441B8Db72C5Ab9cBF4428c7bb060B6);
+    
     // Burn address (standard burn address)
     address public constant BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
     
     // Feature requirements (in SOLAR tokens with 18 decimals)
     mapping(bytes32 => uint256) public featureRequirements;
     
+    // Feature pricing (in USDC with 6 decimals)
+    mapping(bytes32 => uint256) public featurePricing;
+    
     // User access tracking
     mapping(address => mapping(bytes32 => bool)) public permanentAccess;
     mapping(address => mapping(bytes32 => uint256)) public temporaryAccess; // timestamp when access expires
+    mapping(address => mapping(bytes32 => uint256)) public paidAccess; // timestamp when paid access expires
     
     // Burn tracking
     uint256 public totalBurned;
@@ -42,14 +49,21 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant BURN_INTERVAL = 90 days; // Quarterly burns
     uint256 public constant BURN_PERCENTAGE = 2500; // 25% of revenue for burns (in basis points)
     
+    // Treasury contract for automatic deposits
+    address public treasuryContract;
+    uint256 public constant TREASURY_THRESHOLD = 1000 * 1e6; // Auto-deposit when 1000+ USDC
+    
     // ============ EVENTS ============
     
     event SolarBurned(uint256 amount, string reason, address burner);
     event FeatureRequirementSet(bytes32 indexed feature, uint256 requirement);
+    event FeaturePricingSet(bytes32 indexed feature, uint256 price);
     event PermanentAccessGranted(address indexed user, bytes32 indexed feature);
     event TemporaryAccessGranted(address indexed user, bytes32 indexed feature, uint256 duration);
     event FeatureUsed(address indexed user, bytes32 indexed feature);
+    event FeaturePurchased(address indexed user, bytes32 indexed feature, uint256 price, uint256 duration);
     event RevenueAdded(uint256 amount, address source);
+    event TreasuryDeposit(uint256 amount);
     
     // ============ CONSTRUCTOR ============
     
@@ -62,6 +76,15 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
         featureRequirements["api_access"] = 250_000_000 * 1e18;            // 250M SOLAR
         featureRequirements["early_access"] = 50_000_000 * 1e18;           // 50M SOLAR
         featureRequirements["vip_support"] = 500_000_000 * 1e18;           // 500M SOLAR
+        
+        // Set pricing for paid access (USDC with 6 decimals)
+        featurePricing["premium_analytics"] = 10 * 1e6;    // $10/month
+        featurePricing["custom_milestones"] = 25 * 1e6;    // $25/month
+        featurePricing["priority_support"] = 15 * 1e6;     // $15/month
+        featurePricing["advanced_journey"] = 20 * 1e6;     // $20/month
+        featurePricing["api_access"] = 50 * 1e6;           // $50/month
+        featurePricing["early_access"] = 5 * 1e6;          // $5/month
+        featurePricing["vip_support"] = 100 * 1e6;         // $100/month
         
         lastBurnTime = block.timestamp;
     }
@@ -85,11 +108,61 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
             return true;
         }
         
+        // Check paid access
+        if (paidAccess[user][feature] > block.timestamp) {
+            return true;
+        }
+        
         // Check current SOLAR balance
         uint256 userBalance = SOLAR_TOKEN.balanceOf(user);
         uint256 required = featureRequirements[feature];
         
         return userBalance >= required;
+    }
+    
+    /**
+     * @notice Purchase paid access to a premium feature
+     * @param feature Feature identifier
+     * @param duration Duration in days (30, 90, 365)
+     */
+    function purchaseFeatureAccess(bytes32 feature, uint256 duration) external nonReentrant whenNotPaused {
+        require(duration == 30 || duration == 90 || duration == 365, "Invalid duration");
+        require(featurePricing[feature] > 0, "Feature not available for purchase");
+        
+        // Calculate price based on duration
+        uint256 basePrice = featurePricing[feature];
+        uint256 totalPrice;
+        
+        if (duration == 30) {
+            totalPrice = basePrice; // 1 month
+        } else if (duration == 90) {
+            totalPrice = (basePrice * 3 * 90) / 100; // 10% discount for 3 months
+        } else { // 365 days
+            totalPrice = (basePrice * 12 * 80) / 100; // 20% discount for annual
+        }
+        
+        // Transfer USDC from user
+        USDC.transferFrom(msg.sender, address(this), totalPrice);
+        
+        // Grant paid access
+        uint256 accessDuration = duration * 1 days;
+        uint256 newExpiry = block.timestamp + accessDuration;
+        
+        // Extend existing access if any
+        if (paidAccess[msg.sender][feature] > block.timestamp) {
+            newExpiry = paidAccess[msg.sender][feature] + accessDuration;
+        }
+        
+        paidAccess[msg.sender][feature] = newExpiry;
+        
+        // Track revenue
+        totalRevenue += totalPrice;
+        
+        // Auto-deposit to treasury if threshold reached
+        _checkTreasuryDeposit();
+        
+        emit FeaturePurchased(msg.sender, feature, totalPrice, duration);
+        emit RevenueAdded(totalPrice, msg.sender);
     }
     
     /**
@@ -104,6 +177,49 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
         userFeatureUsage[msg.sender][feature]++;
         
         emit FeatureUsed(msg.sender, feature);
+    }
+    
+    /**
+     * @notice Internal function to check and execute treasury deposits
+     */
+    function _checkTreasuryDeposit() internal {
+        if (treasuryContract != address(0)) {
+            uint256 balance = USDC.balanceOf(address(this));
+            if (balance >= TREASURY_THRESHOLD) {
+                // Deposit to treasury
+                USDC.transfer(treasuryContract, balance);
+                
+                // Notify treasury of new revenue
+                (bool success,) = treasuryContract.call(
+                    abi.encodeWithSignature("addRevenue(uint256)", balance)
+                );
+                
+                if (success) {
+                    emit TreasuryDeposit(balance);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @notice Manual treasury deposit (owner only)
+     */
+    function depositToTreasury() external onlyOwner {
+        require(treasuryContract != address(0), "Treasury not set");
+        
+        uint256 balance = USDC.balanceOf(address(this));
+        require(balance > 0, "No USDC to deposit");
+        
+        USDC.transfer(treasuryContract, balance);
+        
+        // Notify treasury
+        (bool success,) = treasuryContract.call(
+            abi.encodeWithSignature("addRevenue(uint256)", balance)
+        );
+        
+        if (success) {
+            emit TreasuryDeposit(balance);
+        }
     }
     
     /**
@@ -140,15 +256,6 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
         burnEvents++;
         
         emit SolarBurned(amount, reason, msg.sender);
-    }
-    
-    /**
-     * @notice Add revenue for future burns (called by treasury contract)
-     * @param amount Amount of USDC revenue to add
-     */
-    function addRevenue(uint256 amount) external onlyOwner {
-        totalRevenue += amount;
-        emit RevenueAdded(amount, msg.sender);
     }
     
     /**
@@ -198,6 +305,59 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     // ============ VIEW FUNCTIONS ============
     
     /**
+     * @notice Get user's access status for a feature
+     * @param user Address to check
+     * @param feature Feature identifier
+     * @return hasAccess Whether user has access
+     * @return accessType Type of access ("solar", "paid", "permanent", "temporary")
+     * @return expiryTime When access expires (0 if permanent)
+     */
+    function getUserFeatureAccess(address user, bytes32 feature) external view returns (
+        bool hasAccess,
+        string memory accessType,
+        uint256 expiryTime
+    ) {
+        if (permanentAccess[user][feature]) {
+            return (true, "permanent", 0);
+        }
+        
+        if (temporaryAccess[user][feature] > block.timestamp) {
+            return (true, "temporary", temporaryAccess[user][feature]);
+        }
+        
+        if (paidAccess[user][feature] > block.timestamp) {
+            return (true, "paid", paidAccess[user][feature]);
+        }
+        
+        uint256 userBalance = SOLAR_TOKEN.balanceOf(user);
+        uint256 required = featureRequirements[feature];
+        
+        if (userBalance >= required) {
+            return (true, "solar", 0);
+        }
+        
+        return (false, "none", 0);
+    }
+    
+    /**
+     * @notice Get feature pricing for different durations
+     * @param feature Feature identifier
+     * @return monthly Monthly price in USDC
+     * @return quarterly Quarterly price in USDC (10% discount)
+     * @return annual Annual price in USDC (20% discount)
+     */
+    function getFeaturePricing(bytes32 feature) external view returns (
+        uint256 monthly,
+        uint256 quarterly,
+        uint256 annual
+    ) {
+        uint256 basePrice = featurePricing[feature];
+        monthly = basePrice;
+        quarterly = (basePrice * 3 * 90) / 100; // 10% discount
+        annual = (basePrice * 12 * 80) / 100; // 20% discount
+    }
+    
+    /**
      * @notice Get user's SOLAR balance and accessible features
      * @param user Address to check
      * @return balance Current SOLAR balance
@@ -245,19 +405,22 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
      * @return burnCount Number of burn events
      * @return revenueForBurns Total revenue accumulated for burns
      * @return nextBurnTime When next quarterly burn can be executed
+     * @return usdcBalance Current USDC balance in contract
      */
     function getStats() external view returns (
         uint256 totalSupply,
         uint256 burnedAmount,
         uint256 burnCount,
         uint256 revenueForBurns,
-        uint256 nextBurnTime
+        uint256 nextBurnTime,
+        uint256 usdcBalance
     ) {
         totalSupply = 100_000_000_000 * 1e18; // 100B SOLAR (static)
         burnedAmount = totalBurned;
         burnCount = burnEvents;
         revenueForBurns = totalRevenue;
         nextBurnTime = lastBurnTime + BURN_INTERVAL;
+        usdcBalance = USDC.balanceOf(address(this));
     }
     
     /**
@@ -273,13 +436,16 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
      * @notice Get all feature requirements
      * @return features Array of feature names
      * @return requirements Array of SOLAR requirements
+     * @return prices Array of USDC prices
      */
     function getAllFeatureRequirements() external view returns (
         bytes32[] memory features,
-        uint256[] memory requirements
+        uint256[] memory requirements,
+        uint256[] memory prices
     ) {
         features = new bytes32[](7);
         requirements = new uint256[](7);
+        prices = new uint256[](7);
         
         features[0] = "premium_analytics";
         features[1] = "custom_milestones";
@@ -291,10 +457,19 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
         
         for (uint256 i = 0; i < features.length; i++) {
             requirements[i] = featureRequirements[features[i]];
+            prices[i] = featurePricing[features[i]];
         }
     }
     
     // ============ ADMIN FUNCTIONS ============
+    
+    /**
+     * @notice Set treasury contract address
+     * @param _treasuryContract Treasury contract address
+     */
+    function setTreasuryContract(address _treasuryContract) external onlyOwner {
+        treasuryContract = _treasuryContract;
+    }
     
     /**
      * @notice Update feature requirement
@@ -307,10 +482,20 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     }
     
     /**
+     * @notice Update feature pricing
+     * @param feature Feature identifier
+     * @param price New USDC price (monthly)
+     */
+    function setFeaturePricing(bytes32 feature, uint256 price) external onlyOwner {
+        featurePricing[feature] = price;
+        emit FeaturePricingSet(feature, price);
+    }
+    
+    /**
      * @notice Update burn percentage (for revenue burns)
      * @param newPercentage New percentage in basis points (2500 = 25%)
      */
-    function setBurnPercentage(uint256 newPercentage) external onlyOwner {
+    function setBurnPercentage(uint256 newPercentage) external onlyOwner view {
         require(newPercentage <= 5000, "Cannot exceed 50%"); // Max 50% of revenue
         // This would need to be a state variable, simplified for now
     }

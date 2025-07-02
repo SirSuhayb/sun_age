@@ -7,6 +7,12 @@
 - [x] Constructor issues resolved for Ownable
 - [x] Address checksum errors fixed
 - [x] Variable shadowing warnings resolved
+- [x] **REVENUE FLOW INTEGRATION COMPLETE**
+- [x] USDC payment collection in SolarUtility
+- [x] Automatic treasury deposits (≥$1000 threshold)
+- [x] Automatic Morpho deposits (≥$100 threshold)
+- [x] Yield distribution system (70/20/10 split)
+- [x] Contract linking in deployment script
 - [x] Compilation successful - **ALL CONTRACTS READY**
 
 ## 📋 **CONTRACTS DEPLOYED**
@@ -54,19 +60,24 @@ npx hardhat run scripts/deploy.js --network base
 ```
 
 ## 📊 **EXPECTED DEPLOYMENT ACTIONS**
-1. Deploy SolarUtility contract
-2. Deploy SolarStaking contract  
-3. Deploy MorphoTreasury contract
-4. Fund staking with 500K SOLAR rewards
-5. Execute 2B SOLAR strategic burns (2% supply reduction)
-6. Link all contracts together
-7. Save deployment addresses to `deployment-results.json`
+1. Deploy SolarUtility contract (with USDC payment system)
+2. Deploy SolarStaking contract (with emission schedule)
+3. Deploy MorphoTreasury contract (with auto-Morpho deposits)
+4. **Link contracts together** (SolarUtility → MorphoTreasury)
+5. Fund staking with 500K SOLAR rewards
+6. Execute 2B SOLAR strategic burns (2% supply reduction)
+7. **Revenue Flow Ready**: USDC sales → Treasury → Morpho yield
+8. Save deployment addresses to `deployment-results.json`
 
 ## 🎯 **DEPLOYMENT IMPACT**
 - **Immediate Burns**: 2B SOLAR (2% supply reduction)
 - **Staking Setup**: 500K SOLAR reward pool
 - **Premium Features**: 7 tiers (30M-500M SOLAR requirements)
-- **Treasury Ready**: For USDC Morpho integration
+- **USDC Revenue Flow**: $5-100/month premium feature pricing
+- **Auto-Treasury Deposits**: ≥$1000 USDC threshold to treasury
+- **Auto-Morpho Yield**: ≥$100 USDC threshold to Morpho (2.5-22% APY)
+- **Yield Distribution**: 70% owner, 20% operations, 10% buybacks
+- **Quarterly Revenue Burns**: 25% of USDC revenue → SOLAR burns
 - **Emissions**: 50K SOLAR/month declining 2%
 
 ## ✨ **POST-DEPLOYMENT**

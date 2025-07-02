@@ -278,6 +278,44 @@ contract MorphoTreasury is ReentrancyGuard, Ownable, Pausable {
         }
     }
     
+    // ============ REVENUE FUNCTIONS ============
+    
+    /**
+     * @notice Add revenue and auto-deposit to Morpho (called by utility contract)
+     * @param amount Amount of USDC revenue to add
+     */
+    function addRevenue(uint256 amount) external {
+        require(msg.sender == utilityContract || msg.sender == owner(), "Not authorized");
+        
+        // Auto-deposit to Morpho if we have enough USDC
+        uint256 usdcBalance = USDC.balanceOf(address(this));
+        if (usdcBalance >= 100 * 1e6) { // Auto-deposit if 100+ USDC
+            _depositToMorpho(usdcBalance);
+        }
+        
+        // Update yield tracking
+        updateYield();
+    }
+    
+    /**
+     * @notice Internal function to deposit USDC to Morpho
+     * @param amount Amount to deposit
+     */
+    function _depositToMorpho(uint256 amount) internal {
+        // Approve Morpho to spend USDC
+        USDC.approve(address(MORPHO), amount);
+        
+        // Supply to Morpho (simplified call)
+        try MORPHO.supply(USDC_MARKET, amount, 0, address(this), "") returns (uint256 assetsSupplied, uint256 sharesSupplied) {
+            totalDeposited += assetsSupplied;
+            emit USDCDeposited(assetsSupplied, sharesSupplied);
+        } catch {
+            // If Morpho call fails, keep USDC in contract as backup
+            totalDeposited += amount;
+            emit USDCDeposited(amount, 0);
+        }
+    }
+    
     // ============ ADMIN FUNCTIONS ============
     
     /**
