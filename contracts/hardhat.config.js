@@ -1,6 +1,14 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
+// Get private key from environment
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
+
+if (!DEPLOYER_PRIVATE_KEY) {
+  console.error("❌ DEPLOYER_PRIVATE_KEY not found in .env file");
+  process.exit(1);
+}
+
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
@@ -8,35 +16,35 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200
-      }
-    }
-  },
-  paths: {
-    artifacts: "../artifacts",
-    cache: "./cache"
+        runs: 200,
+      },
+    },
   },
   networks: {
     hardhat: {
-      chainId: 31337
-    },
-    sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 11155111
-    },
-    mainnet: {
-      url: process.env.MAINNET_RPC_URL || "",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 1
+      chainId: 1337
     },
     base: {
       url: process.env.BASE_RPC_URL || "https://mainnet.base.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 8453
-    }
+      accounts: [DEPLOYER_PRIVATE_KEY],
+      chainId: 8453,
+      gasPrice: "auto",
+      gas: "auto",
+    },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
-  }
-}; 
+    apiKey: {
+      base: process.env.BASESCAN_API_KEY || "",
+    },
+    customChains: [
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org"
+        }
+      }
+    ]
+  },
+};
