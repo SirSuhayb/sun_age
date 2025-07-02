@@ -1,28 +1,30 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
- * @title SolarTokenIntegration
- * @dev Core integration contract for existing SOLAR token utility in Solara ecosystem
- * @notice Manages premium features, burns, and utility for SOLAR token holders
+ * @title SolarUtility
+ * @dev Core SOLAR token utility contract for premium features and burns
+ * @notice Manages premium feature access, burns, and utility tracking
  */
-contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
+contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     
     // ============ STATE VARIABLES ============
     
     // Existing SOLAR token contract
-    IERC20 public constant SOLAR_TOKEN = IERC20(0x746042147240304098c837563aaec0f671881b07);
+    IERC20 public constant SOLAR_TOKEN = IERC20(0x746042147240304098C837563aAEc0F671881B07);
     
     // Burn address (standard burn address)
     address public constant BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
     
-    // Feature requirements and access
+    // Feature requirements (in SOLAR tokens with 18 decimals)
     mapping(bytes32 => uint256) public featureRequirements;
+    
+    // User access tracking
     mapping(address => mapping(bytes32 => bool)) public permanentAccess;
     mapping(address => mapping(bytes32 => uint256)) public temporaryAccess; // timestamp when access expires
     
@@ -30,9 +32,15 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
     uint256 public totalBurned;
     uint256 public burnEvents;
     
-    // Premium feature usage tracking
+    // Feature usage tracking
     mapping(bytes32 => uint256) public featureUsage;
     mapping(address => mapping(bytes32 => uint256)) public userFeatureUsage;
+    
+    // Revenue tracking for burns
+    uint256 public totalRevenue; // Total USDC revenue collected
+    uint256 public lastBurnTime;
+    uint256 public constant BURN_INTERVAL = 90 days; // Quarterly burns
+    uint256 public constant BURN_PERCENTAGE = 2500; // 25% of revenue for burns (in basis points)
     
     // ============ EVENTS ============
     
@@ -41,18 +49,21 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
     event PermanentAccessGranted(address indexed user, bytes32 indexed feature);
     event TemporaryAccessGranted(address indexed user, bytes32 indexed feature, uint256 duration);
     event FeatureUsed(address indexed user, bytes32 indexed feature);
+    event RevenueAdded(uint256 amount, address source);
     
     // ============ CONSTRUCTOR ============
     
-    constructor() {
-        // Set initial feature requirements (in SOLAR tokens with 18 decimals)
-        featureRequirements["premium_analytics"] = 5_000_000 * 1e18;      // 5M SOLAR
-        featureRequirements["custom_milestones"] = 15_000_000 * 1e18;     // 15M SOLAR  
-        featureRequirements["priority_support"] = 3_000_000 * 1e18;       // 3M SOLAR
-        featureRequirements["advanced_journey"] = 10_000_000 * 1e18;      // 10M SOLAR
-        featureRequirements["api_access"] = 25_000_000 * 1e18;            // 25M SOLAR
-        featureRequirements["governance_vote"] = 1_000_000 * 1e18;        // 1M SOLAR
-        featureRequirements["early_access"] = 5_000_000 * 1e18;           // 5M SOLAR
+    constructor() Ownable(msg.sender) {
+        // Set realistic feature requirements for 100B supply
+        featureRequirements["premium_analytics"] = 50_000_000 * 1e18;      // 50M SOLAR
+        featureRequirements["custom_milestones"] = 150_000_000 * 1e18;     // 150M SOLAR  
+        featureRequirements["priority_support"] = 30_000_000 * 1e18;       // 30M SOLAR
+        featureRequirements["advanced_journey"] = 100_000_000 * 1e18;      // 100M SOLAR
+        featureRequirements["api_access"] = 250_000_000 * 1e18;            // 250M SOLAR
+        featureRequirements["early_access"] = 50_000_000 * 1e18;           // 50M SOLAR
+        featureRequirements["vip_support"] = 500_000_000 * 1e18;           // 500M SOLAR
+        
+        lastBurnTime = block.timestamp;
     }
     
     // ============ CORE FUNCTIONS ============
@@ -119,26 +130,11 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
     // ============ BURN FUNCTIONS ============
     
     /**
-     * @notice Burn SOLAR tokens from contract balance
-     * @param amount Amount to burn
-     * @param reason Reason for burning
-     */
-    function burn(uint256 amount, string memory reason) external onlyOwner {
-        require(SOLAR_TOKEN.balanceOf(address(this)) >= amount, "Insufficient contract balance");
-        
-        SOLAR_TOKEN.transfer(BURN_ADDRESS, amount);
-        totalBurned += amount;
-        burnEvents++;
-        
-        emit SolarBurned(amount, reason, msg.sender);
-    }
-    
-    /**
-     * @notice Emergency burn from owner wallet (for immediate impact)
+     * @notice Strategic burn from owner wallet
      * @param amount Amount to burn from owner wallet
      * @param reason Reason for burning
      */
-    function emergencyBurn(uint256 amount, string memory reason) external onlyOwner {
+    function strategicBurn(uint256 amount, string memory reason) external onlyOwner {
         SOLAR_TOKEN.transferFrom(msg.sender, BURN_ADDRESS, amount);
         totalBurned += amount;
         burnEvents++;
@@ -147,25 +143,69 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
     }
     
     /**
-     * @notice Strategic burn for major announcements
-     * @param amount Amount to burn
+     * @notice Add revenue for future burns (called by treasury contract)
+     * @param amount Amount of USDC revenue to add
      */
-    function strategicBurn(uint256 amount) external onlyOwner {
-        string memory reason = string(abi.encodePacked("Strategic burn #", toString(burnEvents + 1)));
-        this.emergencyBurn(amount, reason);
+    function addRevenue(uint256 amount) external onlyOwner {
+        totalRevenue += amount;
+        emit RevenueAdded(amount, msg.sender);
+    }
+    
+    /**
+     * @notice Execute quarterly revenue-based burn
+     * @dev Anyone can call this after the interval has passed
+     */
+    function executeQuarterlyBurn() external nonReentrant {
+        require(block.timestamp >= lastBurnTime + BURN_INTERVAL, "Too early for quarterly burn");
+        require(totalRevenue > 0, "No revenue to burn");
+        
+        // Calculate burn amount (25% of total revenue converted to SOLAR)
+        uint256 burnAmount = calculateBurnAmount();
+        require(burnAmount > 0, "No SOLAR available for burn");
+        
+        // Execute burn from contract balance or owner
+        if (SOLAR_TOKEN.balanceOf(address(this)) >= burnAmount) {
+            SOLAR_TOKEN.transfer(BURN_ADDRESS, burnAmount);
+        } else {
+            // If contract doesn't have enough, burn from owner
+            SOLAR_TOKEN.transferFrom(owner(), BURN_ADDRESS, burnAmount);
+        }
+        
+        totalBurned += burnAmount;
+        burnEvents++;
+        lastBurnTime = block.timestamp;
+        
+        // Reset revenue counter
+        totalRevenue = 0;
+        
+        emit SolarBurned(burnAmount, "Quarterly revenue burn", msg.sender);
+    }
+    
+    /**
+     * @notice Calculate burn amount based on current revenue and SOLAR price
+     * @dev This is a simplified calculation - in practice would use price oracle
+     */
+    function calculateBurnAmount() public view returns (uint256) {
+        if (totalRevenue == 0) return 0;
+        
+        // Simplified: assume 1 USDC can buy ~1M SOLAR tokens (adjustable)
+        uint256 solarPerUSDC = 1_000_000 * 1e18; // 1M SOLAR per USDC
+        uint256 burnBudget = (totalRevenue * BURN_PERCENTAGE) / 10000; // 25% of revenue
+        
+        return burnBudget * solarPerUSDC / 1e6; // Convert USDC (6 decimals) to SOLAR (18 decimals)
     }
     
     // ============ VIEW FUNCTIONS ============
     
     /**
-     * @notice Get user's SOLAR balance and feature access status
+     * @notice Get user's SOLAR balance and accessible features
      * @param user Address to check
      * @return balance Current SOLAR balance
-     * @return accessList Array of accessible features
+     * @return accessibleFeatures Array of accessible feature names
      */
     function getUserStatus(address user) external view returns (
         uint256 balance,
-        bytes32[] memory accessList
+        bytes32[] memory accessibleFeatures
     ) {
         balance = SOLAR_TOKEN.balanceOf(user);
         
@@ -176,8 +216,8 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
         allFeatures[2] = "priority_support";
         allFeatures[3] = "advanced_journey";
         allFeatures[4] = "api_access";
-        allFeatures[5] = "governance_vote";
-        allFeatures[6] = "early_access";
+        allFeatures[5] = "early_access";
+        allFeatures[6] = "vip_support";
         
         // Count accessible features
         uint256 accessCount = 0;
@@ -188,11 +228,11 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
         }
         
         // Create accessible features array
-        accessList = new bytes32[](accessCount);
+        accessibleFeatures = new bytes32[](accessCount);
         uint256 index = 0;
         for (uint256 i = 0; i < allFeatures.length; i++) {
             if (this.checkAccess(user, allFeatures[i])) {
-                accessList[index] = allFeatures[i];
+                accessibleFeatures[index] = allFeatures[i];
                 index++;
             }
         }
@@ -203,24 +243,21 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
      * @return totalSupply Current SOLAR total supply
      * @return burnedAmount Total tokens burned
      * @return burnCount Number of burn events
-     * @return totalUsers Number of users who have used features
+     * @return revenueForBurns Total revenue accumulated for burns
+     * @return nextBurnTime When next quarterly burn can be executed
      */
     function getStats() external view returns (
         uint256 totalSupply,
         uint256 burnedAmount,
         uint256 burnCount,
-        uint256 totalUsers
+        uint256 revenueForBurns,
+        uint256 nextBurnTime
     ) {
-        // Note: SOLAR token total supply would need to be fetched from token contract
-        totalSupply = 100_000_000_000 * 1e18; // 100B SOLAR (static for now)
+        totalSupply = 100_000_000_000 * 1e18; // 100B SOLAR (static)
         burnedAmount = totalBurned;
         burnCount = burnEvents;
-        
-        // Total users is tracked through feature usage
-        // This is a simplified version - in production you'd track unique users
-        totalUsers = featureUsage["premium_analytics"] + 
-                    featureUsage["custom_milestones"] + 
-                    featureUsage["priority_support"];
+        revenueForBurns = totalRevenue;
+        nextBurnTime = lastBurnTime + BURN_INTERVAL;
     }
     
     /**
@@ -249,8 +286,8 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
         features[2] = "priority_support";
         features[3] = "advanced_journey";
         features[4] = "api_access";
-        features[5] = "governance_vote";
-        features[6] = "early_access";
+        features[5] = "early_access";
+        features[6] = "vip_support";
         
         for (uint256 i = 0; i < features.length; i++) {
             requirements[i] = featureRequirements[features[i]];
@@ -270,7 +307,16 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
     }
     
     /**
-     * @notice Withdraw any accidentally sent tokens (except SOLAR)
+     * @notice Update burn percentage (for revenue burns)
+     * @param newPercentage New percentage in basis points (2500 = 25%)
+     */
+    function setBurnPercentage(uint256 newPercentage) external onlyOwner {
+        require(newPercentage <= 5000, "Cannot exceed 50%"); // Max 50% of revenue
+        // This would need to be a state variable, simplified for now
+    }
+    
+    /**
+     * @notice Emergency withdraw (owner only)
      * @param token Token address
      * @param amount Amount to withdraw
      */
@@ -296,24 +342,20 @@ contract SolarTokenIntegration is ReentrancyGuard, Ownable, Pausable {
     // ============ HELPER FUNCTIONS ============
     
     /**
-     * @notice Convert uint to string
+     * @notice Check if quarterly burn is available
      */
-    function toString(uint256 value) internal pure returns (string memory) {
-        if (value == 0) {
-            return "0";
+    function canExecuteQuarterlyBurn() external view returns (bool) {
+        return block.timestamp >= lastBurnTime + BURN_INTERVAL && totalRevenue > 0;
+    }
+    
+    /**
+     * @notice Get time until next burn
+     */
+    function timeUntilNextBurn() external view returns (uint256) {
+        uint256 nextBurn = lastBurnTime + BURN_INTERVAL;
+        if (block.timestamp >= nextBurn) {
+            return 0;
         }
-        uint256 temp = value;
-        uint256 digits;
-        while (temp != 0) {
-            digits++;
-            temp /= 10;
-        }
-        bytes memory buffer = new bytes(digits);
-        while (value != 0) {
-            digits -= 1;
-            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
-            value /= 10;
-        }
-        return string(buffer);
+        return nextBurn - block.timestamp;
     }
 }
