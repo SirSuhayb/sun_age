@@ -7,13 +7,17 @@ async function main() {
   const SOLAR_TOKEN = "0x746042147240304098c837563aaec0f671881b07";
   const BURN_AMOUNT = hre.ethers.parseEther("2000000000"); // 2 Billion SOLAR tokens
   
-  // You'll need to update this with your deployed contract address
-  const SOLAR_INTEGRATION_ADDRESS = process.env.SOLAR_INTEGRATION_ADDRESS || "REPLACE_WITH_DEPLOYED_ADDRESS";
+  // Get contract address from environment
+  const SOLAR_INTEGRATION_ADDRESS = process.env.SOLAR_INTEGRATION_ADDRESS || process.env.NEXT_PUBLIC_SOLAR_INTEGRATION_ADDRESS;
   
-  if (SOLAR_INTEGRATION_ADDRESS === "REPLACE_WITH_DEPLOYED_ADDRESS") {
-    console.error("❌ Please set SOLAR_INTEGRATION_ADDRESS in your environment or update the script");
+  if (!SOLAR_INTEGRATION_ADDRESS) {
+    console.error("❌ SOLAR_INTEGRATION_ADDRESS not found in environment variables");
+    console.error("Please set SOLAR_INTEGRATION_ADDRESS in your .env file");
+    console.error("Example: SOLAR_INTEGRATION_ADDRESS=0x1234567890123456789012345678901234567890");
     process.exit(1);
   }
+  
+  console.log("Using SOLAR Integration contract:", SOLAR_INTEGRATION_ADDRESS);
 
   // Get signers
   const [deployer] = await hre.ethers.getSigners();
@@ -23,14 +27,32 @@ async function main() {
   const solarToken = await hre.ethers.getContractAt("IERC20", SOLAR_TOKEN);
   const solarIntegration = await hre.ethers.getContractAt("SolarTokenIntegration", SOLAR_INTEGRATION_ADDRESS);
 
-  // Check balance
+  // Check balances
   console.log("\n📊 Pre-burn Status:");
-  const balance = await solarToken.balanceOf(deployer.address);
-  console.log("Your SOLAR balance:", hre.ethers.formatEther(balance), "SOLAR");
+  const solarBalance = await solarToken.balanceOf(deployer.address);
+  const ethBalance = await hre.ethers.provider.getBalance(deployer.address);
+  
+  console.log("Your SOLAR balance:", hre.ethers.formatEther(solarBalance), "SOLAR");
+  console.log("Your ETH balance:", hre.ethers.formatEther(ethBalance), "ETH");
   console.log("Burn amount:", hre.ethers.formatEther(BURN_AMOUNT), "SOLAR");
   
-  if (balance < BURN_AMOUNT) {
+  // Check ETH balance for gas
+  const minEthBalance = hre.ethers.parseEther("0.002"); // 0.002 ETH minimum for gas
+  if (ethBalance < minEthBalance) {
+    console.error("❌ Insufficient ETH balance for gas fees");
+    console.error("Required:", hre.ethers.formatEther(minEthBalance), "ETH");
+    console.error("Current:", hre.ethers.formatEther(ethBalance), "ETH");
+    console.error("\n💰 Please send ETH to:", deployer.address);
+    process.exit(1);
+  }
+  
+  // Check SOLAR balance for burn
+  if (solarBalance < BURN_AMOUNT) {
     console.error("❌ Insufficient SOLAR balance for burn");
+    console.error("Required:", hre.ethers.formatEther(BURN_AMOUNT), "SOLAR");
+    console.error("Current:", hre.ethers.formatEther(solarBalance), "SOLAR");
+    console.error("\n🌟 Please send SOLAR tokens to:", deployer.address);
+    console.error("SOLAR Token Contract:", SOLAR_TOKEN);
     process.exit(1);
   }
 

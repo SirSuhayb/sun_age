@@ -10,6 +10,16 @@ async function main() {
   // Check deployer balance
   const balance = await hre.ethers.provider.getBalance(deployer.address);
   console.log("Deployer balance:", hre.ethers.formatEther(balance), "ETH");
+  
+  // Verify minimum balance for deployment
+  const minBalance = hre.ethers.parseEther("0.005"); // 0.005 ETH minimum
+  if (balance < minBalance) {
+    console.error("❌ Insufficient ETH balance for deployment");
+    console.error("Required:", hre.ethers.formatEther(minBalance), "ETH");
+    console.error("Current:", hre.ethers.formatEther(balance), "ETH");
+    console.error("\n💰 Please send ETH to:", deployer.address);
+    process.exit(1);
+  }
 
   // Deploy SolarTokenIntegration
   console.log("\n📝 Deploying SolarTokenIntegration contract...");
