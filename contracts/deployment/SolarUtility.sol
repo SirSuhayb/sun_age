@@ -49,9 +49,14 @@ contract SolarUtility is ReentrancyGuard, Ownable, Pausable {
     uint256 public constant BURN_INTERVAL = 90 days; // Quarterly burns
     uint256 public constant BURN_PERCENTAGE = 2500; // 25% of revenue for burns (in basis points)
     
-    // Treasury contract for automatic deposits
-    address public treasuryContract;
+    // Treasury contracts for revenue split
+    address public morphoTreasuryContract;   // 50% to Morpho for yield
+    address public companyTreasuryContract;  // 50% to company operations
     uint256 public constant TREASURY_THRESHOLD = 1000 * 1e6; // Auto-deposit when 1000+ USDC
+    
+    // Revenue split tracking
+    uint256 public morphoAllocatedRevenue;    // Revenue sent to Morpho treasury
+    uint256 public companyAllocatedRevenue;   // Revenue sent to company treasury
     
     // ============ EVENTS ============
     
