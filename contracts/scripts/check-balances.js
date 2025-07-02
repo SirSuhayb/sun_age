@@ -20,16 +20,14 @@ async function main() {
     const ethBalance = await hre.ethers.provider.getBalance(deployer.address);
     const ethFormatted = hre.ethers.formatEther(ethBalance);
     
-    console.log("💎 ETH Balance:", ethFormatted, "ETH");
+    console.log("�� ETH Balance:", ethFormatted, "ETH");
     
     // ETH requirements check
     const minEthForDeployment = hre.ethers.parseEther("0.005");
-    const minEthForBurn = hre.ethers.parseEther("0.002");
     const recommendedEth = hre.ethers.parseEther("0.015");
     
     console.log("\n📊 ETH Requirements:");
     console.log("Minimum for deployment:", hre.ethers.formatEther(minEthForDeployment), "ETH");
-    console.log("Minimum for burn:", hre.ethers.formatEther(minEthForBurn), "ETH");
     console.log("Recommended total:", hre.ethers.formatEther(recommendedEth), "ETH");
     
     if (ethBalance >= recommendedEth) {
@@ -54,16 +52,12 @@ async function main() {
     
     // SOLAR requirements check
     const burnAmount = hre.ethers.parseEther("2000000000"); // 2B SOLAR
-    const recommendedSolar = hre.ethers.parseEther("2100000000"); // 2.1B SOLAR
     
     console.log("\n📊 SOLAR Requirements:");
     console.log("Required for burn:", "2,000,000,000 SOLAR");
-    console.log("Recommended total:", "2,100,000,000 SOLAR");
     
-    if (solarBalance >= recommendedSolar) {
+    if (solarBalance >= burnAmount) {
       console.log("✅ SOLAR balance is sufficient");
-    } else if (solarBalance >= burnAmount) {
-      console.log("⚠️  SOLAR balance meets minimum - no buffer");
     } else {
       console.log("❌ SOLAR balance too low for strategic burn");
       console.log("Need:", hre.ethers.formatEther(burnAmount - solarBalance), "more SOLAR");
@@ -92,26 +86,17 @@ async function main() {
   
   if (ethReady && solarReady) {
     console.log("\n🚀 ALL SYSTEMS GO! Ready for deployment!");
-    console.log("\nNext steps:");
-    console.log("1. npx hardhat run scripts/deploy-solar-integration.js --network", hre.network.name);
-    console.log("2. Update .env with deployed contract address");
-    console.log("3. npx hardhat run scripts/execute-burn.js --network", hre.network.name);
   } else {
     console.log("\n⏳ Not ready for deployment yet.");
     console.log("\nFunding instructions:");
     if (!ethReady) {
-      console.log("💰 Send ETH to:", deployer.address);
-      console.log("   Minimum:", hre.ethers.formatEther(minEth), "ETH");
+      console.log("�� Send ETH to:", deployer.address);
     }
     if (!solarReady) {
       console.log("🌟 Send SOLAR to:", deployer.address);
       console.log("   Amount: 2,000,000,000 SOLAR");
-      console.log("   Contract:", SOLAR_TOKEN);
     }
   }
-  
-  console.log("\n📝 Need to generate a new wallet?");
-  console.log("Run: node scripts/generate-wallet.js");
 }
 
 main()
