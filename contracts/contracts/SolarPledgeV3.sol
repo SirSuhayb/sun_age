@@ -6,6 +6,25 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
+// Simplified Uniswap V3 Router interface
+interface ISwapRouter {
+    struct ExactInputSingleParams {
+        address tokenIn;
+        address tokenOut;
+        uint24 fee;
+        address recipient;
+        uint256 deadline;
+        uint256 amountIn;
+        uint256 amountOutMinimum;
+        uint160 sqrtPriceLimitX96;
+    }
+    
+    function exactInputSingle(ExactInputSingleParams calldata params)
+        external
+        payable
+        returns (uint256 amountOut);
+}
+
 /**
  * @title SolarPledgeV3
  * @dev Enhanced Solar Pledge contract with REAL USDC-to-SOLAR purchase & burn
@@ -102,27 +121,6 @@ contract SolarPledgeV3 is ReentrancyGuard, Ownable, Pausable {
     event PremiumFeatureUnlocked(address indexed user, uint256 pledgeAmount);
     event RevenueAllocated(uint256 morphoShare, uint256 utilityShare);
     event UsdcToSolarSwap(uint256 usdcIn, uint256 solarOut, uint256 slippage);
-    
-    // ============ INTERFACES ============
-    
-    // Simplified Uniswap V3 Router interface
-    interface ISwapRouter {
-        struct ExactInputSingleParams {
-            address tokenIn;
-            address tokenOut;
-            uint24 fee;
-            address recipient;
-            uint256 deadline;
-            uint256 amountIn;
-            uint256 amountOutMinimum;
-            uint160 sqrtPriceLimitX96;
-        }
-        
-        function exactInputSingle(ExactInputSingleParams calldata params)
-            external
-            payable
-            returns (uint256 amountOut);
-    }
     
     // ============ CONSTRUCTOR ============
     
