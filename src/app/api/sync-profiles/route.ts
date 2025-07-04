@@ -22,10 +22,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    console.log('[API] sync-profiles GET called for fid:', fidNumber);
+
+    // Check if service role key is configured
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) {
+      console.error('[API] sync-profiles: SUPABASE_SERVICE_ROLE_KEY not found');
+      return new Response(JSON.stringify({ 
+        error: 'SUPABASE_SERVICE_ROLE_KEY environment variable is required' 
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const supabase = createServiceRoleClient();
     const neynarApiKey = process.env.NEYNAR_API_KEY;
     
     if (!neynarApiKey) {
+      console.error('[API] sync-profiles: NEYNAR_API_KEY not found');
       return new Response(JSON.stringify({ 
         error: 'NEYNAR_API_KEY environment variable is required' 
       }), {
@@ -38,6 +53,7 @@ export async function GET(request: NextRequest) {
 
     try {
       // Try to fetch real Farcaster user data
+      console.log('[API] sync-profiles: Fetching user data from Neynar for fid:', fidNumber);
       const userResponse = await neynarClient.fetchBulkUsers({ fids: [fidNumber] });
       
       if (userResponse && userResponse.users && userResponse.users.length > 0) {
@@ -45,13 +61,14 @@ export async function GET(request: NextRequest) {
         const username = user.username || `soluser_${fidNumber}`;
         const display_name = user.display_name || user.username || `soluser_${fidNumber}`;
         
+        console.log('[API] sync-profiles: Upserting profile with real data for fid:', fidNumber);
         // Upsert profile with real data
         const { error } = await supabase
           .from('profiles')
           .upsert([{ fid: fidNumber, username, display_name }], { onConflict: 'fid' });
         
         if (error) {
-          console.error(`Error upserting profile for fid ${fidNumber}:`, error);
+          console.error(`[API] sync-profiles: Error upserting profile for fid ${fidNumber}:`, error);
           return new Response(JSON.stringify({ 
             error: `Error upserting profile: ${error.message}`,
             status: 'error'
@@ -60,7 +77,7 @@ export async function GET(request: NextRequest) {
             headers: { 'Content-Type': 'application/json' },
           });
         } else {
-          console.log(`Successfully synced real profile for fid ${fidNumber}: ${username} (${display_name})`);
+          console.log(`[API] sync-profiles: Successfully synced real profile for fid ${fidNumber}: ${username} (${display_name})`);
           return new Response(JSON.stringify({ 
             status: 'success',
             fid: fidNumber,
@@ -73,6 +90,7 @@ export async function GET(request: NextRequest) {
         }
       } else {
         // Fallback to generated username if no real data found
+        console.log('[API] sync-profiles: No real data found, using fallback for fid:', fidNumber);
         const username = `soluser_${fidNumber}`;
         const display_name = `soluser_${fidNumber}`;
         
@@ -81,7 +99,7 @@ export async function GET(request: NextRequest) {
           .upsert([{ fid: fidNumber, username, display_name }], { onConflict: 'fid' });
         
         if (error) {
-          console.error(`Error upserting fallback profile for fid ${fidNumber}:`, error);
+          console.error(`[API] sync-profiles: Error upserting fallback profile for fid ${fidNumber}:`, error);
           return new Response(JSON.stringify({ 
             error: `Error upserting fallback profile: ${error.message}`,
             status: 'error'
@@ -90,7 +108,7 @@ export async function GET(request: NextRequest) {
             headers: { 'Content-Type': 'application/json' },
           });
         } else {
-          console.log(`Successfully synced fallback profile for fid ${fidNumber}`);
+          console.log(`[API] sync-profiles: Successfully synced fallback profile for fid ${fidNumber}`);
           return new Response(JSON.stringify({ 
             status: 'success_fallback',
             fid: fidNumber,
@@ -103,7 +121,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (error) {
-      console.error(`Error fetching Farcaster data for fid ${fidNumber}:`, error);
+      console.error(`[API] sync-profiles: Error fetching Farcaster data for fid ${fidNumber}:`, error);
       
       // Fallback to generated username on error
       const username = `soluser_${fidNumber}`;
@@ -114,7 +132,7 @@ export async function GET(request: NextRequest) {
         .upsert([{ fid: fidNumber, username, display_name }], { onConflict: 'fid' });
       
       if (upsertError) {
-        console.error(`Error upserting fallback profile for fid ${fidNumber}:`, upsertError);
+        console.error(`[API] sync-profiles: Error upserting fallback profile for fid ${fidNumber}:`, upsertError);
         return new Response(JSON.stringify({ 
           error: `Error upserting fallback profile: ${upsertError.message}`,
           status: 'error'
@@ -123,7 +141,7 @@ export async function GET(request: NextRequest) {
           headers: { 'Content-Type': 'application/json' },
         });
       } else {
-        console.log(`Successfully synced fallback profile for fid ${fidNumber} after API error`);
+        console.log(`[API] sync-profiles: Successfully synced fallback profile for fid ${fidNumber} after API error`);
         return new Response(JSON.stringify({ 
           status: 'success_fallback',
           fid: fidNumber,
@@ -137,7 +155,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Error in single profile sync:', error);
+    console.error('[API] sync-profiles: Error in single profile sync:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -147,10 +165,25 @@ export async function GET(request: NextRequest) {
 
 export async function POST() {
   try {
+    console.log('[API] sync-profiles POST called');
+    
+    // Check if service role key is configured
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) {
+      console.error('[API] sync-profiles POST: SUPABASE_SERVICE_ROLE_KEY not found');
+      return new Response(JSON.stringify({ 
+        error: 'SUPABASE_SERVICE_ROLE_KEY environment variable is required' 
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    
     const supabase = createServiceRoleClient();
     const neynarApiKey = process.env.NEYNAR_API_KEY;
     
     if (!neynarApiKey) {
+      console.error('[API] sync-profiles POST: NEYNAR_API_KEY not found');
       return new Response(JSON.stringify({ 
         error: 'NEYNAR_API_KEY environment variable is required' 
       }), {
@@ -162,10 +195,12 @@ export async function POST() {
     const neynarClient = new NeynarAPIClient({ apiKey: neynarApiKey });
 
     // Get all unique user_fid from journal_entries
+    console.log('[API] sync-profiles POST: Fetching journal_entries user_fids');
     const { data: entryFids, error: entryError } = await supabase
       .from('journal_entries')
       .select('user_fid');
     if (entryError) {
+      console.error('[API] sync-profiles POST: Error fetching journal_entries:', entryError);
       return new Response(JSON.stringify({ error: `Error fetching journal_entries: ${entryError.message}` }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -173,10 +208,12 @@ export async function POST() {
     }
 
     // Get all unique user_fid from journal_shares
+    console.log('[API] sync-profiles POST: Fetching journal_shares user_fids');
     const { data: shareFids, error: shareError } = await supabase
       .from('journal_shares')
       .select('user_fid');
     if (shareError) {
+      console.error('[API] sync-profiles POST: Error fetching journal_shares:', shareError);
       return new Response(JSON.stringify({ error: `Error fetching journal_shares: ${shareError.message}` }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -189,11 +226,14 @@ export async function POST() {
       ...shareFids.map(s => s.user_fid),
     ].filter(Boolean));
 
+    console.log('[API] sync-profiles POST: Total unique FIDs to sync:', allFids.size);
+
     const results: Array<{ fid: number; status: string; message?: string; username?: string; display_name?: string }> = [];
     
     // Fetch all users in bulk
     try {
       const fidsArray = Array.from(allFids);
+      console.log('[API] sync-profiles POST: Fetching bulk user data from Neynar');
       const userResponse = await neynarClient.fetchBulkUsers({ fids: fidsArray });
       
       if (userResponse && userResponse.users) {
@@ -205,6 +245,7 @@ export async function POST() {
           }
         });
         
+        console.log('[API] sync-profiles POST: Processing', allFids.size, 'FIDs');
         // Process each FID
         for (const fid of allFids) {
           const user = userMap.get(fid);
@@ -219,10 +260,10 @@ export async function POST() {
               .upsert([{ fid, username, display_name }], { onConflict: 'fid' });
             
             if (error) {
-              console.error(`Error upserting profile for fid ${fid}:`, error);
+              console.error(`[API] sync-profiles POST: Error upserting profile for fid ${fid}:`, error);
               results.push({ fid, status: 'error', message: error.message });
             } else {
-              console.log(`Successfully synced real profile for fid ${fid}: ${username} (${display_name})`);
+              console.log(`[API] sync-profiles POST: Successfully synced real profile for fid ${fid}: ${username} (${display_name})`);
               results.push({ fid, status: 'success', username, display_name });
             }
           } else {
@@ -235,16 +276,17 @@ export async function POST() {
               .upsert([{ fid, username, display_name }], { onConflict: 'fid' });
             
             if (error) {
-              console.error(`Error upserting fallback profile for fid ${fid}:`, error);
+              console.error(`[API] sync-profiles POST: Error upserting fallback profile for fid ${fid}:`, error);
               results.push({ fid, status: 'error', message: error.message });
             } else {
-              console.log(`Successfully synced fallback profile for fid ${fid}`);
+              console.log(`[API] sync-profiles POST: Successfully synced fallback profile for fid ${fid}`);
               results.push({ fid, status: 'success_fallback', username, display_name });
             }
           }
         }
       } else {
         // Fallback to generated usernames if bulk fetch fails
+        console.log('[API] sync-profiles POST: Bulk fetch failed, using fallback for all FIDs');
         for (const fid of allFids) {
           const username = `soluser_${fid}`;
           const display_name = `soluser_${fid}`;
@@ -254,18 +296,19 @@ export async function POST() {
             .upsert([{ fid, username, display_name }], { onConflict: 'fid' });
           
           if (error) {
-            console.error(`Error upserting fallback profile for fid ${fid}:`, error);
+            console.error(`[API] sync-profiles POST: Error upserting fallback profile for fid ${fid}:`, error);
             results.push({ fid, status: 'error', message: error.message });
           } else {
-            console.log(`Successfully synced fallback profile for fid ${fid}`);
+            console.log(`[API] sync-profiles POST: Successfully synced fallback profile for fid ${fid}`);
             results.push({ fid, status: 'success_fallback', username, display_name });
           }
         }
       }
     } catch (error) {
-      console.error('Error fetching Farcaster data:', error);
+      console.error('[API] sync-profiles POST: Error fetching Farcaster data:', error);
       
       // Fallback to generated usernames on error
+      console.log('[API] sync-profiles POST: Using fallback for all FIDs due to API error');
       for (const fid of allFids) {
         const username = `soluser_${fid}`;
         const display_name = `soluser_${fid}`;
@@ -275,15 +318,16 @@ export async function POST() {
           .upsert([{ fid, username, display_name }], { onConflict: 'fid' });
         
         if (upsertError) {
-          console.error(`Error upserting fallback profile for fid ${fid}:`, upsertError);
+          console.error(`[API] sync-profiles POST: Error upserting fallback profile for fid ${fid}:`, upsertError);
           results.push({ fid, status: 'error', message: upsertError.message });
         } else {
-          console.log(`Successfully synced fallback profile for fid ${fid} after API error`);
+          console.log(`[API] sync-profiles POST: Successfully synced fallback profile for fid ${fid} after API error`);
           results.push({ fid, status: 'success_fallback', username, display_name });
         }
       }
     }
 
+    console.log('[API] sync-profiles POST: Sync complete. Results:', results);
     return new Response(JSON.stringify({
       message: 'Profile sync complete',
       totalFids: allFids.size,
@@ -294,7 +338,7 @@ export async function POST() {
     });
 
   } catch (error) {
-    console.error('Error in profile sync:', error);
+    console.error('[API] sync-profiles POST: Error in profile sync:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

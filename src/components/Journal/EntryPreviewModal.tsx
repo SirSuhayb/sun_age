@@ -197,13 +197,15 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
                   >
                     EDIT REFLECTION
                   </button>
-                  <button
-                    className="font-mono text-[16px] tracking-tight py-3 rounded-none text-sm w-1/2 border border-black bg-[#d4af37] text-black hover:bg-[#e6c75a] transition-colors"
-                    style={{ letterSpacing: '-0.04em', fontWeight: 400 }}
-                    onClick={onShare}
-                  >
-                    SHARE REFLECTION
-                  </button>
+                  {entry.preservation_status === 'synced' && (
+                    <button
+                      className="font-mono text-[16px] tracking-tight py-3 rounded-none text-sm w-1/2 border border-black bg-[#d4af37] text-black hover:bg-[#e6c75a] transition-colors"
+                      style={{ letterSpacing: '-0.04em', fontWeight: 400 }}
+                      onClick={onShare}
+                    >
+                      SHARE REFLECTION
+                    </button>
+                  )}
                 </div>
               )}
             </div>

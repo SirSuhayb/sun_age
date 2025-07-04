@@ -1,29 +1,36 @@
 import { NextResponse } from 'next/server'
+import { createServiceRoleClient } from '~/utils/supabase/server'
 
 export async function GET() {
   try {
-    // Basic health check - updated for deployment test
-    const health = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version || '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      services: {
-        database: 'connected', // You can add actual DB health check here
-        frameSDK: 'available',
-        journal: 'functional'
-      }
-    }
-
-    return NextResponse.json(health, { status: 200 })
-  } catch (error) {
-    return NextResponse.json(
-      { 
-        status: 'unhealthy', 
-        error: error instanceof Error ? error.message : 'Unknown error',
+    const supabase = createServiceRoleClient()
+    
+    // Test service role client access to profiles table
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('count')
+      .limit(1)
+    
+    if (error) {
+      console.error('[Health] Service role client test failed:', error)
+      return NextResponse.json({ 
+        status: 'error',
+        error: `Service role client test failed: ${error.message}`,
         timestamp: new Date().toISOString()
-      }, 
-      { status: 500 }
-    )
+      }, { status: 500 })
+    }
+    
+    return NextResponse.json({ 
+      status: 'healthy',
+      serviceRoleClient: 'working',
+      timestamp: new Date().toISOString()
+    })
+  } catch (error) {
+    console.error('[Health] Health check failed:', error)
+    return NextResponse.json({ 
+      status: 'error',
+      error: 'Health check failed',
+      timestamp: new Date().toISOString()
+    }, { status: 500 })
   }
 } 

@@ -90,8 +90,19 @@ export async function composeAndShareEntry(entry: JournalEntry, sdk?: any, isInF
     entryId: entry.id,
     userFid: userFid || entry.user_fid,
     isInFrame,
-    hasSdk: !!sdk
+    hasSdk: !!sdk,
+    preservationStatus: entry.preservation_status
   });
+
+  // Check if this is a local entry (starts with 'local_')
+  if (entry.id.startsWith('local_')) {
+    throw new Error('Cannot share local entries. Please migrate your entry to the database first.');
+  }
+
+  // Check if entry is synced
+  if (entry.preservation_status !== 'synced') {
+    throw new Error('Only synced entries can be shared. Please wait for your entry to be synced to the database.');
+  }
 
   // Use provided userFid (for dev override) or fall back to entry.user_fid
   const finalUserFid = userFid || entry.user_fid;

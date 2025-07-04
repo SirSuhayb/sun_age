@@ -43,6 +43,13 @@ export async function POST(req: NextRequest) {
   
   console.log('[API] Using user FID:', finalUserFid);
 
+  // Check if this is a local entry (starts with 'local_')
+  if (entryId.startsWith('local_')) {
+    return NextResponse.json({ 
+      error: 'Cannot share local entries. Please migrate your entry to the database first.' 
+    }, { status: 400 });
+  }
+
   // Validate entry exists and belongs to user
   const { data: entry, error: entryError } = await supabase
     .from('journal_entries')
