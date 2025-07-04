@@ -1,10 +1,10 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/workspace/contracts/contracts/SolarPledgeV2.sol": {
-      "lastModificationDate": 1751507047012,
-      "contentHash": "a9329ae3e97b24da6b9cecc794250da4",
-      "sourceName": "contracts/SolarPledgeV2.sol",
+    "/workspace/contracts/deployment/MorphoTreasury.sol": {
+      "lastModificationDate": 1751495307633,
+      "contentHash": "3852b87eeb3c3dc4f54dc808e363cd4a",
+      "sourceName": "contracts/deployment/MorphoTreasury.sol",
       "solcConfig": {
         "version": "0.8.20",
         "settings": {
@@ -39,7 +39,8 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "SolarPledgeV2"
+        "IMorpho",
+        "MorphoTreasury"
       ]
     },
     "/workspace/node_modules/@openzeppelin/contracts/utils/Pausable.sol": {
@@ -78,42 +79,6 @@
       ],
       "artifacts": [
         "Pausable"
-      ]
-    },
-    "/workspace/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
-      "lastModificationDate": 1751488164422,
-      "contentHash": "8f19f64d2adadf448840908bbaf431c8",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-      "solcConfig": {
-        "version": "0.8.20",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IERC20"
       ]
     },
     "/workspace/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
@@ -190,6 +155,42 @@
         "ReentrancyGuard"
       ]
     },
+    "/workspace/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1751488164422,
+      "contentHash": "8f19f64d2adadf448840908bbaf431c8",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
     "/workspace/node_modules/@openzeppelin/contracts/utils/Context.sol": {
       "lastModificationDate": 1751488164413,
       "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
@@ -226,10 +227,10 @@
         "Context"
       ]
     },
-    "/workspace/contracts/contracts/SolarPledgeV3.sol": {
-      "lastModificationDate": 1751569774726,
-      "contentHash": "242b31ea2a8e04568334b822d0d84365",
-      "sourceName": "contracts/SolarPledgeV3.sol",
+    "/workspace/contracts/deployment/SolarUtility.sol": {
+      "lastModificationDate": 1751495251757,
+      "contentHash": "335d5aa0117b1f66a2f97b85f7a84073",
+      "sourceName": "contracts/deployment/SolarUtility.sol",
       "solcConfig": {
         "version": "0.8.20",
         "settings": {
@@ -264,8 +265,48 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "ISwapRouter",
-        "SolarPledgeV3"
+        "SolarUtility"
+      ]
+    },
+    "/workspace/contracts/deployment/SolarStaking.sol": {
+      "lastModificationDate": 1751488537813,
+      "contentHash": "6b1fa9d64973afbd606b6c2616879b8d",
+      "sourceName": "contracts/deployment/SolarStaking.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/utils/Pausable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SolarStaking"
       ]
     }
   }

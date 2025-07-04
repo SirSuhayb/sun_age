@@ -2,67 +2,74 @@ require("@nomicfoundation/hardhat-toolbox");
 require("@nomicfoundation/hardhat-ethers");
 require("dotenv").config();
 
-// Log environment variables (without exposing private key)
-console.log("Network:", process.env.HARDHAT_NETWORK);
-console.log("Private key exists:", !!process.env.PRIVATE_KEY);
-console.log("Basescan API key exists:", !!process.env.BASESCAN_API_KEY);
+// Environment configuration for SOLAR deployment
+
+// Fallback private key for development (DO NOT USE IN PRODUCTION)
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.19",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200
+    compilers: [
+      {
+        version: "0.8.19",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: "0.8.20",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       }
-    }
+    ]
   },
   networks: {
     hardhat: {
       chainId: 1337
     },
+    base: {
+      url: process.env.BASE_RPC_URL || "https://mainnet.base.org",
+      accounts: [DEPLOYER_PRIVATE_KEY],
+      chainId: 8453,
+      gasPrice: "auto",
+      gas: "auto",
+    },
     "base-sepolia": {
       url: "https://sepolia.base.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: [DEPLOYER_PRIVATE_KEY],
       chainId: 84532,
-      verify: {
-        etherscan: {
-          apiKey: process.env.BASESCAN_API_KEY
-        }
-      }
+      gasPrice: "auto",
+      gas: "auto",
     },
-    "base": {
-      url: "https://mainnet.base.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 8453,
-      verify: {
-        etherscan: {
-          apiKey: process.env.BASESCAN_API_KEY
-        }
-      }
-    }
   },
   etherscan: {
     apiKey: {
+      base: process.env.BASESCAN_API_KEY || "",
       "base-sepolia": process.env.BASESCAN_API_KEY || "",
-      "base": process.env.BASESCAN_API_KEY || ""
     },
     customChains: [
-      {
-        network: "base-sepolia",
-        chainId: 84532,
-        urls: {
-          apiURL: "https://api-sepolia.basescan.org/api",
-          browserURL: "https://sepolia.basescan.org"
-        }
-      },
       {
         network: "base",
         chainId: 8453,
         urls: {
           apiURL: "https://api.basescan.org/api",
           browserURL: "https://basescan.org"
+        }
+      },
+      {
+        network: "base-sepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org"
         }
       }
     ]

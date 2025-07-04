@@ -1,0 +1,121 @@
+const hre = require("hardhat");
+
+async function main() {
+  const contractAddress = "0x860434EA4e4114B63F44C70a304fa3eD2B32E77c";
+  
+  console.log(`Checking contract at: ${contractAddress}`);
+  
+  // Get provider
+  const [signer] = await hre.ethers.getSigners();
+  const provider = signer.provider;
+  
+  // Check if contract exists
+  const code = await provider.getCode(contractAddress);
+  if (code === "0x") {
+    console.log("No contract found at this address");
+    return;
+  }
+  
+  console.log("Contract exists, checking for proxy patterns...");
+  
+  // Common proxy storage slots
+  const proxySlots = [
+    "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc", // EIP-1967 implementation slot
+    "0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103", // EIP-1967 admin slot
+    "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"  // OpenZeppelin proxy admin slot
+  ];
+  
+  let isProxy = false;
+  
+  for (const slot of proxySlots) {
+    try {
+      const value = await provider.getStorage(contractAddress, slot);
+      if (value !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+        console.log(`Found proxy data in slot ${slot}: ${value}`);
+        isProxy = true;
+      }
+    } catch (error) {
+      console.log(`Error checking slot ${slot}:`, error.message);
+    }
+  }
+  
+  if (isProxy) {
+    console.log("✅ Contract appears to be upgradeable (proxy pattern detected)");
+  } else {
+    console.log("❌ Contract does not appear to be upgradeable (no proxy pattern found)");
+  }
+  
+  // Try to get contract interface
+  try {
+    const contract = await hre.ethers.getContractAt("IERC20", contractAddress);
+    console.log("\nTrying to read contract as ERC20...");
+    
+    // Check common ERC20 functions
+    try {
+      const name = await contract.name();
+      console.log(`Token name: ${name}`);
+    } catch (e) {
+      console.log("No name() function");
+    }
+    
+    try {
+      const symbol = await contract.symbol();
+      console.log(`Token symbol: ${symbol}`);
+    } catch (e) {
+      console.log("No symbol() function");
+    }
+    
+    try {
+      const totalSupply = await contract.totalSupply();
+      console.log(`Total supply: ${hre.ethers.formatEther(totalSupply)} tokens`);
+    } catch (e) {
+      console.log("No totalSupply() function");
+    }
+    
+  } catch (error) {
+    console.log("Contract is not a standard ERC20");
+  }
+  
+  // Check bytecode patterns for upgrade functions
+  const bytecode = await provider.getCode(contractAddress);
+  const upgradeSignatures = [
+    "3659cfe6", // upgradeTo(address)
+    "4f1ef286", // upgradeToAndCall(address,bytes)
+    "8f283970", // changeAdmin(address)
+    "f851a440"  // admin()
+  ];
+  
+  console.log("\nChecking for upgrade function signatures in bytecode...");
+  let hasUpgradeFunctions = false;
+  
+  for (const sig of upgradeSignatures) {
+    if (bytecode.toLowerCase().includes(sig)) {
+      console.log(`Found upgrade function signature: 0x${sig}`);
+      hasUpgradeFunctions = true;
+    }
+  }
+  
+  if (!hasUpgradeFunctions) {
+    console.log("No upgrade function signatures found in bytecode");
+  }
+  
+  // Check if the contract has common patterns that suggest it's not upgradeable
+  const nonUpgradeablePatterns = [
+    "constructor", // Constructor presence suggests non-upgradeable
+  ];
+  
+  console.log("\n" + "=".repeat(50));
+  if (isProxy || hasUpgradeFunctions) {
+    console.log("✅ CONTRACT APPEARS TO BE UPGRADEABLE");
+    console.log("You can potentially upgrade this contract to add new functionality");
+  } else {
+    console.log("❌ CONTRACT DOES NOT APPEAR TO BE UPGRADEABLE");
+    console.log("This appears to be a regular contract without proxy upgrade capability");
+    console.log("You would need to deploy a new contract with the enhanced functionality");
+  }
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
