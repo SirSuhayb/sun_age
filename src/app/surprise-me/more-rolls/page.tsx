@@ -143,9 +143,9 @@ export default function MoreRollsPage() {
   const currentOptions = paymentOptions[selectedPayment];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative z-10">
       {/* Header */}
-      <div className="w-full bg-white border-b border-amber-200 px-4 py-6">
+      <div className="w-full bg-white border-b border-amber-200 px-4 py-6 relative z-20">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <button
             onClick={() => router.back()}
@@ -163,7 +163,7 @@ export default function MoreRollsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-md mx-auto px-4 py-8">
+      <div className="max-w-md mx-auto px-4 py-8 relative z-20">
         {/* Payment Method Selection */}
         <div className="mb-8">
           <h2 className="font-serif font-bold text-lg text-amber-800 mb-4 text-center">
