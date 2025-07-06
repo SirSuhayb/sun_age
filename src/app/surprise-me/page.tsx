@@ -211,7 +211,7 @@ export default function SurpriseMePage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#FFFCF2' }}>
+    <div className="min-h-screen relative z-10" style={{ background: '#FFFCF2' }}>
       {/* Game Explanation Modal */}
       <AnimatePresence>
         {showGameExplanation && (
@@ -356,7 +356,7 @@ export default function SurpriseMePage() {
       </AnimatePresence>
 
       {/* Header */}
-      <div className="w-full bg-white border-b border-amber-200 px-4 py-6">
+      <div className="w-full bg-white border-b border-amber-200 px-4 py-6 relative z-20">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <button
             onClick={() => router.back()}
@@ -386,7 +386,7 @@ export default function SurpriseMePage() {
       </div>
 
       {/* SOLAR Earnings Display */}
-      <div className="w-full bg-white border-b border-gray-200 px-4 py-3">
+      <div className="w-full bg-white border-b border-gray-200 px-4 py-3 relative z-20">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="text-center">
@@ -418,7 +418,7 @@ export default function SurpriseMePage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-md mx-auto px-4 py-8">
+      <div className="max-w-md mx-auto px-4 py-8 relative z-20">
         {/* User Info */}
         {userArchetype && (
           <div className="bg-white border border-gray-200 p-4 mb-6">
