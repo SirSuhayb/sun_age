@@ -1,20 +1,10 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSolarArchetype } from '~/lib/solarIdentity';
+import { surpriseMeFramework, DailyRoll } from '~/lib/surpriseMe';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface DailyRoll {
-  id: string;
-  type: 'activity' | 'item' | 'experience';
-  title: string;
-  description: string;
-  archetype: string;
-  rarity: 'common' | 'rare' | 'legendary';
-  icon: string;
-  color: string;
-}
 
 export default function SurpriseMePage() {
   const router = useRouter();
@@ -60,7 +50,23 @@ export default function SurpriseMePage() {
 
     // Simulate rolling animation delay
     setTimeout(() => {
-      const roll = generatePersonalizedRoll(userArchetype);
+      if (!userArchetype) return;
+      
+      const roll = surpriseMeFramework.generatePersonalizedRoll(
+        // Get birth date from localStorage
+        (() => {
+          const saved = localStorage.getItem('sunCycleBookmark');
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              return parsed.birthDate || '';
+            } catch {}
+          }
+          return '';
+        })(),
+        rollHistory
+      );
+      
       setCurrentRoll(roll);
       setShowReveal(true);
       setIsRolling(false);
@@ -82,205 +88,7 @@ export default function SurpriseMePage() {
     }, 2000);
   };
 
-  const generatePersonalizedRoll = (archetype: string | null): DailyRoll => {
-    const archetypeActivities = getArchetypeActivities(archetype);
-    const randomActivity = archetypeActivities[Math.floor(Math.random() * archetypeActivities.length)];
-    
-    return {
-      id: Math.random().toString(36).substr(2, 9),
-      ...randomActivity,
-      archetype: archetype || 'Sol Traveler'
-    };
-  };
 
-  const getArchetypeActivities = (archetype: string | null) => {
-    const activities = {
-      'Sol Innovator': [
-        {
-          type: 'activity' as const,
-          title: 'Prototype Something New',
-          description: 'Spend 30 minutes creating a rough prototype or sketch of an idea that excites you.',
-          rarity: 'common' as const,
-          icon: '🔧',
-          color: 'bg-blue-100 border-blue-300'
-        },
-        {
-          type: 'experience' as const,
-          title: 'Future Visioning Session',
-          description: 'Write down 5 technologies or innovations you believe will exist in 10 years.',
-          rarity: 'rare' as const,
-          icon: '🚀',
-          color: 'bg-purple-100 border-purple-300'
-        },
-        {
-          type: 'item' as const,
-          title: 'Innovation Catalyst',
-          description: 'A book, tool, or resource that could spark your next breakthrough idea.',
-          rarity: 'legendary' as const,
-          icon: '💡',
-          color: 'bg-yellow-100 border-yellow-300'
-        }
-      ],
-      'Sol Nurturer': [
-        {
-          type: 'activity' as const,
-          title: 'Tend to Something Growing',
-          description: 'Water a plant, start seeds, or care for something that needs nurturing attention.',
-          rarity: 'common' as const,
-          icon: '🌱',
-          color: 'bg-green-100 border-green-300'
-        },
-        {
-          type: 'experience' as const,
-          title: 'Acts of Service',
-          description: 'Perform three small acts of kindness for people in your life without expecting anything back.',
-          rarity: 'rare' as const,
-          icon: '🤝',
-          color: 'bg-pink-100 border-pink-300'
-        },
-        {
-          type: 'item' as const,
-          title: 'Sacred Space Creator',
-          description: 'Something to make your environment more nurturing and healing for yourself and others.',
-          rarity: 'legendary' as const,
-          icon: '🏡',
-          color: 'bg-amber-100 border-amber-300'
-        }
-      ],
-      'Sol Alchemist': [
-        {
-          type: 'activity' as const,
-          title: 'Transform a Challenge',
-          description: 'Take one current difficulty and reframe it as a growth opportunity. Write about the lesson.',
-          rarity: 'common' as const,
-          icon: '⚗️',
-          color: 'bg-indigo-100 border-indigo-300'
-        },
-        {
-          type: 'experience' as const,
-          title: 'Shadow Work Session',
-          description: 'Spend time examining and integrating an aspect of yourself you usually avoid.',
-          rarity: 'rare' as const,
-          icon: '🌙',
-          color: 'bg-slate-100 border-slate-300'
-        },
-        {
-          type: 'item' as const,
-          title: 'Transmutation Tool',
-          description: 'A resource, practice, or object that helps you transform negative energy into wisdom.',
-          rarity: 'legendary' as const,
-          icon: '🔮',
-          color: 'bg-violet-100 border-violet-300'
-        }
-      ],
-      'Sol Sage': [
-        {
-          type: 'activity' as const,
-          title: 'Seek Ancient Wisdom',
-          description: 'Read or listen to teachings from a philosopher, mystic, or wisdom tradition new to you.',
-          rarity: 'common' as const,
-          icon: '📚',
-          color: 'bg-orange-100 border-orange-300'
-        },
-        {
-          type: 'experience' as const,
-          title: 'Consciousness Expansion',
-          description: 'Try a new meditation technique, breathwork practice, or contemplative exercise.',
-          rarity: 'rare' as const,
-          icon: '🧘',
-          color: 'bg-teal-100 border-teal-300'
-        },
-        {
-          type: 'item' as const,
-          title: 'Wisdom Keeper',
-          description: 'A text, teacher, or practice that could deepen your understanding of life\'s mysteries.',
-          rarity: 'legendary' as const,
-          icon: '🦉',
-          color: 'bg-emerald-100 border-emerald-300'
-        }
-      ],
-      'Sol Builder': [
-        {
-          type: 'activity' as const,
-          title: 'Build Something Lasting',
-          description: 'Create or improve something that will have positive impact beyond today.',
-          rarity: 'common' as const,
-          icon: '🏗️',
-          color: 'bg-stone-100 border-stone-300'
-        },
-        {
-          type: 'experience' as const,
-          title: 'Foundation Assessment',
-          description: 'Review the foundations of your life - relationships, health, finances. Strengthen one area.',
-          rarity: 'rare' as const,
-          icon: '🏛️',
-          color: 'bg-gray-100 border-gray-300'
-        },
-        {
-          type: 'item' as const,
-          title: 'Master Builder\'s Tool',
-          description: 'A skill, resource, or connection that could help you build something meaningful.',
-          rarity: 'legendary' as const,
-          icon: '🔨',
-          color: 'bg-red-100 border-red-300'
-        }
-      ],
-      'Sol Artist': [
-        {
-          type: 'activity' as const,
-          title: 'Create Beauty',
-          description: 'Spend time creating something beautiful - art, music, writing, or any form of expression.',
-          rarity: 'common' as const,
-          icon: '🎨',
-          color: 'bg-rose-100 border-rose-300'
-        },
-        {
-          type: 'experience' as const,
-          title: 'Aesthetic Immersion',
-          description: 'Immerse yourself in beauty - visit a gallery, watch a sunset, or create a beautiful space.',
-          rarity: 'rare' as const,
-          icon: '🌅',
-          color: 'bg-cyan-100 border-cyan-300'
-        },
-        {
-          type: 'item' as const,
-          title: 'Muse\'s Gift',
-          description: 'Something that could inspire your creative expression or bring more beauty into your life.',
-          rarity: 'legendary' as const,
-          icon: '🎭',
-          color: 'bg-fuchsia-100 border-fuchsia-300'
-        }
-      ],
-      'Sol Traveler': [
-        {
-          type: 'activity' as const,
-          title: 'Explore the Unknown',
-          description: 'Try something you\'ve never done before, however small. Step outside your comfort zone.',
-          rarity: 'common' as const,
-          icon: '🧭',
-          color: 'bg-sky-100 border-sky-300'
-        },
-        {
-          type: 'experience' as const,
-          title: 'Cosmic Contemplation',
-          description: 'Spend time under the stars or looking at space imagery, contemplating your place in the universe.',
-          rarity: 'rare' as const,
-          icon: '🌌',
-          color: 'bg-indigo-100 border-indigo-300'
-        },
-        {
-          type: 'item' as const,
-          title: 'Cosmic Compass',
-          description: 'A tool, insight, or connection that could guide you on your journey of self-discovery.',
-          rarity: 'legendary' as const,
-          icon: '⭐',
-          color: 'bg-yellow-100 border-yellow-300'
-        }
-      ]
-    };
-
-    return activities[archetype as keyof typeof activities] || activities['Sol Traveler'];
-  };
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
@@ -428,9 +236,75 @@ export default function SurpriseMePage() {
                     {currentRoll.title}
                   </div>
                 </div>
-                <div className="text-gray-700 text-center leading-relaxed">
+                <div className="text-gray-700 text-center leading-relaxed mb-6">
                   {currentRoll.description}
                 </div>
+                
+                {/* Actionable Steps */}
+                {currentRoll.actionableSteps && currentRoll.actionableSteps.length > 0 && (
+                  <div className="border-t border-gray-200 pt-4">
+                    <h4 className="font-serif font-bold text-lg text-gray-800 mb-3 text-center">
+                      🎯 Ready to Take Action?
+                    </h4>
+                    <div className="space-y-3">
+                      {currentRoll.actionableSteps.map((step, index) => (
+                        <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                          <div className="flex items-start gap-3">
+                            <div className="text-sm">
+                              {step.type === 'link' && '🔗'}
+                              {step.type === 'search' && '🔍'}
+                              {step.type === 'prompt' && '💭'}
+                              {step.type === 'list' && '📋'}
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-800 text-sm mb-1">
+                                {step.label}
+                              </div>
+                              {step.type === 'link' && step.url ? (
+                                <div>
+                                  <div className="text-gray-600 text-sm mb-2">{step.content}</div>
+                                  <a
+                                    href={step.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
+                                  >
+                                    Visit Link ↗
+                                  </a>
+                                </div>
+                              ) : step.type === 'search' ? (
+                                <div>
+                                  <div className="text-gray-600 text-sm mb-2">Search for:</div>
+                                  <div className="bg-white rounded border p-2 text-xs font-mono text-gray-700 mb-2 cursor-pointer" 
+                                       onClick={() => navigator.clipboard?.writeText(step.content)}>
+                                    {step.content}
+                                    <div className="text-xs text-gray-500 mt-1">↑ Click to copy search terms</div>
+                                  </div>
+                                  <a
+                                    href={`https://google.com/search?q=${encodeURIComponent(step.content)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
+                                  >
+                                    Google Search ↗
+                                  </a>
+                                </div>
+                              ) : step.type === 'list' ? (
+                                <div className="text-gray-600 text-sm whitespace-pre-line">
+                                  {step.content}
+                                </div>
+                              ) : (
+                                <div className="text-gray-600 text-sm">
+                                  {step.content}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

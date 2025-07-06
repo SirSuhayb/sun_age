@@ -1,5 +1,12 @@
 import { getSolarArchetype } from './solarIdentity';
 
+export interface ActionableStep {
+  type: 'link' | 'search' | 'prompt' | 'list';
+  label: string;
+  content: string;
+  url?: string;
+}
+
 export interface DailyRoll {
   id: string;
   type: 'activity' | 'item' | 'experience';
@@ -13,6 +20,7 @@ export interface DailyRoll {
   duration?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
   timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
+  actionableSteps: ActionableStep[];
 }
 
 export interface UserProfile {
@@ -57,7 +65,25 @@ export class SurpriseMeFramework {
           tags: ['creativity', 'innovation', 'hands-on'],
           duration: '30 minutes',
           difficulty: 'medium',
-          timeOfDay: 'anytime'
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Quick Idea Spark',
+              content: 'Open a notes app and write: "What if [everyday object] could [unexpected action]?" Fill in 5 combinations.'
+            },
+            {
+              type: 'link',
+              label: 'Digital Prototyping Tool',
+              content: 'Start sketching with Figma (free)',
+              url: 'https://figma.com'
+            },
+            {
+              type: 'search',
+              label: 'Inspiration Search',
+              content: '"rapid prototyping techniques" OR "quick mockup ideas" OR "30 minute build challenge"'
+            }
+          ]
         },
         {
           id: 'inn-2',
@@ -71,7 +97,25 @@ export class SurpriseMeFramework {
           tags: ['research', 'technology', 'learning'],
           duration: '45 minutes',
           difficulty: 'easy',
-          timeOfDay: 'anytime'
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'search',
+              label: 'Trending Tech Research',
+              content: '"emerging technology 2024" OR "breakthrough innovations" OR "future tech trends"'
+            },
+            {
+              type: 'link',
+              label: 'MIT Technology Review',
+              content: 'Latest breakthroughs and analysis',
+              url: 'https://www.technologyreview.com/'
+            },
+            {
+              type: 'prompt',
+              label: 'Impact Analysis Framework',
+              content: 'For your chosen tech, answer: 1) What problem does it solve? 2) Who benefits? 3) What could go wrong? 4) How might it change daily life in 10 years?'
+            }
+          ]
         },
         // Rare Activities
         {
@@ -86,21 +130,25 @@ export class SurpriseMeFramework {
           tags: ['visioning', 'future', 'strategy'],
           duration: '60 minutes',
           difficulty: 'hard',
-          timeOfDay: 'evening'
-        },
-        {
-          id: 'inn-4',
-          type: 'experience',
-          title: 'Innovation Challenge',
-          description: 'Identify a problem in your daily life and brainstorm 10 different solutions. Pick one to test tomorrow.',
-          archetype: 'Sol Innovator',
-          rarity: 'rare',
-          icon: '💡',
-          color: 'bg-purple-100 border-purple-300',
-          tags: ['problem-solving', 'creativity', 'practical'],
-          duration: '45 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'afternoon'
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Future Vision Template',
+              content: 'For each innovation, write: Technology Name | Main Function | Target Users | Societal Impact | Timeline to Reality | Potential Obstacles'
+            },
+            {
+              type: 'search',
+              label: 'Future Prediction Research',
+              content: '"technology predictions 2034" OR "future innovations timeline" OR "emerging tech roadmap"'
+            },
+            {
+              type: 'link',
+              label: 'Ray Kurzweil\'s Predictions',
+              content: 'Learn from a master futurist',
+              url: 'https://www.kurzweilai.net/predictions'
+            }
+          ]
         },
         // Legendary Activities
         {
@@ -115,7 +163,32 @@ export class SurpriseMeFramework {
           tags: ['inspiration', 'breakthrough', 'learning'],
           duration: 'variable',
           difficulty: 'hard',
-          timeOfDay: 'anytime'
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'link',
+              label: 'Buy: "The Innovator\'s Dilemma" by Clayton Christensen',
+              content: 'Revolutionary book on disruptive innovation',
+              url: 'https://amazon.com/dp/0062060244'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "Zero to One" by Peter Thiel',
+              content: 'Building the future through monopoly',
+              url: 'https://amazon.com/dp/0804139296'
+            },
+            {
+              type: 'link',
+              label: 'Free Tool: Miro Brainstorming',
+              content: 'Visual collaboration for breakthrough thinking',
+              url: 'https://miro.com'
+            },
+            {
+              type: 'search',
+              label: 'Innovation Framework Research',
+              content: '"design thinking framework" OR "SCAMPER innovation method" OR "Jobs to be Done theory"'
+            }
+          ]
         }
       ],
       'Sol Nurturer': [
@@ -132,21 +205,31 @@ export class SurpriseMeFramework {
           tags: ['nurturing', 'growth', 'patience'],
           duration: '20 minutes',
           difficulty: 'easy',
-          timeOfDay: 'morning'
-        },
-        {
-          id: 'nur-2',
-          type: 'activity',
-          title: 'Prepare a Healing Meal',
-          description: 'Cook something nourishing with intention. Focus on how each ingredient contributes to wellbeing.',
-          archetype: 'Sol Nurturer',
-          rarity: 'common',
-          icon: '🥗',
-          color: 'bg-green-100 border-green-300',
-          tags: ['nourishment', 'intention', 'care'],
-          duration: '45 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'afternoon'
+          timeOfDay: 'morning',
+          actionableSteps: [
+            {
+              type: 'link',
+              label: 'Buy: Indoor Herb Garden Kit',
+              content: 'Easy-to-grow herbs for beginners',
+              url: 'https://amazon.com/s?k=indoor+herb+garden+kit'
+            },
+            {
+              type: 'search',
+              label: 'Plant Care Guide',
+              content: '"easy houseplants for beginners" OR "how to care for [specific plant]" OR "plant watering schedule"'
+            },
+            {
+              type: 'prompt',
+              label: 'Mindful Plant Care',
+              content: 'As you tend your plant: 1) Notice its current state 2) Speak or think encouraging words 3) Imagine its growth over time 4) Reflect on what nurturing means to you'
+            },
+            {
+              type: 'link',
+              label: 'Free: PlantIn App',
+              content: 'Plant identification and care reminders',
+              url: 'https://plantin.com'
+            }
+          ]
         },
         // Rare Activities
         {
@@ -161,40 +244,34 @@ export class SurpriseMeFramework {
           tags: ['service', 'kindness', 'community'],
           duration: '2 hours',
           difficulty: 'medium',
-          timeOfDay: 'anytime'
-        },
-        {
-          id: 'nur-4',
-          type: 'experience',
-          title: 'Healing Circle Creation',
-          description: 'Create a safe space for someone to share what they\'re struggling with. Practice deep listening without trying to fix.',
-          archetype: 'Sol Nurturer',
-          rarity: 'rare',
-          icon: '🫂',
-          color: 'bg-pink-100 border-pink-300',
-          tags: ['healing', 'listening', 'support'],
-          duration: '60 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'evening'
-        },
-        // Legendary Activities
-        {
-          id: 'nur-5',
-          type: 'item',
-          title: 'Sacred Space Creator',
-          description: 'Something to make your environment more nurturing and healing for yourself and others. A tool for creating sanctuary.',
-          archetype: 'Sol Nurturer',
-          rarity: 'legendary',
-          icon: '🏡',
-          color: 'bg-amber-100 border-amber-300',
-          tags: ['sanctuary', 'healing', 'environment'],
-          duration: 'ongoing',
-          difficulty: 'medium',
-          timeOfDay: 'anytime'
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'list',
+              label: 'Quick Acts of Service Ideas',
+              content: '• Send an encouraging text to someone • Buy coffee for the person behind you • Leave a positive review for a small business • Write a thank-you note • Offer to help with errands • Listen without giving advice'
+            },
+            {
+              type: 'search',
+              label: 'Local Volunteering',
+              content: '"volunteer opportunities near me" OR "community service [your city]" OR "local food bank volunteer"'
+            },
+            {
+              type: 'prompt',
+              label: 'Service Reflection',
+              content: 'After each act: 1) How did the person respond? 2) How did it feel to give? 3) What did you learn about service? 4) How might this create positive ripples?'
+            },
+            {
+              type: 'link',
+              label: 'Find: JustServe.org',
+              content: 'Discover volunteer opportunities',
+              url: 'https://justserve.org'
+            }
+          ]
         }
       ],
       'Sol Alchemist': [
-        // Common Activities
+        // Common Activities  
         {
           id: 'alc-1',
           type: 'activity',
@@ -207,21 +284,25 @@ export class SurpriseMeFramework {
           tags: ['transformation', 'growth', 'wisdom'],
           duration: '30 minutes',
           difficulty: 'medium',
-          timeOfDay: 'evening'
-        },
-        {
-          id: 'alc-2',
-          type: 'activity',
-          title: 'Energy Transmutation',
-          description: 'Notice when you feel negative emotion today. Practice transforming it into curiosity about what it\'s teaching you.',
-          archetype: 'Sol Alchemist',
-          rarity: 'common',
-          icon: '🔄',
-          color: 'bg-indigo-100 border-indigo-300',
-          tags: ['emotion', 'transformation', 'awareness'],
-          duration: 'ongoing',
-          difficulty: 'hard',
-          timeOfDay: 'anytime'
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Challenge Transformation Framework',
+              content: 'Choose your current challenge and write: 1) What is the difficulty? 2) What skills might this develop? 3) What would my future self thank me for learning? 4) How might this serve others? 5) What\'s the hidden gift in this experience?'
+            },
+            {
+              type: 'search',
+              label: 'Growth Mindset Resources',
+              content: '"post traumatic growth" OR "resilience building" OR "reframing negative thoughts" OR "finding meaning in suffering"'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "Man\'s Search for Meaning" by Viktor Frankl',
+              content: 'Finding purpose in the darkest times',
+              url: 'https://amazon.com/dp/080701429X'
+            }
+          ]
         },
         // Rare Activities
         {
@@ -236,36 +317,25 @@ export class SurpriseMeFramework {
           tags: ['shadow work', 'integration', 'self-discovery'],
           duration: '60 minutes',
           difficulty: 'hard',
-          timeOfDay: 'evening'
-        },
-        {
-          id: 'alc-4',
-          type: 'experience',
-          title: 'Polarity Integration',
-          description: 'Choose two opposing forces in your life. Explore how they might actually complement each other.',
-          archetype: 'Sol Alchemist',
-          rarity: 'rare',
-          icon: '☯️',
-          color: 'bg-slate-100 border-slate-300',
-          tags: ['polarity', 'integration', 'balance'],
-          duration: '45 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'afternoon'
-        },
-        // Legendary Activities
-        {
-          id: 'alc-5',
-          type: 'item',
-          title: 'Transmutation Tool',
-          description: 'A resource, practice, or object that helps you transform negative energy into wisdom. Your personal philosopher\'s stone.',
-          archetype: 'Sol Alchemist',
-          rarity: 'legendary',
-          icon: '🔮',
-          color: 'bg-violet-100 border-violet-300',
-          tags: ['transmutation', 'wisdom', 'mastery'],
-          duration: 'ongoing',
-          difficulty: 'hard',
-          timeOfDay: 'anytime'
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Shadow Work Questions',
+              content: 'What quality do I judge most in others? When do I feel shame or anger? What do I try to hide from others? What would I never want people to know about me? How might these rejected parts actually serve me?'
+            },
+            {
+              type: 'search',
+              label: 'Shadow Work Guidance',
+              content: '"Carl Jung shadow work" OR "shadow integration exercises" OR "embracing your dark side" OR "shadow work journal prompts"'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "Meeting the Shadow" by Connie Zweig',
+              content: 'Comprehensive guide to shadow work',
+              url: 'https://amazon.com/dp/0874776864'
+            }
+          ]
         }
       ],
       'Sol Sage': [
@@ -282,7 +352,37 @@ export class SurpriseMeFramework {
           tags: ['wisdom', 'learning', 'philosophy'],
           duration: '45 minutes',
           difficulty: 'medium',
-          timeOfDay: 'morning'
+          timeOfDay: 'morning',
+          actionableSteps: [
+            {
+              type: 'link',
+              label: 'Buy: "Meditations" by Marcus Aurelius',
+              content: 'Timeless Stoic wisdom from a Roman Emperor',
+              url: 'https://amazon.com/dp/0486298043'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "The Tao of Physics" by Fritjof Capra',
+              content: 'Where ancient wisdom meets modern science',
+              url: 'https://amazon.com/dp/1570627681'
+            },
+            {
+              type: 'link',
+              label: 'Free: Daily Stoic Archives',
+              content: 'Bite-sized daily wisdom',
+              url: 'https://dailystoic.com/archives/'
+            },
+            {
+              type: 'search',
+              label: 'Wisdom Tradition Exploration',
+              content: '"ancient philosophy quotes" OR "Buddhist teachings beginners" OR "Sufi wisdom stories" OR "indigenous wisdom traditions"'
+            },
+            {
+              type: 'prompt',
+              label: 'Wisdom Integration Exercise',
+              content: 'After reading, ask yourself: 1) What resonated most? 2) How does this apply to my current challenges? 3) What would I tell a friend about this teaching?'
+            }
+          ]
         },
         {
           id: 'sag-2',
@@ -296,7 +396,25 @@ export class SurpriseMeFramework {
           tags: ['questioning', 'beliefs', 'critical thinking'],
           duration: '30 minutes',
           difficulty: 'hard',
-          timeOfDay: 'afternoon'
+          timeOfDay: 'afternoon',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Belief Examination Framework',
+              content: 'Pick a strong belief and ask: 1) Where did this belief come from? 2) What evidence supports it? 3) What evidence contradicts it? 4) How might someone from a different culture view this? 5) What if the opposite were true?'
+            },
+            {
+              type: 'search',
+              label: 'Critical Thinking Resources',
+              content: '"cognitive biases list" OR "logical fallacies examples" OR "Socratic questioning method"'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "Thinking, Fast and Slow" by Daniel Kahneman',
+              content: 'Understand how your mind makes decisions',
+              url: 'https://amazon.com/dp/0374533555'
+            }
+          ]
         },
         // Rare Activities
         {
@@ -311,21 +429,31 @@ export class SurpriseMeFramework {
           tags: ['consciousness', 'meditation', 'awareness'],
           duration: '60 minutes',
           difficulty: 'medium',
-          timeOfDay: 'morning'
-        },
-        {
-          id: 'sag-4',
-          type: 'experience',
-          title: 'Wisdom Teaching',
-          description: 'Share a piece of wisdom you\'ve learned with someone who could benefit from it. Focus on planting seeds, not forcing growth.',
-          archetype: 'Sol Sage',
-          rarity: 'rare',
-          icon: '🌰',
-          color: 'bg-teal-100 border-teal-300',
-          tags: ['teaching', 'wisdom', 'sharing'],
-          duration: '30 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'anytime'
+          timeOfDay: 'morning',
+          actionableSteps: [
+            {
+              type: 'link',
+              label: 'Free: Insight Timer App',
+              content: 'Thousands of guided meditations',
+              url: 'https://insighttimer.com'
+            },
+            {
+              type: 'link',
+              label: 'Free: Wim Hof Breathing Method',
+              content: 'Powerful breathwork technique (YouTube)',
+              url: 'https://youtube.com/watch?v=tybOi4hjZFQ'
+            },
+            {
+              type: 'search',
+              label: 'Consciousness Practices',
+              content: '"vipassana meditation technique" OR "breathwork for beginners" OR "contemplative practices" OR "mindfulness exercises"'
+            },
+            {
+              type: 'prompt',
+              label: 'Awareness Tracking',
+              content: 'Before starting: Rate your current mental state 1-10. During practice: Notice 3 things that arise. After: Rate again and write one insight.'
+            }
+          ]
         },
         // Legendary Activities
         {
@@ -340,11 +468,35 @@ export class SurpriseMeFramework {
           tags: ['wisdom', 'mystery', 'awakening'],
           duration: 'ongoing',
           difficulty: 'hard',
-          timeOfDay: 'anytime'
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'link',
+              label: 'Buy: "The Power of Now" by Eckhart Tolle',
+              content: 'Profound guide to spiritual awakening',
+              url: 'https://amazon.com/dp/1577314808'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "Sapiens" by Yuval Noah Harari',
+              content: 'Mind-expanding view of human consciousness',
+              url: 'https://amazon.com/dp/0062316095'
+            },
+            {
+              type: 'link',
+              label: 'Free: Ram Dass Lectures',
+              content: 'Transformative spiritual teachings',
+              url: 'https://www.ramdass.org/audio/'
+            },
+            {
+              type: 'search',
+              label: 'Advanced Wisdom Resources',
+              content: '"perennial philosophy" OR "consciousness research" OR "enlightenment teachers" OR "spiritual teachers 2024"'
+            }
+          ]
         }
       ],
       'Sol Builder': [
-        // Common Activities
         {
           id: 'bui-1',
           type: 'activity',
@@ -357,69 +509,28 @@ export class SurpriseMeFramework {
           tags: ['building', 'impact', 'legacy'],
           duration: '60 minutes',
           difficulty: 'medium',
-          timeOfDay: 'morning'
-        },
-        {
-          id: 'bui-2',
-          type: 'activity',
-          title: 'System Optimization',
-          description: 'Choose one system in your life (morning routine, workspace, finances) and make it 10% more efficient.',
-          archetype: 'Sol Builder',
-          rarity: 'common',
-          icon: '⚙️',
-          color: 'bg-stone-100 border-stone-300',
-          tags: ['systems', 'efficiency', 'optimization'],
-          duration: '45 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'afternoon'
-        },
-        // Rare Activities
-        {
-          id: 'bui-3',
-          type: 'experience',
-          title: 'Foundation Assessment',
-          description: 'Review the foundations of your life - relationships, health, finances, purpose. Choose one area to strengthen.',
-          archetype: 'Sol Builder',
-          rarity: 'rare',
-          icon: '🏛️',
-          color: 'bg-gray-100 border-gray-300',
-          tags: ['foundation', 'assessment', 'strengthening'],
-          duration: '90 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'evening'
-        },
-        {
-          id: 'bui-4',
-          type: 'experience',
-          title: 'Legacy Planning',
-          description: 'Write about what you want to be remembered for. What are you building that will outlast you?',
-          archetype: 'Sol Builder',
-          rarity: 'rare',
-          icon: '📜',
-          color: 'bg-gray-100 border-gray-300',
-          tags: ['legacy', 'purpose', 'meaning'],
-          duration: '60 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'evening'
-        },
-        // Legendary Activities
-        {
-          id: 'bui-5',
-          type: 'item',
-          title: 'Master Builder\'s Tool',
-          description: 'A skill, resource, or connection that could help you build something truly meaningful. Your next level of mastery.',
-          archetype: 'Sol Builder',
-          rarity: 'legendary',
-          icon: '🔨',
-          color: 'bg-red-100 border-red-300',
-          tags: ['mastery', 'skill', 'tools'],
-          duration: 'ongoing',
-          difficulty: 'hard',
-          timeOfDay: 'anytime'
+          timeOfDay: 'morning',
+          actionableSteps: [
+            {
+              type: 'list',
+              label: 'Build Ideas by Time Investment',
+              content: '• 30 min: Organize important files/photos • 1 hr: Create a resource guide for others • 2 hrs: Start a helpful blog post • 4 hrs: Build a simple website • Weekend: Organize a community event'
+            },
+            {
+              type: 'search',
+              label: 'Building Resources',
+              content: '"no-code website builders" OR "how to start a blog" OR "community organizing tips" OR "legacy project ideas"'
+            },
+            {
+              type: 'link',
+              label: 'Free: Notion Templates',
+              content: 'Build organized systems',
+              url: 'https://notion.so/templates'
+            }
+          ]
         }
       ],
       'Sol Artist': [
-        // Common Activities
         {
           id: 'art-1',
           type: 'activity',
@@ -432,69 +543,34 @@ export class SurpriseMeFramework {
           tags: ['creativity', 'beauty', 'expression'],
           duration: '45 minutes',
           difficulty: 'medium',
-          timeOfDay: 'afternoon'
-        },
-        {
-          id: 'art-2',
-          type: 'activity',
-          title: 'Harmony Practice',
-          description: 'Arrange something in your space to create more visual or energetic harmony. Notice how it affects your mood.',
-          archetype: 'Sol Artist',
-          rarity: 'common',
-          icon: '🎭',
-          color: 'bg-rose-100 border-rose-300',
-          tags: ['harmony', 'space', 'energy'],
-          duration: '30 minutes',
-          difficulty: 'easy',
-          timeOfDay: 'anytime'
-        },
-        // Rare Activities
-        {
-          id: 'art-3',
-          type: 'experience',
-          title: 'Aesthetic Immersion',
-          description: 'Immerse yourself in beauty - visit a gallery, watch a sunset, or create a beautiful space. Let it fill your senses.',
-          archetype: 'Sol Artist',
-          rarity: 'rare',
-          icon: '🌅',
-          color: 'bg-cyan-100 border-cyan-300',
-          tags: ['beauty', 'immersion', 'senses'],
-          duration: '90 minutes',
-          difficulty: 'easy',
-          timeOfDay: 'evening'
-        },
-        {
-          id: 'art-4',
-          type: 'experience',
-          title: 'Emotional Alchemy',
-          description: 'Transform a difficult emotion into a creative work. Let art be your way of processing and healing.',
-          archetype: 'Sol Artist',
-          rarity: 'rare',
-          icon: '🎪',
-          color: 'bg-cyan-100 border-cyan-300',
-          tags: ['emotion', 'healing', 'transformation'],
-          duration: '60 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'evening'
-        },
-        // Legendary Activities
-        {
-          id: 'art-5',
-          type: 'item',
-          title: 'Muse\'s Gift',
-          description: 'Something that could inspire your creative expression or bring more beauty into your life. Your next artistic breakthrough.',
-          archetype: 'Sol Artist',
-          rarity: 'legendary',
-          icon: '🎭',
-          color: 'bg-fuchsia-100 border-fuchsia-300',
-          tags: ['inspiration', 'creativity', 'breakthrough'],
-          duration: 'ongoing',
-          difficulty: 'medium',
-          timeOfDay: 'anytime'
+          timeOfDay: 'afternoon',
+          actionableSteps: [
+            {
+              type: 'link',
+              label: 'Free: Procreate for iPad',
+              content: 'Professional digital art creation',
+              url: 'https://procreate.art'
+            },
+            {
+              type: 'search',
+              label: 'Creative Inspiration',
+              content: '"art prompts for beginners" OR "creative writing exercises" OR "photography challenges" OR "music composition tips"'
+            },
+            {
+              type: 'prompt',
+              label: 'Beauty Creation Prompt',
+              content: 'Choose your medium and create something inspired by: "The feeling of sunlight through trees" or "The sound of rain on windows" or "The color of contentment"'
+            },
+            {
+              type: 'link',
+              label: 'Buy: Beginner Art Supply Kit',
+              content: 'Everything needed to start creating',
+              url: 'https://amazon.com/s?k=beginner+art+supplies+kit'
+            }
+          ]
         }
       ],
       'Sol Traveler': [
-        // Common Activities
         {
           id: 'tra-1',
           type: 'activity',
@@ -507,65 +583,30 @@ export class SurpriseMeFramework {
           tags: ['exploration', 'unknown', 'courage'],
           duration: '30 minutes',
           difficulty: 'medium',
-          timeOfDay: 'anytime'
-        },
-        {
-          id: 'tra-2',
-          type: 'activity',
-          title: 'Path Discovery',
-          description: 'Take a walk without a destination. Let your intuition guide you. Notice what you discover about yourself.',
-          archetype: 'Sol Traveler',
-          rarity: 'common',
-          icon: '🚶',
-          color: 'bg-sky-100 border-sky-300',
-          tags: ['intuition', 'discovery', 'walking'],
-          duration: '45 minutes',
-          difficulty: 'easy',
-          timeOfDay: 'morning'
-        },
-        // Rare Activities
-        {
-          id: 'tra-3',
-          type: 'experience',
-          title: 'Cosmic Contemplation',
-          description: 'Spend time under the stars or looking at space imagery, contemplating your place in the universe.',
-          archetype: 'Sol Traveler',
-          rarity: 'rare',
-          icon: '🌌',
-          color: 'bg-indigo-100 border-indigo-300',
-          tags: ['cosmos', 'contemplation', 'perspective'],
-          duration: '60 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'evening'
-        },
-        {
-          id: 'tra-4',
-          type: 'experience',
-          title: 'Inner Journey',
-          description: 'Close your eyes and take a journey within. What landscapes, colors, or symbols do you encounter?',
-          archetype: 'Sol Traveler',
-          rarity: 'rare',
-          icon: '🗺️',
-          color: 'bg-indigo-100 border-indigo-300',
-          tags: ['inner journey', 'symbols', 'imagination'],
-          duration: '45 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'evening'
-        },
-        // Legendary Activities
-        {
-          id: 'tra-5',
-          type: 'item',
-          title: 'Cosmic Compass',
-          description: 'A tool, insight, or connection that could guide you on your journey of self-discovery. Your next direction.',
-          archetype: 'Sol Traveler',
-          rarity: 'legendary',
-          icon: '⭐',
-          color: 'bg-yellow-100 border-yellow-300',
-          tags: ['guidance', 'discovery', 'direction'],
-          duration: 'ongoing',
-          difficulty: 'medium',
-          timeOfDay: 'anytime'
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'list',
+              label: 'Quick Exploration Ideas',
+              content: '• Try a new cuisine • Take a different route home • Learn 5 words in a new language • Listen to music from another culture • Visit a local place you\'ve never been • Try a new hobby for 30 minutes'
+            },
+            {
+              type: 'search',
+              label: 'Local Discovery',
+              content: '"things to do near me" OR "hidden gems [your city]" OR "local attractions" OR "new experiences to try"'
+            },
+            {
+              type: 'link',
+              label: 'Free: Duolingo Language Learning',
+              content: 'Explore new languages',
+              url: 'https://duolingo.com'
+            },
+            {
+              type: 'prompt',
+              label: 'Exploration Reflection',
+              content: 'After your exploration: What surprised me? What did I learn about myself? What assumptions did I challenge? What would I explore next?'
+            }
+          ]
         }
       ]
     };
