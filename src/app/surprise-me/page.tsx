@@ -211,7 +211,7 @@ export default function SurpriseMePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+    <div className="min-h-screen" style={{ background: '#FFFCF2' }}>
       {/* Game Explanation Modal */}
       <AnimatePresence>
         {showGameExplanation && (
@@ -330,27 +330,27 @@ export default function SurpriseMePage() {
             exit={{ opacity: 0, y: -50 }}
             className="fixed top-4 left-4 right-4 z-40 max-w-md mx-auto"
           >
-            <div className="bg-gradient-to-r from-purple-100 to-amber-100 border-2 border-purple-300 rounded-lg p-4 shadow-lg">
-              <div className="text-center">
-                <div className="text-3xl mb-2">🏆</div>
-                <div className="font-serif font-bold text-lg text-purple-800 mb-2">
-                  Achievement{achievementNotifications.length > 1 ? 's' : ''} Unlocked!
-                </div>
-                <div className="space-y-1">
-                  {achievementNotifications.map((achievement, index) => (
-                    <div key={index} className="font-mono text-sm text-purple-700 bg-white rounded px-2 py-1">
-                      {achievement}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => setShowAchievements(false)}
-                  className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-mono uppercase tracking-wide hover:bg-purple-700 transition-colors"
-                >
-                  Awesome!
-                </button>
-              </div>
-            </div>
+                         <div className="backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 p-6 shadow-lg">
+               <div className="text-center">
+                 <div className="text-3xl mb-2">🏆</div>
+                 <div className="text-xl font-serif font-bold mb-2" style={{ letterSpacing: '-0.06em' }}>
+                   Achievement{achievementNotifications.length > 1 ? 's' : ''} Unlocked!
+                 </div>
+                 <div className="space-y-1 mb-4">
+                   {achievementNotifications.map((achievement, index) => (
+                     <div key={index} className="font-mono text-sm text-gray-700 bg-white border border-gray-200 px-2 py-1">
+                       {achievement}
+                     </div>
+                   ))}
+                 </div>
+                 <button
+                   onClick={() => setShowAchievements(false)}
+                   className="px-6 py-3 bg-[#d4af37] text-black font-mono uppercase tracking-widest text-sm hover:bg-[#e6c75a] transition-colors border border-black"
+                 >
+                   Awesome!
+                 </button>
+               </div>
+             </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -360,57 +360,57 @@ export default function SurpriseMePage() {
         <div className="max-w-md mx-auto flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-amber-700 hover:text-amber-800 transition-colors"
+            className="flex items-center gap-2 text-gray-700 hover:text-black transition-colors"
           >
             <span>←</span>
-            <span className="font-mono text-sm uppercase tracking-wide">Back</span>
+            <span className="font-mono text-sm uppercase tracking-widest">Back</span>
           </button>
           <div className="text-center">
-            <h1 className="font-serif font-bold text-xl text-amber-800">Surprise Me</h1>
-            <p className="font-mono text-xs uppercase text-amber-600 tracking-wide">Daily Cosmic Guidance</p>
+            <h1 className="font-serif font-bold text-xl text-black" style={{ letterSpacing: '-0.06em' }}>Surprise Me</h1>
+            <p className="font-mono text-xs uppercase text-gray-500 tracking-widest">Daily Cosmic Guidance</p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-amber-700">🎲</span>
-            <span className="font-mono text-sm text-amber-700">{dailyRolls}</span>
-            {!hasSeenExplanation && (
-              <button
-                onClick={() => setShowGameExplanation(true)}
-                className="ml-2 text-amber-600 hover:text-amber-700 text-xs"
-                title="How it works"
-              >
-                ❓
-              </button>
-            )}
-          </div>
+                      <div className="flex items-center gap-2">
+              <span className="text-gray-700">🎲</span>
+              <span className="font-mono text-sm text-gray-700">{dailyRolls}</span>
+              {!hasSeenExplanation && (
+                <button
+                  onClick={() => setShowGameExplanation(true)}
+                  className="ml-2 text-gray-600 hover:text-gray-700 text-xs"
+                  title="How it works"
+                >
+                  ❓
+                </button>
+              )}
+            </div>
         </div>
       </div>
 
       {/* SOLAR Earnings Display */}
-      <div className="w-full bg-gradient-to-r from-amber-100 to-yellow-100 border-b border-amber-200 px-4 py-3">
+      <div className="w-full bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="text-center">
-              <div className="text-sm font-mono font-bold text-amber-800">
+              <div className="text-sm font-mono font-bold text-black">
                 {solarEarnings.totalEarned.toLocaleString()} $SOLAR
               </div>
-              <div className="text-xs font-mono text-amber-600 uppercase tracking-wide">
+              <div className="text-xs font-mono text-gray-500 uppercase tracking-widest">
                 Total Earned
               </div>
             </div>
             <div className="text-center">
-              <div className="text-sm font-mono font-bold text-amber-800 flex items-center gap-1">
+              <div className="text-sm font-mono font-bold text-black flex items-center gap-1">
                 {solarEarnings.streakDays} {solarEarnings.streakDays > 1 ? '🔥' : ''}
               </div>
-              <div className="text-xs font-mono text-amber-600 uppercase tracking-wide">
+              <div className="text-xs font-mono text-gray-500 uppercase tracking-widest">
                 Day Streak
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-sm font-mono font-bold text-amber-800">
+            <div className="text-sm font-mono font-bold text-black">
               {solarEarnings.streakMultiplier.toFixed(1)}x
             </div>
-            <div className="text-xs font-mono text-amber-600 uppercase tracking-wide">
+            <div className="text-xs font-mono text-gray-500 uppercase tracking-widest">
               Multiplier
             </div>
           </div>
@@ -421,11 +421,11 @@ export default function SurpriseMePage() {
       <div className="max-w-md mx-auto px-4 py-8">
         {/* User Info */}
         {userArchetype && (
-          <div className="bg-white rounded-lg border border-amber-200 p-4 mb-6">
+          <div className="bg-white border border-gray-200 p-4 mb-6">
             <div className="text-center">
               <div className="text-2xl mb-2">☀️</div>
-              <div className="font-serif font-bold text-lg text-amber-800">{userArchetype}</div>
-              <div className="font-mono text-sm text-amber-600 uppercase tracking-wide">
+              <div className="font-serif font-bold text-lg text-black" style={{ letterSpacing: '-0.06em' }}>{userArchetype}</div>
+              <div className="font-mono text-xs text-gray-500 uppercase tracking-widest">
                 Your cosmic guidance is personalized
               </div>
             </div>
@@ -436,27 +436,27 @@ export default function SurpriseMePage() {
         {(() => {
           const progress = solarEarningsManager.getAchievementProgress();
           return (
-            <div className="bg-white rounded-lg border border-purple-200 p-4 mb-6">
+            <div className="bg-white border border-gray-200 p-4 mb-6">
               <div className="flex items-center justify-between mb-3">
-                <div className="font-serif font-bold text-lg text-purple-800">Achievements</div>
-                <div className="font-mono text-sm text-purple-600">
+                <div className="font-serif font-bold text-lg text-black" style={{ letterSpacing: '-0.06em' }}>Achievements</div>
+                <div className="font-mono text-sm text-gray-700">
                   {progress.completed}/{progress.total}
                 </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+              <div className="w-full bg-gray-200 h-2 mb-3">
                 <div 
-                  className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                  className="bg-[#d4af37] h-2 transition-all duration-300"
                   style={{ width: `${(progress.completed / progress.total) * 100}%` }}
                 />
               </div>
               {progress.nextAchievements.length > 0 && (
                 <div>
-                  <div className="font-mono text-xs text-purple-600 uppercase tracking-wide mb-2">
+                  <div className="font-mono text-xs text-gray-500 uppercase tracking-widest mb-2">
                     Next Goals:
                   </div>
                   <div className="space-y-1">
                     {progress.nextAchievements.slice(0, 2).map((achievement, index) => (
-                      <div key={index} className="text-xs font-mono text-purple-700 bg-purple-50 rounded px-2 py-1">
+                      <div key={index} className="text-xs font-mono text-gray-700 bg-gray-50 border border-gray-200 px-2 py-1">
                         {achievement}
                       </div>
                     ))}
@@ -469,16 +469,16 @@ export default function SurpriseMePage() {
 
         {/* How It Works - for first time users */}
         {!hasSeenExplanation && !hasRolledToday && (
-          <div className="bg-gradient-to-r from-purple-50 to-amber-50 rounded-lg border border-purple-200 p-4 mb-6">
+          <div className="bg-white border border-gray-200 p-4 mb-6">
             <div className="text-center">
               <div className="text-2xl mb-2">✨</div>
-              <div className="font-serif font-bold text-lg text-purple-800 mb-2">New to Surprise Me?</div>
-              <div className="text-sm text-purple-700 mb-3">
+              <div className="font-serif font-bold text-lg text-black mb-2" style={{ letterSpacing: '-0.06em' }}>New to Surprise Me?</div>
+              <div className="text-sm text-gray-700 mb-3">
                 Get personalized cosmic guidance tailored to your {userArchetype} energy.
               </div>
               <button
                 onClick={() => setShowGameExplanation(true)}
-                className="text-purple-700 hover:text-purple-800 underline font-mono text-xs uppercase tracking-wide"
+                className="text-gray-700 hover:text-black underline font-mono text-xs uppercase tracking-widest"
               >
                 Learn How It Works
               </button>
@@ -491,27 +491,27 @@ export default function SurpriseMePage() {
           const eventMultiplier = solarEarningsManager.getEventMultiplier();
           if (eventMultiplier > 1.0) {
             return (
-              <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-400 rounded-lg p-4 mb-6">
+              <div className="bg-white border-2 border-[#d4af37] p-4 mb-6">
                 <div className="text-center">
                   <div className="text-3xl mb-2">🌟</div>
-                  <div className="font-serif font-bold text-lg text-orange-800 mb-2">
+                  <div className="font-serif font-bold text-lg text-black mb-2" style={{ letterSpacing: '-0.06em' }}>
                     Cosmic Event Active!
                   </div>
-                  <div className="font-mono text-sm text-orange-700">
+                  <div className="font-mono text-sm text-gray-700">
                     {eventMultiplier.toFixed(1)}x SOLAR bonus for all rolls today!
                   </div>
                   {eventMultiplier === 3.0 && (
-                    <div className="text-xs font-mono text-orange-600 mt-1">
+                    <div className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-widest">
                       🌒 Solar Eclipse Energy
                     </div>
                   )}
                   {eventMultiplier === 2.0 && (
-                    <div className="text-xs font-mono text-orange-600 mt-1">
+                    <div className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-widest">
                       ❄️ Winter Solstice - Cosmic Convergence
                     </div>
                   )}
                   {eventMultiplier === 1.5 && (
-                    <div className="text-xs font-mono text-orange-600 mt-1">
+                    <div className="text-xs font-mono text-gray-500 mt-1 uppercase tracking-widest">
                       🌕 Full Moon Power
                     </div>
                   )}
@@ -527,10 +527,10 @@ export default function SurpriseMePage() {
           <motion.button
             onClick={handleRollClick}
             disabled={dailyRolls <= 0 || isRolling}
-            className={`relative overflow-hidden px-8 py-4 rounded-full font-serif font-bold text-lg transition-all duration-200 ${
+            className={`relative overflow-hidden px-8 py-4 font-mono font-bold text-lg transition-all duration-200 border border-black uppercase tracking-widest ${
               dailyRolls <= 0 || isRolling
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-amber-400 text-amber-900 hover:bg-amber-500 active:scale-95 shadow-lg hover:shadow-xl'
+                : 'bg-[#d4af37] text-black hover:bg-[#e6c75a]'
             }`}
             whileHover={dailyRolls > 0 && !isRolling ? { scale: 1.05 } : {}}
             whileTap={dailyRolls > 0 && !isRolling ? { scale: 0.95 } : {}}
@@ -555,7 +555,7 @@ export default function SurpriseMePage() {
             <div className="mt-4">
               <button
                 onClick={() => router.push('/surprise-me/more-rolls')}
-                className="text-amber-700 hover:text-amber-800 underline font-mono text-sm uppercase tracking-wide"
+                className="text-gray-700 hover:text-black underline font-mono text-sm uppercase tracking-widest"
               >
                 Get More Rolls
               </button>
@@ -586,7 +586,7 @@ export default function SurpriseMePage() {
               >
                 ✨
               </motion.div>
-              <div className="font-mono text-amber-700 uppercase tracking-wide">
+              <div className="font-mono text-gray-500 uppercase tracking-widest">
                 The cosmos is deciding...
               </div>
             </motion.div>
@@ -602,12 +602,12 @@ export default function SurpriseMePage() {
               exit={{ opacity: 0, y: -20 }}
               className="mb-8"
             >
-              <div className={`bg-white rounded-lg border-2 p-6 shadow-lg ${currentRoll.color} ${getRarityBorder(currentRoll.rarity)}`}>
+              <div className={`bg-white border-2 p-6 ${currentRoll.color} ${getRarityBorder(currentRoll.rarity)}`}>
                 <div className="text-center mb-4">
                   <div className="text-4xl mb-2">{currentRoll.icon}</div>
-                  <div className={`font-mono text-xs uppercase tracking-wide mb-1 ${getRarityColor(currentRoll.rarity)}`}>
-                    {currentRoll.rarity} {currentRoll.type}
-                  </div>
+                                      <div className={`font-mono text-xs uppercase tracking-widest mb-1 ${getRarityColor(currentRoll.rarity)}`}>
+                      {currentRoll.rarity} {currentRoll.type}
+                    </div>
                   <div className="font-serif font-bold text-xl text-gray-800 mb-2">
                     {currentRoll.title}
                   </div>
@@ -618,13 +618,13 @@ export default function SurpriseMePage() {
 
                 {/* SOLAR Earnings Celebration */}
                 {lastRollEarnings && (
-                  <div className="bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-300 rounded-lg p-4 mb-6">
+                  <div className="bg-white border border-[#d4af37] p-4 mb-6">
                     <div className="text-center">
                       <div className="text-2xl mb-2">🎉</div>
-                      <div className="font-mono font-bold text-amber-800 text-lg">
+                      <div className="font-mono font-bold text-black text-lg uppercase tracking-widest">
                         +{lastRollEarnings.totalEarned} $SOLAR EARNED!
                       </div>
-                      <div className="text-xs font-mono text-amber-600 uppercase tracking-wide mt-1">
+                      <div className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-1">
                         Base: {lastRollEarnings.baseAmount} • Streak: {lastRollEarnings.streakMultiplier.toFixed(1)}x
                         {lastRollEarnings.eventMultiplier > 1.0 && (
                           <span> • Event: {lastRollEarnings.eventMultiplier.toFixed(1)}x</span>
@@ -633,11 +633,11 @@ export default function SurpriseMePage() {
                       
                       {/* Bonus Earnings */}
                       {lastRollEarnings.totalBonusEarned > 0 && (
-                        <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-3 mt-3">
-                          <div className="font-mono font-bold text-green-800">
+                        <div className="bg-white border border-gray-200 p-3 mt-3">
+                          <div className="font-mono font-bold text-black uppercase tracking-widest">
                             +{lastRollEarnings.totalBonusEarned} BONUS $SOLAR!
                           </div>
-                          <div className="text-xs text-green-600 mt-1">
+                          <div className="text-xs text-gray-500 mt-1 uppercase tracking-widest">
                             {lastRollEarnings.achievements.bonusEarned > 0 && (
                               <div>🏆 Achievements: +{lastRollEarnings.achievements.bonusEarned}</div>
                             )}
@@ -652,12 +652,12 @@ export default function SurpriseMePage() {
                       )}
                       
                       {lastRollEarnings.newStreak > 1 && (
-                        <div className="text-sm font-mono text-amber-700 mt-2">
+                        <div className="text-sm font-mono text-gray-700 mt-2">
                           🔥 {lastRollEarnings.newStreak} day streak! Keep rolling daily for higher multipliers!
                         </div>
                       )}
                       {lastRollEarnings.streakBroken && (
-                        <div className="text-sm font-mono text-orange-600 mt-2">
+                        <div className="text-sm font-mono text-gray-600 mt-2">
                           💔 Your streak was broken. Start fresh today!
                         </div>
                       )}
@@ -694,7 +694,7 @@ export default function SurpriseMePage() {
                     </h4>
                     <div className="space-y-3">
                       {currentRoll.actionableSteps.map((step, index) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                        <div key={index} className="bg-gray-50 p-3 border border-gray-200">
                           <div className="flex items-start gap-3">
                             <div className="text-sm flex-shrink-0">
                               {step.type === 'link' && '🔗'}
@@ -725,7 +725,7 @@ export default function SurpriseMePage() {
                                         href={step.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
+                                        className="inline-flex items-center gap-2 bg-[#d4af37] hover:bg-[#e6c75a] text-black px-3 py-1 text-xs font-mono uppercase tracking-widest transition-colors duration-200 border border-black"
                                       >
                                         {step.type === 'booking' ? 'Book Now' : 
                                          step.type === 'product' ? 'Buy Now' :
@@ -749,7 +749,7 @@ export default function SurpriseMePage() {
                                         href={`https://google.com/search?q=${encodeURIComponent(step.content)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
+                                        className="inline-flex items-center gap-2 bg-[#d4af37] hover:bg-[#e6c75a] text-black px-3 py-1 text-xs font-mono uppercase tracking-widest transition-colors duration-200 border border-black"
                                       >
                                         Google Search ↗
                                       </a>
@@ -770,7 +770,7 @@ export default function SurpriseMePage() {
                                     <img
                                       src={step.productImage}
                                       alt={step.label}
-                                      className="w-full h-full object-cover rounded-lg border border-gray-200 shadow-sm"
+                                      className="w-full h-full object-cover border border-gray-200"
                                       onError={(e) => {
                                         e.currentTarget.style.display = 'none';
                                       }}
@@ -785,8 +785,8 @@ export default function SurpriseMePage() {
                     </div>
                     
                     {/* Affiliate Disclosure */}
-                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                      <div className="text-xs text-amber-800">
+                    <div className="mt-4 p-3 bg-gray-50 border border-gray-200">
+                      <div className="text-xs text-gray-700">
                         <strong>⚖️ Disclosure:</strong> This post contains affiliate links. We may earn a commission when you purchase through these links at no additional cost to you. This helps support our cosmic guidance mission while bringing you carefully curated recommendations.
                       </div>
                     </div>
@@ -800,17 +800,17 @@ export default function SurpriseMePage() {
         {/* Roll History */}
         {rollHistory.length > 0 && (
           <div className="mt-8">
-            <h3 className="font-serif font-bold text-lg text-amber-800 mb-4 text-center">
+            <h3 className="font-serif font-bold text-lg text-black mb-4 text-center" style={{ letterSpacing: '-0.06em' }}>
               Today's Guidance
             </h3>
             <div className="space-y-3">
               {rollHistory.map((roll, index) => (
-                <div key={roll.id} className={`bg-white rounded-lg border p-4 ${roll.color} opacity-75`}>
+                <div key={roll.id} className={`bg-white border p-4 ${roll.color} opacity-75`}>
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">{roll.icon}</div>
                     <div>
                       <div className="font-serif font-bold text-sm text-gray-800">{roll.title}</div>
-                      <div className={`font-mono text-xs uppercase tracking-wide ${getRarityColor(roll.rarity)}`}>
+                      <div className={`font-mono text-xs uppercase tracking-widest ${getRarityColor(roll.rarity)}`}>
                         {roll.rarity} {roll.type}
                       </div>
                     </div>
