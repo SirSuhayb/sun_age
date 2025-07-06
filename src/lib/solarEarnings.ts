@@ -54,6 +54,10 @@ export interface RollEarnings {
   totalEarned: number;
   newStreak: number;
   streakBroken: boolean;
+  achievements: { unlocked: string[]; bonusEarned: number };
+  bonuses: { weeklyBonus: number; monthlyBonus: number };
+  eventMultiplier: number;
+  totalBonusEarned: number;
 }
 
 export class SolarEarningsManager {
@@ -216,30 +220,23 @@ export class SolarEarningsManager {
       streakMultiplier,
       totalEarned,
       newStreak,
-      streakBroken
+      streakBroken,
+      achievements: { unlocked: [], bonusEarned: 0 },
+      bonuses: { weeklyBonus: 0, monthlyBonus: 0 },
+      eventMultiplier: 1.0,
+      totalBonusEarned: 0
     };
   }
 
   // Award SOLAR for a roll with all bonuses
-  awardSolar(rarity: string, rollTitle: string): RollEarnings & {
-    achievements: { unlocked: string[]; bonusEarned: number };
-    bonuses: { weeklyBonus: number; monthlyBonus: number };
-    eventMultiplier: number;
-    totalBonusEarned: number;
-  } {
+  awardSolar(rarity: string, rollTitle: string): RollEarnings {
     const earnings = this.getEarnings();
     const rollEarnings = this.calculateRollEarnings(rarity);
     const today = new Date().toDateString();
 
     // Don't award if already rolled today (this check should be handled upstream)
     if (earnings.lastRollDate === today) {
-      return {
-        ...rollEarnings,
-        achievements: { unlocked: [], bonusEarned: 0 },
-        bonuses: { weeklyBonus: 0, monthlyBonus: 0 },
-        eventMultiplier: 1.0,
-        totalBonusEarned: 0
-      };
+      return rollEarnings;
     }
 
     // Check for special event multipliers
