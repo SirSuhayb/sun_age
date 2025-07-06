@@ -188,8 +188,8 @@ export function SolAgeClaimModal({
         return (
           <div className="text-center">
             <div className="text-4xl mb-4">🔍</div>
-            <h2 className="text-xl font-bold mb-2">Verifying Share</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-xl font-serif font-bold mb-2">Verifying Share</h2>
+            <p className="text-gray-600 text-xs font-mono tracking-widest uppercase mb-6 max-w-xs mx-auto" style={{ letterSpacing: '0.15em' }}>
               Checking if you've shared your sol age recently...
             </p>
             {error && (
@@ -204,8 +204,8 @@ export function SolAgeClaimModal({
         return (
           <div className="text-center">
             <div className="text-4xl mb-4">🌞</div>
-            <h2 className="text-xl font-bold mb-2">Connect Wallet</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-xl font-serif font-bold mb-2">Connect Wallet</h2>
+            <p className="text-gray-600 text-xs font-mono tracking-widest uppercase mb-6 max-w-xs mx-auto" style={{ letterSpacing: '0.15em' }}>
               Connect your wallet to claim {claimAmount.toLocaleString()} $SOLAR tokens for sharing your sol age
             </p>
 
@@ -219,7 +219,8 @@ export function SolAgeClaimModal({
                 <button
                   onClick={handleDirectClaim}
                   disabled={claiming}
-                  className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm hover:bg-[#e6c75a] disabled:bg-gray-300 disabled:text-gray-500 transition-colors"
+                  className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm font-bold hover:bg-[#e6c75a] disabled:bg-gray-300 disabled:text-gray-500 transition-colors rounded-none border border-[#d4af37]"
+                  style={{ letterSpacing: '0.1em' }}
                 >
                   {claiming ? 'CLAIMING...' : 'CLAIM $SOLAR'}
                 </button>
@@ -228,7 +229,8 @@ export function SolAgeClaimModal({
               <div className="space-y-4">
                 <button
                   onClick={handleConnectWallet}
-                  className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm hover:bg-[#e6c75a] transition-colors"
+                  className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm font-bold hover:bg-[#e6c75a] transition-colors rounded-none border border-[#d4af37]"
+                  style={{ letterSpacing: '0.1em' }}
                 >
                   CONNECT WALLET
                 </button>
@@ -244,27 +246,34 @@ export function SolAgeClaimModal({
                 
                 <button
                   onClick={() => setShowEmailInput(!showEmailInput)}
-                  className="w-full px-4 py-3 border border-gray-300 text-gray-700 font-mono text-sm hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 text-gray-700 font-mono text-sm font-bold hover:bg-gray-50 transition-colors rounded-none"
+                  style={{ letterSpacing: '0.1em' }}
                 >
                   CREATE ACCOUNT & CLAIM
                 </button>
                 
                 {showEmailInput && (
-                  <div className="space-y-3">
-                    <input
-                      type="email"
-                      value={userEmail}
-                      onChange={(e) => setUserEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      className="w-full px-3 py-2 border border-gray-300 text-gray-900 placeholder-gray-400 font-mono text-sm focus:outline-none focus:border-[#d4af37]"
-                    />
-                    <button
-                      onClick={handleCreateAccountAndClaim}
-                      disabled={claiming || !userEmail.trim()}
-                      className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm hover:bg-[#e6c75a] disabled:bg-gray-300 disabled:text-gray-500 transition-colors"
-                    >
-                      {claiming ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT & CLAIM'}
-                    </button>
+                                     <div className="space-y-3">
+                     <div>
+                       <label className="block text-gray-700 text-sm font-mono mb-2">
+                         EMAIL ADDRESS
+                       </label>
+                       <input
+                         type="email"
+                         value={userEmail}
+                         onChange={(e) => setUserEmail(e.target.value)}
+                         placeholder="Enter your email"
+                         className="w-full px-3 py-2 border border-gray-300 text-gray-900 placeholder-gray-400 font-mono text-sm focus:outline-none focus:border-[#d4af37]"
+                       />
+                     </div>
+                                         <button
+                       onClick={handleCreateAccountAndClaim}
+                       disabled={claiming || !userEmail.trim()}
+                       className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm font-bold hover:bg-[#e6c75a] disabled:bg-gray-300 disabled:text-gray-500 transition-colors rounded-none border border-[#d4af37]"
+                       style={{ letterSpacing: '0.1em' }}
+                     >
+                       {claiming ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT & CLAIM'}
+                     </button>
                   </div>
                 )}
               </div>
@@ -282,20 +291,21 @@ export function SolAgeClaimModal({
         return (
           <div className="text-center">
             <div className="text-4xl mb-4">🎉</div>
-            <h2 className="text-xl font-bold mb-2">Tokens Claimed!</h2>
-            <p className="text-gray-600 mb-6">
-              Your {claimAmount.toLocaleString()} $SOLAR tokens have been claimed successfully!
+            <h2 className="text-xl font-serif font-bold mb-2 text-[#d4af37]">Tokens Claimed!</h2>
+            <p className="text-gray-700 font-mono mb-4 text-center">
+              Your {claimAmount.toLocaleString()} $SOLAR tokens have been claimed and are being processed.
             </p>
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded mb-6">
-              <p className="text-sm text-yellow-700">
+            <div className="p-4 bg-yellow-50 border border-yellow-200 mb-6">
+              <p className="text-sm text-yellow-700 font-mono">
                 <strong>What's next?</strong> Your tokens will be deposited to your wallet within 24 hours.
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm hover:bg-[#e6c75a] transition-colors"
+              className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm font-bold hover:bg-[#e6c75a] transition-colors rounded-none border border-[#d4af37]"
+              style={{ letterSpacing: '0.1em' }}
             >
-              AWESOME!
+              RETURN TO SOLARA
             </button>
           </div>
         );
@@ -311,13 +321,14 @@ export function SolAgeClaimModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div className="relative z-10 w-full max-w-md mx-4">
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-[#d4af37] p-6 shadow-sm" style={{ boxShadow: '0 2px 8px 0 #e6c75a22' }}>
           {renderStepContent()}
           
           {step !== 'success' && (
             <button
               onClick={onClose}
-              className="w-full mt-4 px-4 py-2 text-gray-500 font-mono text-sm hover:text-gray-700 transition-colors"
+              className="w-full mt-4 px-4 py-2 text-gray-500 font-mono text-sm font-bold hover:text-gray-700 transition-colors"
+              style={{ letterSpacing: '0.1em' }}
             >
               CANCEL
             </button>
