@@ -219,7 +219,7 @@ export default function SurpriseMePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
           >
             {/* Sunrise gradient overlay */}
             <div className="absolute inset-0 bg-solara-sunrise" style={{ opacity: 0.6 }} />
@@ -328,7 +328,7 @@ export default function SurpriseMePage() {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-4 left-4 right-4 z-40 max-w-md mx-auto"
+            className="fixed top-4 left-4 right-4 z-[9998] max-w-md mx-auto"
           >
                          <div className="backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 p-6 shadow-lg">
                <div className="text-center">
