@@ -34,13 +34,13 @@ export class SolarEarningsManager {
     return SolarEarningsManager.instance;
   }
 
-  // Base earnings per rarity
+  // Base earnings per rarity (scaled for 100M+ token supply)
   private getBaseEarnings(rarity: string): number {
     switch (rarity) {
-      case 'common': return 10;
-      case 'rare': return 25;
-      case 'legendary': return 50;
-      default: return 10;
+      case 'common': return 1000;      // 1K SOLAR
+      case 'rare': return 2500;       // 2.5K SOLAR  
+      case 'legendary': return 5000;  // 5K SOLAR
+      default: return 1000;
     }
   }
 
