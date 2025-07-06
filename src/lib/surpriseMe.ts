@@ -1,7 +1,7 @@
 import { getSolarArchetype } from './solarIdentity';
 
 export interface ActionableStep {
-  type: 'link' | 'search' | 'prompt' | 'list';
+  type: 'link' | 'search' | 'prompt' | 'list' | 'booking' | 'product';
   label: string;
   content: string;
   url?: string;
@@ -12,6 +12,7 @@ export interface ActionableStep {
   };
   productImage?: string;
   price?: string;
+  category?: 'accommodation' | 'flights' | 'gear' | 'experiences' | 'insurance' | 'books' | 'tools';
 }
 
 export interface DailyRoll {
@@ -43,375 +44,242 @@ export interface UserProfile {
 
 export class SurpriseMeFramework {
   private static instance: SurpriseMeFramework;
-  private activityDatabase: Record<string, DailyRoll[]> = {};
+  private activities: Record<string, DailyRoll[]> = {};
 
   private constructor() {
-    this.initializeActivityDatabase();
+    this.initializeActivities();
   }
 
-  public static getInstance(): SurpriseMeFramework {
+  static getInstance(): SurpriseMeFramework {
     if (!SurpriseMeFramework.instance) {
       SurpriseMeFramework.instance = new SurpriseMeFramework();
     }
     return SurpriseMeFramework.instance;
   }
 
-  private initializeActivityDatabase(): void {
-    this.activityDatabase = {
-      'Sol Innovator': [
+  private initializeActivities() {
+    this.activities = {
+      'Sol Traveler': [
         // Common Activities
         {
-          id: 'inn-1',
+          id: 'trav-1',
           type: 'activity',
-          title: 'Prototype Something New',
-          description: 'Spend 30 minutes creating a rough prototype or sketch of an idea that excites you.',
-          archetype: 'Sol Innovator',
+          title: 'Plan Your Next Adventure',
+          description: 'Research and book a destination that calls to your wandering soul. Let curiosity guide your journey.',
+          archetype: 'Sol Traveler',
           rarity: 'common',
-          icon: '🔧',
-          color: 'bg-blue-100 border-blue-300',
-          tags: ['creativity', 'innovation', 'hands-on'],
-          duration: '30 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'anytime',
+          icon: '🌍',
+          color: 'bg-emerald-100 border-emerald-300',
+          tags: ['travel', 'planning', 'adventure'],
+          duration: '2 hours',
+          difficulty: 'easy',
+          timeOfDay: 'afternoon',
           actionableSteps: [
             {
-              type: 'prompt',
-              label: 'Quick Idea Spark',
-              content: 'Open a notes app and write: "What if [everyday object] could [unexpected action]?" Fill in 5 combinations.'
-            },
-            {
-              type: 'link',
-              label: 'Digital Prototyping Tool',
-              content: 'Start sketching with Figma (free)',
-              url: 'https://figma.com',
+              type: 'booking',
+              label: 'Search Hotels & Stays',
+              content: 'Find unique accommodations worldwide with up to 25% commission',
+              url: 'https://www.booking.com/searchresults.html?ss=worldwide&aid=yourtag',
               affiliate: {
-                program: 'Direct',
-                commission: 'Free Tool',
-                tracking: 'organic'
-              }
-            },
-            {
-              type: 'link',
-              label: 'Prototyping Kit on Amazon',
-              content: 'Physical sketching and wireframing kit',
-              url: 'https://amazon.com/dp/B08CY2QZ43?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
+                program: 'Booking.com',
+                commission: 'Up to 25% of commission',
+                tracking: 'Session-based'
               },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71Q4bYhWTxL._AC_UL300_SR300,300_.jpg',
-              price: '$24.99'
+              productImage: '/api/placeholder/300/200',
+              category: 'accommodation'
+            },
+            {
+              type: 'booking',
+              label: 'Find Flights',
+              content: 'Compare flight prices across 1,200+ airlines worldwide',
+              url: 'https://www.skyscanner.com/flights?pid=yourtag',
+              affiliate: {
+                program: 'Skyscanner',
+                commission: 'Up to 20%',
+                tracking: '30 days'
+              },
+              category: 'flights'
+            },
+            {
+              type: 'booking',
+              label: 'Book Experiences',
+              content: 'Discover unique activities and tours in 2,500+ destinations',
+              url: 'https://www.viator.com/tours?pid=yourtag',
+              affiliate: {
+                program: 'Viator',
+                commission: '8%',
+                tracking: '30 days'
+              },
+              category: 'experiences'
             },
             {
               type: 'search',
-              label: 'Inspiration Search',
-              content: '"rapid prototyping techniques" OR "quick mockup ideas" OR "30 minute build challenge"'
+              label: 'Google Search: "Hidden gems [destination]"',
+              content: 'hidden gems [destination] local experiences off beaten path',
+              url: 'https://www.google.com/search?q=hidden+gems+destination+local+experiences'
+            },
+            {
+              type: 'product',
+              label: 'Travel Insurance',
+              content: 'Protect your adventure with comprehensive travel insurance',
+              url: 'https://www.worldnomads.com/travel-insurance?affiliate=yourtag',
+              affiliate: {
+                program: 'World Nomads',
+                commission: '10%',
+                tracking: '60 days'
+              },
+              price: 'From $45',
+              category: 'insurance'
             }
           ]
         },
         {
-          id: 'inn-2',
+          id: 'trav-2',
           type: 'activity',
-          title: 'Tech Trend Research',
-          description: 'Dive deep into an emerging technology you\'ve been curious about. Take notes on its potential impact.',
-          archetype: 'Sol Innovator',
+          title: 'Learn a Local Phrase',
+          description: 'Connect with a new culture by learning key phrases in a language you\'ve never spoken.',
+          archetype: 'Sol Traveler',
           rarity: 'common',
-          icon: '🔬',
-          color: 'bg-blue-100 border-blue-300',
-          tags: ['research', 'technology', 'learning'],
-          duration: '45 minutes',
+          icon: '🗣️',
+          color: 'bg-emerald-100 border-emerald-300',
+          tags: ['language', 'culture', 'connection'],
+          duration: '30 minutes',
           difficulty: 'easy',
           timeOfDay: 'anytime',
           actionableSteps: [
             {
-              type: 'search',
-              label: 'Trending Tech Research',
-              content: '"emerging technology 2024" OR "breakthrough innovations" OR "future tech trends"'
+              type: 'link',
+              label: 'Start Learning on Duolingo',
+              content: 'Free language learning app with 40+ languages',
+              url: 'https://www.duolingo.com/?pid=yourtag',
+              affiliate: {
+                program: 'Duolingo Plus',
+                commission: '30-day free trial',
+                tracking: '30 days'
+              }
             },
             {
               type: 'link',
-              label: 'MIT Technology Review',
-              content: 'Latest breakthroughs and analysis',
-              url: 'https://www.technologyreview.com/'
-            },
-            {
-              type: 'link',
-              label: 'Research Journal - Amazon',
-              content: 'Premium notebook for tech research notes',
-              url: 'https://amazon.com/dp/B07NVWBLZR?tag=yourtag-20',
+              label: 'Buy: "Lonely Planet Phrasebook"',
+              content: 'Essential phrases for travelers',
+              url: 'https://amazon.com/dp/B00JVBF8QG?tag=yourtag-20',
               affiliate: {
                 program: 'Amazon Associates',
                 commission: 'Up to 10%',
-                tracking: 'yourtag-20'
+                tracking: '24 hours'
               },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71VkL9dKqBL._AC_UL300_SR300,300_.jpg',
-              price: '$19.95'
+              productImage: '/api/placeholder/200/250',
+              price: '$12.99',
+              category: 'books'
             },
             {
               type: 'prompt',
-              label: 'Impact Analysis Framework',
-              content: 'For your chosen tech, answer: 1) What problem does it solve? 2) Who benefits? 3) What could go wrong? 4) How might it change daily life in 10 years?'
+              label: 'Practice Today',
+              content: 'Choose 3 essential phrases: "Hello," "Thank you," and "Where is...?" Practice using them in conversation with yourself or friends.'
             }
           ]
         },
         // Rare Activities
         {
-          id: 'inn-3',
+          id: 'trav-3',
           type: 'experience',
-          title: 'Future Visioning Session',
-          description: 'Write down 5 technologies or innovations you believe will exist in 10 years. Detail how they might change society.',
-          archetype: 'Sol Innovator',
+          title: 'Digital Nomad Day',
+          description: 'Experience the nomadic lifestyle by working from a new location today.',
+          archetype: 'Sol Traveler',
           rarity: 'rare',
-          icon: '🚀',
-          color: 'bg-purple-100 border-purple-300',
-          tags: ['visioning', 'future', 'strategy'],
-          duration: '60 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'evening',
+          icon: '💻',
+          color: 'bg-emerald-100 border-emerald-300',
+          tags: ['remote work', 'lifestyle', 'flexibility'],
+          duration: '8 hours',
+          difficulty: 'medium',
+          timeOfDay: 'morning',
           actionableSteps: [
             {
-              type: 'prompt',
-              label: 'Future Vision Template',
-              content: 'For each innovation, write: Technology Name | Main Function | Target Users | Societal Impact | Timeline to Reality | Potential Obstacles'
-            },
-            {
               type: 'search',
-              label: 'Future Prediction Research',
-              content: '"technology predictions 2034" OR "future innovations timeline" OR "emerging tech roadmap"'
+              label: 'Find Remote Work Spots',
+              content: 'coworking spaces near me wifi coffee shops remote work',
+              url: 'https://www.google.com/search?q=coworking+spaces+near+me+wifi+coffee+shops'
             },
             {
-              type: 'link',
-              label: 'Ray Kurzweil\'s Predictions',
-              content: 'Learn from a master futurist',
-              url: 'https://www.kurzweilai.net/predictions'
+              type: 'product',
+              label: 'Portable Travel Backpack',
+              content: 'Professional laptop backpack for digital nomads',
+              url: 'https://www.amazon.com/dp/B07MKBZRJH?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 8%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/250',
+              price: '$79.99',
+              category: 'gear'
+            },
+            {
+              type: 'booking',
+              label: 'Book a Day Pass',
+              content: 'Access professional coworking spaces worldwide',
+              url: 'https://www.wework.com/day-passes?pid=yourtag',
+              affiliate: {
+                program: 'WeWork',
+                commission: 'Varies',
+                tracking: '30 days'
+              },
+              category: 'experiences'
             }
           ]
         },
         // Legendary Activities
         {
-          id: 'inn-5',
-          type: 'item',
-          title: 'Innovation Catalyst',
-          description: 'A book, tool, or resource that could spark your next breakthrough idea. Something that challenges your current thinking.',
-          archetype: 'Sol Innovator',
+          id: 'trav-4',
+          type: 'experience',
+          title: 'Spontaneous Journey',
+          description: 'Book a last-minute trip to somewhere you\'ve never been. Trust the universe to guide your adventure.',
+          archetype: 'Sol Traveler',
           rarity: 'legendary',
-          icon: '🌟',
-          color: 'bg-yellow-100 border-yellow-300',
-          tags: ['inspiration', 'breakthrough', 'learning'],
-          duration: 'variable',
+          icon: '✈️',
+          color: 'bg-emerald-100 border-emerald-300',
+          tags: ['spontaneous', 'adventure', 'trust'],
+          duration: '3-7 days',
           difficulty: 'hard',
-          timeOfDay: 'anytime',
-          actionableSteps: [
-            {
-              type: 'link',
-              label: 'Buy: "The Innovator\'s Dilemma" by Clayton Christensen',
-              content: 'Revolutionary book on disruptive innovation',
-              url: 'https://amazon.com/dp/0062060244?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51T2K3QQz2L._SX329_BO1,204,203,200_.jpg',
-              price: '$14.99'
-            },
-            {
-              type: 'link',
-              label: 'Buy: "Zero to One" by Peter Thiel',
-              content: 'Building the future through monopoly',
-              url: 'https://amazon.com/dp/0804139296?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71p5V6HQFHL._SX329_BO1,204,203,200_.jpg',
-              price: '$16.99'
-            },
-            {
-              type: 'link',
-              label: 'Webflow Website Builder',
-              content: 'Build your innovation showcase',
-              url: 'https://webflow.com?aff=referral-link',
-              affiliate: {
-                program: 'Webflow Affiliate',
-                commission: '50% for 12 months',
-                tracking: 'referral-link'
-              }
-            },
-            {
-              type: 'search',
-              label: 'Innovation Framework Research',
-              content: '"design thinking framework" OR "SCAMPER innovation method" OR "Jobs to be Done theory"'
-            }
-          ]
-        }
-      ],
-      'Sol Nurturer': [
-        // Common Activities
-        {
-          id: 'nur-1',
-          type: 'activity',
-          title: 'Tend to Something Growing',
-          description: 'Water a plant, start seeds, or care for something that needs nurturing attention. Notice how it responds to your care.',
-          archetype: 'Sol Nurturer',
-          rarity: 'common',
-          icon: '🌱',
-          color: 'bg-green-100 border-green-300',
-          tags: ['nurturing', 'growth', 'patience'],
-          duration: '20 minutes',
-          difficulty: 'easy',
           timeOfDay: 'morning',
           actionableSteps: [
             {
-              type: 'link',
-              label: 'Buy: Indoor Herb Garden Kit',
-              content: 'Easy-to-grow herbs for beginners',
-              url: 'https://amazon.com/dp/B082PQJZ6L?tag=yourtag-20',
+              type: 'booking',
+              label: 'Last-Minute Flight Deals',
+              content: 'Find spontaneous flight deals and save up to 70%',
+              url: 'https://www.expedia.com/Last-Minute-Flights?pid=yourtag',
+              affiliate: {
+                program: 'Expedia',
+                commission: 'Up to 4%',
+                tracking: '7 days'
+              },
+              category: 'flights'
+            },
+            {
+              type: 'booking',
+              label: 'Same-Day Accommodation',
+              content: 'Book hotels with same-day availability',
+              url: 'https://www.booking.com/searchresults.html?ss=surprise+me&aid=yourtag',
+              affiliate: {
+                program: 'Booking.com',
+                commission: 'Up to 25% of commission',
+                tracking: 'Session-based'
+              },
+              category: 'accommodation'
+            },
+            {
+              type: 'product',
+              label: 'Travel Packing Cubes',
+              content: 'Pack efficiently for spontaneous trips',
+              url: 'https://www.amazon.com/dp/B07MNBGPZQ?tag=yourtag-20',
               affiliate: {
                 program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
+                commission: 'Up to 8%',
+                tracking: '24 hours'
               },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71G2hNJH6zL._AC_SL1500_.jpg',
-              price: '$39.95'
-            },
-            {
-              type: 'search',
-              label: 'Plant Care Guide',
-              content: '"easy houseplants for beginners" OR "how to care for [specific plant]" OR "plant watering schedule"'
-            },
-            {
-              type: 'prompt',
-              label: 'Mindful Plant Care',
-              content: 'As you tend your plant: 1) Notice its current state 2) Speak or think encouraging words 3) Imagine its growth over time 4) Reflect on what nurturing means to you'
-            },
-            {
-              type: 'link',
-              label: 'Free: PlantIn App',
-              content: 'Plant identification and care reminders',
-              url: 'https://plantin.com'
-            }
-          ]
-        },
-        // Rare Activities
-        {
-          id: 'nur-3',
-          type: 'experience',
-          title: 'Acts of Service',
-          description: 'Perform three small acts of kindness for people in your life without expecting anything back. Notice the ripple effects.',
-          archetype: 'Sol Nurturer',
-          rarity: 'rare',
-          icon: '🤝',
-          color: 'bg-pink-100 border-pink-300',
-          tags: ['service', 'kindness', 'community'],
-          duration: '2 hours',
-          difficulty: 'medium',
-          timeOfDay: 'anytime',
-          actionableSteps: [
-            {
-              type: 'list',
-              label: 'Quick Acts of Service Ideas',
-              content: '• Send an encouraging text to someone • Buy coffee for the person behind you • Leave a positive review for a small business • Write a thank-you note • Offer to help with errands • Listen without giving advice'
-            },
-            {
-              type: 'search',
-              label: 'Local Volunteering',
-              content: '"volunteer opportunities near me" OR "community service [your city]" OR "local food bank volunteer"'
-            },
-            {
-              type: 'prompt',
-              label: 'Service Reflection',
-              content: 'After each act: 1) How did the person respond? 2) How did it feel to give? 3) What did you learn about service? 4) How might this create positive ripples?'
-            },
-            {
-              type: 'link',
-              label: 'Find: JustServe.org',
-              content: 'Discover volunteer opportunities',
-              url: 'https://justserve.org'
-            }
-          ]
-        }
-      ],
-      'Sol Alchemist': [
-        // Common Activities  
-        {
-          id: 'alc-1',
-          type: 'activity',
-          title: 'Transform a Challenge',
-          description: 'Take one current difficulty and reframe it as a growth opportunity. Write about the lesson it offers.',
-          archetype: 'Sol Alchemist',
-          rarity: 'common',
-          icon: '⚗️',
-          color: 'bg-indigo-100 border-indigo-300',
-          tags: ['transformation', 'growth', 'wisdom'],
-          duration: '30 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'evening',
-          actionableSteps: [
-            {
-              type: 'prompt',
-              label: 'Challenge Transformation Framework',
-              content: 'Choose your current challenge and write: 1) What is the difficulty? 2) What skills might this develop? 3) What would my future self thank me for learning? 4) How might this serve others? 5) What\'s the hidden gift in this experience?'
-            },
-            {
-              type: 'search',
-              label: 'Growth Mindset Resources',
-              content: '"post traumatic growth" OR "resilience building" OR "reframing negative thoughts" OR "finding meaning in suffering"'
-            },
-            {
-              type: 'link',
-              label: 'Buy: "Man\'s Search for Meaning" by Viktor Frankl',
-              content: 'Finding purpose in the darkest times',
-              url: 'https://amazon.com/dp/080701429X?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/61U6-9iL-TL._SX329_BO1,204,203,200_.jpg',
-              price: '$12.99'
-            }
-          ]
-        },
-        // Rare Activities
-        {
-          id: 'alc-3',
-          type: 'experience',
-          title: 'Shadow Work Session',
-          description: 'Spend time examining and integrating an aspect of yourself you usually avoid. Journal about what you discover.',
-          archetype: 'Sol Alchemist',
-          rarity: 'rare',
-          icon: '🌙',
-          color: 'bg-slate-100 border-slate-300',
-          tags: ['shadow work', 'integration', 'self-discovery'],
-          duration: '60 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'evening',
-          actionableSteps: [
-            {
-              type: 'prompt',
-              label: 'Shadow Work Questions',
-              content: 'What quality do I judge most in others? When do I feel shame or anger? What do I try to hide from others? What would I never want people to know about me? How might these rejected parts actually serve me?'
-            },
-            {
-              type: 'search',
-              label: 'Shadow Work Guidance',
-              content: '"Carl Jung shadow work" OR "shadow integration exercises" OR "embracing your dark side" OR "shadow work journal prompts"'
-            },
-            {
-              type: 'link',
-              label: 'Buy: "Meeting the Shadow" by Connie Zweig',
-              content: 'Comprehensive guide to shadow work',
-              url: 'https://amazon.com/dp/0874776864?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51JHbFhO3sL._SX331_BO1,204,203,200_.jpg',
-              price: '$19.95'
+              productImage: '/api/placeholder/200/250',
+              price: '$24.99',
+              category: 'gear'
             }
           ]
         }
@@ -440,314 +308,321 @@ export class SurpriseMeFramework {
               affiliate: {
                 program: 'Amazon Associates',
                 commission: 'Up to 10%',
-                tracking: 'yourtag-20'
+                tracking: '24 hours'
               },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51fL3AeDL6L._SX331_BO1,204,203,200_.jpg',
-              price: '$8.95'
-            },
-            {
-              type: 'link',
-              label: 'Buy: "The Tao of Physics" by Fritjof Capra',
-              content: 'Where ancient wisdom meets modern science',
-              url: 'https://amazon.com/dp/1570627681?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51HElE7FoxL._SX331_BO1,204,203,200_.jpg',
-              price: '$16.99'
-            },
-            {
-              type: 'link',
-              label: 'Free: Daily Stoic Archives',
-              content: 'Bite-sized daily wisdom',
-              url: 'https://dailystoic.com/archives/'
+              productImage: '/api/placeholder/200/250',
+              price: '$8.99',
+              category: 'books'
             },
             {
               type: 'search',
-              label: 'Wisdom Tradition Exploration',
-              content: '"ancient philosophy quotes" OR "Buddhist teachings beginners" OR "Sufi wisdom stories" OR "indigenous wisdom traditions"'
+              label: 'Google Search: "Daily Stoic practices"',
+              content: 'daily stoic practices morning routine wisdom philosophy',
+              url: 'https://www.google.com/search?q=daily+stoic+practices+morning+routine+wisdom'
+            },
+            {
+              type: 'link',
+              label: 'Free: "Tao Te Ching" (Public Domain)',
+              content: 'Ancient Chinese philosophical text on natural harmony',
+              url: 'https://www.gutenberg.org/ebooks/216',
+              price: 'Free'
             },
             {
               type: 'prompt',
-              label: 'Wisdom Integration Exercise',
-              content: 'After reading, ask yourself: 1) What resonated most? 2) How does this apply to my current challenges? 3) What would I tell a friend about this teaching?'
+              label: 'Reflection Journal',
+              content: 'After reading, write down 3 insights that resonate with your current life situation. How can you apply this wisdom today?'
             }
           ]
         },
+        // Continue with other Sol Sage activities...
         {
           id: 'sag-2',
-          type: 'activity',
-          title: 'Question Everything',
-          description: 'Choose a belief you hold strongly. Spend time examining it from multiple angles. What assumptions are you making?',
-          archetype: 'Sol Sage',
-          rarity: 'common',
-          icon: '🤔',
-          color: 'bg-orange-100 border-orange-300',
-          tags: ['questioning', 'beliefs', 'critical thinking'],
-          duration: '30 minutes',
-          difficulty: 'hard',
-          timeOfDay: 'afternoon',
-          actionableSteps: [
-            {
-              type: 'prompt',
-              label: 'Belief Examination Framework',
-              content: 'Pick a strong belief and ask: 1) Where did this belief come from? 2) What evidence supports it? 3) What evidence contradicts it? 4) How might someone from a different culture view this? 5) What if the opposite were true?'
-            },
-            {
-              type: 'search',
-              label: 'Critical Thinking Resources',
-              content: '"cognitive biases list" OR "logical fallacies examples" OR "Socratic questioning method"'
-            },
-            {
-              type: 'link',
-              label: 'Buy: "Thinking, Fast and Slow" by Daniel Kahneman',
-              content: 'Understand how your mind makes decisions',
-              url: 'https://amazon.com/dp/0374533555?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/61fdrEuPJwL._SX329_BO1,204,203,200_.jpg',
-              price: '$17.00'
-            }
-          ]
-        },
-        // Rare Activities
-        {
-          id: 'sag-3',
           type: 'experience',
-          title: 'Consciousness Expansion',
-          description: 'Try a new meditation technique, breathwork practice, or contemplative exercise. Notice what shifts in your awareness.',
+          title: 'Temple or Sacred Space Visit',
+          description: 'Visit a place of worship, meditation center, or natural sacred space to connect with deeper wisdom.',
           archetype: 'Sol Sage',
           rarity: 'rare',
-          icon: '🧘',
-          color: 'bg-teal-100 border-teal-300',
-          tags: ['consciousness', 'meditation', 'awareness'],
-          duration: '60 minutes',
-          difficulty: 'medium',
+          icon: '🏛️',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['sacred', 'meditation', 'pilgrimage'],
+          duration: '2 hours',
+          difficulty: 'easy',
           timeOfDay: 'morning',
           actionableSteps: [
             {
-              type: 'link',
-              label: 'Free: Insight Timer App',
-              content: 'Thousands of guided meditations',
-              url: 'https://insighttimer.com'
-            },
-            {
-              type: 'link',
-              label: 'Free: Wim Hof Breathing Method',
-              content: 'Powerful breathwork technique (YouTube)',
-              url: 'https://youtube.com/watch?v=tybOi4hjZFQ'
-            },
-            {
-              type: 'link',
-              label: 'Meditation Cushion Set',
-              content: 'Professional zabuton and zafu set',
-              url: 'https://amazon.com/dp/B01LXFMLEI?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71VXqsGjRcL._AC_SL1500_.jpg',
-              price: '$89.95'
-            },
-            {
               type: 'search',
-              label: 'Consciousness Practices',
-              content: '"vipassana meditation technique" OR "breathwork for beginners" OR "contemplative practices" OR "mindfulness exercises"'
+              label: 'Find Sacred Spaces Near You',
+              content: 'meditation centers temples sacred spaces near me spiritual retreats',
+              url: 'https://www.google.com/search?q=meditation+centers+temples+sacred+spaces+near+me'
             },
             {
-              type: 'prompt',
-              label: 'Awareness Tracking',
-              content: 'Before starting: Rate your current mental state 1-10. During practice: Notice 3 things that arise. After: Rate again and write one insight.'
-            }
-          ]
-        },
-        // Legendary Activities
-        {
-          id: 'sag-5',
-          type: 'item',
-          title: 'Wisdom Keeper',
-          description: 'A text, teacher, or practice that could deepen your understanding of life\'s mysteries. Your next level of awakening.',
-          archetype: 'Sol Sage',
-          rarity: 'legendary',
-          icon: '🦉',
-          color: 'bg-emerald-100 border-emerald-300',
-          tags: ['wisdom', 'mystery', 'awakening'],
-          duration: 'ongoing',
-          difficulty: 'hard',
-          timeOfDay: 'anytime',
-          actionableSteps: [
+              type: 'booking',
+              label: 'Book Spiritual Experiences',
+              content: 'Find meditation retreats and spiritual tours worldwide',
+              url: 'https://www.viator.com/tours/Spiritual-Tours/d4-g6045?pid=yourtag',
+              affiliate: {
+                program: 'Viator',
+                commission: '8%',
+                tracking: '30 days'
+              },
+              category: 'experiences'
+            },
             {
-              type: 'link',
-              label: 'Buy: "The Power of Now" by Eckhart Tolle',
-              content: 'Profound guide to spiritual awakening',
-              url: 'https://amazon.com/dp/1577314808?tag=yourtag-20',
+              type: 'product',
+              label: 'Travel Meditation Cushion',
+              content: 'Portable meditation cushion for sacred space visits',
+              url: 'https://www.amazon.com/dp/B07MXZQXJH?tag=yourtag-20',
               affiliate: {
                 program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
+                commission: 'Up to 8%',
+                tracking: '24 hours'
               },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51A2BH5THhL._SX331_BO1,204,203,200_.jpg',
-              price: '$14.99'
-            },
-            {
-              type: 'link',
-              label: 'Buy: "Sapiens" by Yuval Noah Harari',
-              content: 'Mind-expanding view of human consciousness',
-              url: 'https://amazon.com/dp/0062316095?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
-              },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/713jIoMO3UL._SX329_BO1,204,203,200_.jpg',
-              price: '$15.99'
-            },
-            {
-              type: 'link',
-              label: 'Free: Ram Dass Lectures',
-              content: 'Transformative spiritual teachings',
-              url: 'https://www.ramdass.org/audio/'
-            },
-            {
-              type: 'search',
-              label: 'Advanced Wisdom Resources',
-              content: '"perennial philosophy" OR "consciousness research" OR "enlightenment teachers" OR "spiritual teachers 2024"'
+              productImage: '/api/placeholder/200/250',
+              price: '$39.99',
+              category: 'gear'
             }
           ]
         }
       ],
-      'Sol Builder': [
+      'Sol Innovator': [
+        // Common Activities
         {
-          id: 'bui-1',
+          id: 'inn-1',
           type: 'activity',
-          title: 'Build Something Lasting',
-          description: 'Create or improve something that will have positive impact beyond today. Focus on quality over speed.',
-          archetype: 'Sol Builder',
+          title: 'Prototype Something New',
+          description: 'Spend 30 minutes creating a rough prototype or sketch of an idea that excites you.',
+          archetype: 'Sol Innovator',
           rarity: 'common',
-          icon: '🏗️',
-          color: 'bg-stone-100 border-stone-300',
-          tags: ['building', 'impact', 'legacy'],
-          duration: '60 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'morning',
+          icon: '🔧',
+          color: 'bg-blue-100 border-blue-300',
+          tags: ['creation', 'innovation', 'prototype'],
+          duration: '30 minutes',
+          difficulty: 'easy',
+          timeOfDay: 'afternoon',
           actionableSteps: [
             {
-              type: 'list',
-              label: 'Build Ideas by Time Investment',
-              content: '• 30 min: Organize important files/photos • 1 hr: Create a resource guide for others • 2 hrs: Start a helpful blog post • 4 hrs: Build a simple website • Weekend: Organize a community event'
+              type: 'link',
+              label: 'Free: Design with Figma',
+              content: 'Professional design tool with free tier',
+              url: 'https://www.figma.com/pricing/?pid=yourtag',
+              affiliate: {
+                program: 'Figma',
+                commission: 'Referral program',
+                tracking: 'Varies'
+              }
+            },
+            {
+              type: 'product',
+              label: 'Moleskine Sketchbook',
+              content: 'High-quality sketching notebook for innovators',
+              url: 'https://www.amazon.com/dp/B00AZZY8LG?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 8%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/250',
+              price: '$18.95',
+              category: 'tools'
             },
             {
               type: 'search',
-              label: 'Building Resources',
-              content: '"no-code website builders" OR "how to start a blog" OR "community organizing tips" OR "legacy project ideas"'
+              label: 'Google Search: "Rapid prototyping techniques"',
+              content: 'rapid prototyping techniques design thinking innovation methods',
+              url: 'https://www.google.com/search?q=rapid+prototyping+techniques+design+thinking'
             },
             {
-              type: 'link',
-              label: 'Notion Workspace Templates',
-              content: 'Build organized systems',
-              url: 'https://notion.so/templates?utm_source=affiliate',
-              affiliate: {
-                program: 'Notion Affiliate',
-                commission: 'Varies',
-                tracking: 'affiliate'
-              }
+              type: 'prompt',
+              label: 'Innovation Framework',
+              content: 'Use the "How Might We..." framework. Pick a problem you\'ve noticed today and ask: "How might we solve this in a completely new way?"'
             }
           ]
         }
       ],
       'Sol Artist': [
+        // Common Activities  
         {
           id: 'art-1',
           type: 'activity',
           title: 'Create Beauty',
-          description: 'Spend time creating something beautiful - art, music, writing, or any form of expression that moves you.',
+          description: 'Make something beautiful today - a drawing, photo, poem, or any creative expression that moves you.',
           archetype: 'Sol Artist',
           rarity: 'common',
           icon: '🎨',
-          color: 'bg-rose-100 border-rose-300',
+          color: 'bg-purple-100 border-purple-300',
           tags: ['creativity', 'beauty', 'expression'],
-          duration: '45 minutes',
-          difficulty: 'medium',
+          duration: '1 hour',
+          difficulty: 'easy',
           timeOfDay: 'afternoon',
           actionableSteps: [
             {
-              type: 'link',
-              label: 'Professional Art Supply Kit',
-              content: 'Everything needed to start creating',
-              url: 'https://amazon.com/dp/B0811P8KJV?tag=yourtag-20',
+              type: 'product',
+              label: 'Professional Art Supplies',
+              content: 'High-quality art materials for creative expression',
+              url: 'https://www.amazon.com/dp/B07QXHZQZV?tag=yourtag-20',
               affiliate: {
                 program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: 'yourtag-20'
+                commission: 'Up to 8%',
+                tracking: '24 hours'
               },
-              productImage: 'https://images-na.ssl-images-amazon.com/images/I/81MZo7mK%2BiL._AC_SL1500_.jpg',
-              price: '$49.99'
+              productImage: '/api/placeholder/200/250',
+              price: '$49.99',
+              category: 'tools'
             },
             {
               type: 'search',
-              label: 'Creative Inspiration',
-              content: '"art prompts for beginners" OR "creative writing exercises" OR "photography challenges" OR "music composition tips"'
-            },
-            {
-              type: 'prompt',
-              label: 'Beauty Creation Prompt',
-              content: 'Choose your medium and create something inspired by: "The feeling of sunlight through trees" or "The sound of rain on windows" or "The color of contentment"'
+              label: 'Google Search: "Daily art prompts"',
+              content: 'daily art prompts creative exercises inspiration drawing ideas',
+              url: 'https://www.google.com/search?q=daily+art+prompts+creative+exercises+inspiration'
             },
             {
               type: 'link',
-              label: 'Visme Design Tool',
-              content: 'Create stunning visual content',
-              url: 'https://visme.co?aff=partner-link',
+              label: 'Free: Adobe Creative Cloud Trial',
+              content: 'Professional creative software suite',
+              url: 'https://www.adobe.com/creativecloud/free-trial.html?pid=yourtag',
               affiliate: {
-                program: 'Visme Partner',
-                commission: '25% lifetime',
-                tracking: 'partner-link'
-              }
+                program: 'Adobe',
+                commission: 'Varies',
+                tracking: '30 days'
+              },
+              price: 'Free trial'
+            },
+            {
+              type: 'prompt',
+              label: 'Creative Challenge',
+              content: 'Set a timer for 15 minutes and create something without stopping to judge or edit. Focus on the pure joy of creation.'
             }
           ]
         }
       ],
-      'Sol Traveler': [
+      'Sol Builder': [
+        // Common Activities
         {
-          id: 'tra-1',
+          id: 'bui-1',
           type: 'activity',
-          title: 'Explore the Unknown',
-          description: 'Try something you\'ve never done before, however small. Step outside your comfort zone with curiosity.',
-          archetype: 'Sol Traveler',
+          title: 'Build Your Foundation',
+          description: 'Strengthen one area of your life infrastructure - health, finances, relationships, or skills.',
+          archetype: 'Sol Builder',
           rarity: 'common',
-          icon: '🧭',
-          color: 'bg-sky-100 border-sky-300',
-          tags: ['exploration', 'unknown', 'courage'],
-          duration: '30 minutes',
+          icon: '🏗️',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['foundation', 'stability', 'growth'],
+          duration: '1 hour',
           difficulty: 'medium',
-          timeOfDay: 'anytime',
+          timeOfDay: 'morning',
           actionableSteps: [
             {
-              type: 'list',
-              label: 'Quick Exploration Ideas',
-              content: '• Try a new cuisine • Take a different route home • Learn 5 words in a new language • Listen to music from another culture • Visit a local place you\'ve never been • Try a new hobby for 30 minutes'
-            },
-            {
               type: 'search',
-              label: 'Local Discovery',
-              content: '"things to do near me" OR "hidden gems [your city]" OR "local attractions" OR "new experiences to try"'
+              label: 'Google Search: "Foundation building habits"',
+              content: 'foundation building habits life infrastructure personal development',
+              url: 'https://www.google.com/search?q=foundation+building+habits+life+infrastructure'
             },
             {
               type: 'link',
-              label: 'Free: Duolingo Language Learning',
-              content: 'Explore new languages',
-              url: 'https://duolingo.com'
+              label: 'Buy: "Atomic Habits" by James Clear',
+              content: 'The definitive guide to building good habits',
+              url: 'https://amazon.com/dp/0735211299?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/250',
+              price: '$14.99',
+              category: 'books'
             },
             {
               type: 'prompt',
-              label: 'Exploration Reflection',
-              content: 'After your exploration: What surprised me? What did I learn about myself? What assumptions did I challenge? What would I explore next?'
+              label: 'Foundation Assessment',
+              content: 'Rate these areas 1-10: Health, Finances, Relationships, Skills, Home Environment. Pick your lowest score and take one small action to improve it today.'
+            }
+          ]
+        }
+      ],
+      'Sol Nurturer': [
+        // Common Activities
+        {
+          id: 'nur-1',
+          type: 'activity',
+          title: 'Nurture Connection',
+          description: 'Reach out to someone you care about with genuine intention to support, listen, or simply connect.',
+          archetype: 'Sol Nurturer',
+          rarity: 'common',
+          icon: '🤗',
+          color: 'bg-pink-100 border-pink-300',
+          tags: ['connection', 'support', 'empathy'],
+          duration: '30 minutes',
+          difficulty: 'easy',
+          timeOfDay: 'afternoon',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Connection Ritual',
+              content: 'Think of 3 people you haven\'t spoken to in a while. Choose one and send them a thoughtful message asking how they\'re really doing.'
+            },
+            {
+              type: 'search',
+              label: 'Google Search: "Meaningful conversation starters"',
+              content: 'meaningful conversation starters deep questions connection friendship',
+              url: 'https://www.google.com/search?q=meaningful+conversation+starters+deep+questions+connection'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "The Art of Gathering" by Priya Parker',
+              content: 'Transform how you connect with others',
+              url: 'https://amazon.com/dp/1594634920?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/250',
+              price: '$16.99',
+              category: 'books'
+            }
+          ]
+        }
+      ],
+      'Sol Alchemist': [
+        // Common Activities
+        {
+          id: 'alc-1',
+          type: 'activity',
+          title: 'Transform Something',
+          description: 'Take something in your life that feels stuck or stagnant and consciously transform it into something better.',
+          archetype: 'Sol Alchemist',
+          rarity: 'common',
+          icon: '⚗️',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['transformation', 'change', 'growth'],
+          duration: '45 minutes',
+          difficulty: 'medium',
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Transformation Inventory',
+              content: 'Identify one area of your life that feels stuck. Write down: What it is now → What you want it to become → One small action you can take today.'
+            },
+            {
+              type: 'search',
+              label: 'Google Search: "Personal transformation techniques"',
+              content: 'personal transformation techniques change management self improvement',
+              url: 'https://www.google.com/search?q=personal+transformation+techniques+change+management'
+            },
+            {
+              type: 'link',
+              label: 'Buy: "The Gifts of Imperfection" by Brené Brown',
+              content: 'Guide to transformation through vulnerability',
+              url: 'https://amazon.com/dp/159285849X?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/250',
+              price: '$15.99',
+              category: 'books'
             }
           ]
         }
@@ -755,95 +630,69 @@ export class SurpriseMeFramework {
     };
   }
 
-  public generatePersonalizedRoll(birthDate: string, userHistory: DailyRoll[] = []): DailyRoll {
-    const archetype = getSolarArchetype(birthDate);
-    const activities = this.activityDatabase[archetype] || this.activityDatabase['Sol Traveler'];
-    
-    // Filter out recently rolled activities to avoid repetition
-    const recentIds = userHistory.slice(-10).map(roll => roll.id);
-    const availableActivities = activities.filter(activity => !recentIds.includes(activity.id));
+  generatePersonalizedRoll(userProfile: UserProfile): DailyRoll {
+    const archetypeActivities = this.activities[userProfile.archetype] || this.activities['Sol Traveler'];
+    const availableActivities = archetypeActivities.filter(activity => 
+      !this.wasRecentlyRolled(activity.id, userProfile.history)
+    );
+
+    const finalActivities = availableActivities.length > 0 ? availableActivities : archetypeActivities;
     
     // Weighted random selection based on rarity
-    const weightedActivities = this.createWeightedArray(availableActivities);
-    const randomActivity = weightedActivities[Math.floor(Math.random() * weightedActivities.length)];
+    const rarityWeights = { common: 0.6, rare: 0.3, legendary: 0.1 };
+    const randomValue = Math.random();
+    let targetRarity: 'common' | 'rare' | 'legendary' = 'common';
     
+    if (randomValue > 0.6 && randomValue <= 0.9) targetRarity = 'rare';
+    else if (randomValue > 0.9) targetRarity = 'legendary';
+    
+    const filteredByRarity = finalActivities.filter(activity => activity.rarity === targetRarity);
+    const selectedActivities = filteredByRarity.length > 0 ? filteredByRarity : finalActivities;
+    
+    const randomIndex = Math.floor(Math.random() * selectedActivities.length);
+    return selectedActivities[randomIndex];
+  }
+
+  private wasRecentlyRolled(activityId: string, history: DailyRoll[]): boolean {
+    const recentHistory = history.slice(-5); // Check last 5 rolls
+    return recentHistory.some(roll => roll.id === activityId);
+  }
+
+  getUserProfile(birthDate: string): UserProfile {
+    const archetype = getSolarArchetype(birthDate);
     return {
-      ...randomActivity,
-      id: `${randomActivity.id}-${Date.now()}` // Ensure uniqueness
+      birthDate,
+      archetype,
+      history: []
     };
   }
 
-  private createWeightedArray(activities: DailyRoll[]): DailyRoll[] {
-    const weighted: DailyRoll[] = [];
-    
-    activities.forEach(activity => {
-      let weight = 1;
-      switch (activity.rarity) {
-        case 'common': weight = 60; break;
-        case 'rare': weight = 30; break;
-        case 'legendary': weight = 10; break;
-      }
-      
-      for (let i = 0; i < weight; i++) {
-        weighted.push(activity);
-      }
-    });
-    
-    return weighted;
+  getArchetypeActivities(archetype: string): DailyRoll[] {
+    return this.activities[archetype] || this.activities['Sol Traveler'];
   }
 
-  public getActivitiesByArchetype(archetype: string): DailyRoll[] {
-    return this.activityDatabase[archetype] || this.activityDatabase['Sol Traveler'];
-  }
-
-  public getActivitiesByType(type: 'activity' | 'item' | 'experience'): DailyRoll[] {
-    const allActivities = Object.values(this.activityDatabase).flat();
-    return allActivities.filter(activity => activity.type === type);
-  }
-
-  public getActivitiesByRarity(rarity: 'common' | 'rare' | 'legendary'): DailyRoll[] {
-    const allActivities = Object.values(this.activityDatabase).flat();
-    return allActivities.filter(activity => activity.rarity === rarity);
-  }
-
-  public getTodaysRollCount(): number {
+  getDailyRollsCount(): number {
     const today = new Date().toDateString();
-    const rollData = localStorage.getItem(`dailyRolls_${today}`);
-    if (rollData) {
-      const parsed = JSON.parse(rollData);
-      return parsed.remaining || 0;
+    const stored = localStorage.getItem(`dailyRolls_${today}`);
+    if (stored) {
+      const data = JSON.parse(stored);
+      return data.remaining || 3;
     }
-    return 3; // Default daily rolls
+    return 3;
   }
 
-  public updateDailyRolls(count: number): void {
+  updateDailyRolls(newCount: number, roll: DailyRoll): void {
     const today = new Date().toDateString();
-    const rollData = localStorage.getItem(`dailyRolls_${today}`);
-    let data = rollData ? JSON.parse(rollData) : { remaining: 3, history: [] };
+    const stored = localStorage.getItem(`dailyRolls_${today}`);
+    const currentData = stored ? JSON.parse(stored) : { remaining: 3, history: [] };
     
-    data.remaining = count;
-    localStorage.setItem(`dailyRolls_${today}`, JSON.stringify(data));
-  }
-
-  public addRollToHistory(roll: DailyRoll): void {
-    const today = new Date().toDateString();
-    const rollData = localStorage.getItem(`dailyRolls_${today}`);
-    let data = rollData ? JSON.parse(rollData) : { remaining: 3, history: [] };
+    const updatedData = {
+      remaining: newCount,
+      history: [...currentData.history, roll]
+    };
     
-    data.history.push(roll);
-    localStorage.setItem(`dailyRolls_${today}`, JSON.stringify(data));
-  }
-
-  public getTodaysHistory(): DailyRoll[] {
-    const today = new Date().toDateString();
-    const rollData = localStorage.getItem(`dailyRolls_${today}`);
-    if (rollData) {
-      const parsed = JSON.parse(rollData);
-      return parsed.history || [];
-    }
-    return [];
+    localStorage.setItem(`dailyRolls_${today}`, JSON.stringify(updatedData));
   }
 }
 
-// Export singleton instance
 export const surpriseMeFramework = SurpriseMeFramework.getInstance();

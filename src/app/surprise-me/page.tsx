@@ -52,20 +52,22 @@ export default function SurpriseMePage() {
     setTimeout(() => {
       if (!userArchetype) return;
       
-      const roll = surpriseMeFramework.generatePersonalizedRoll(
-        // Get birth date from localStorage
-        (() => {
-          const saved = localStorage.getItem('sunCycleBookmark');
-          if (saved) {
-            try {
-              const parsed = JSON.parse(saved);
-              return parsed.birthDate || '';
-            } catch {}
-          }
-          return '';
-        })(),
-        rollHistory
-      );
+      // Create user profile for the framework
+      const userProfile = (() => {
+        const saved = localStorage.getItem('sunCycleBookmark');
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            return surpriseMeFramework.getUserProfile(parsed.birthDate || '1990-01-01');
+          } catch {}
+        }
+        return surpriseMeFramework.getUserProfile('1990-01-01');
+      })();
+      
+      // Add current history to profile
+      userProfile.history = rollHistory;
+      
+      const roll = surpriseMeFramework.generatePersonalizedRoll(userProfile);
       
       setCurrentRoll(roll);
       setShowReveal(true);
@@ -255,6 +257,8 @@ export default function SurpriseMePage() {
                               {step.type === 'search' && '🔍'}
                               {step.type === 'prompt' && '💭'}
                               {step.type === 'list' && '📋'}
+                              {step.type === 'booking' && '🏨'}
+                              {step.type === 'product' && '🛍️'}
                             </div>
                             <div className="flex-1">
                               <div className="flex items-start justify-between gap-3">
@@ -267,7 +271,7 @@ export default function SurpriseMePage() {
                                       </span>
                                     )}
                                   </div>
-                                  {step.type === 'link' && step.url ? (
+                                  {(step.type === 'link' || step.type === 'booking' || step.type === 'product') && step.url ? (
                                     <div>
                                       <div className="text-gray-600 text-sm mb-2">{step.content}</div>
                                       {step.price && (
@@ -279,7 +283,9 @@ export default function SurpriseMePage() {
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
                                       >
-                                        {step.price ? 'Buy Now' : 'Visit Link'} ↗
+                                        {step.type === 'booking' ? 'Book Now' : 
+                                         step.type === 'product' ? 'Buy Now' :
+                                         step.price ? 'Buy Now' : 'Visit Link'} ↗
                                       </a>
                                       {step.affiliate && (
                                         <div className="text-xs text-gray-500 mt-2">
