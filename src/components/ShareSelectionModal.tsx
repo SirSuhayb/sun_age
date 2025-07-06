@@ -118,7 +118,7 @@ export function ShareSelectionModal({
             <div className="text-4xl mb-4">🌞</div>
             <h2 className="text-xl font-serif font-bold mb-2">Share Your Sol Age</h2>
             <p className="text-gray-600 text-xs font-mono tracking-widest uppercase text-center max-w-xs mx-auto" style={{ letterSpacing: '0.15em' }}>
-              Choose where you'd like to share your cosmic journey and earn $SOLAR tokens
+              Choose where you&apos;d like to share your cosmic journey and earn $SOLAR tokens
             </p>
           </div>
 
