@@ -49,6 +49,114 @@ This document outlines our comprehensive strategy for monetizing the Surprise Me
 - **Status**: Research ongoing
 - **Strategy**: Free tool promotion for user engagement
 
+## 🌍 **Travel Monetization Ecosystem**
+
+### **Travel Booking Platforms**
+
+#### **Booking.com (Primary Partner)**
+- **Commission Rate**: Up to 25% of Booking.com's commission (~4% of booking value)
+- **Cookie Duration**: Session-based
+- **Products**: Hotels, apartments, vacation rentals, 28M+ listings
+- **Revenue Potential**: $15-50 per booking
+- **Best For**: Sol Traveler, Sol Sage (sacred spaces)
+
+#### **Expedia Group**
+- **Commission Rate**: Up to 4%
+- **Cookie Duration**: 7 days
+- **Products**: Flights, hotels, packages, car rentals
+- **Revenue Potential**: $25-75 per booking
+- **Best For**: Sol Traveler (comprehensive travel planning)
+
+#### **Skyscanner**
+- **Commission Rate**: Up to 20%
+- **Cookie Duration**: 30 days
+- **Products**: Flight comparison across 1,200+ airlines
+- **Revenue Potential**: $10-40 per booking
+- **Best For**: All archetypes (price-conscious travelers)
+
+### **Travel Experiences & Tours**
+
+#### **Viator (TripAdvisor)**
+- **Commission Rate**: 8% on completed experiences
+- **Cookie Duration**: 30 days
+- **Products**: 300,000+ tours & activities in 2,500+ destinations
+- **Revenue Potential**: $20-80 per booking
+- **Best For**: Sol Traveler (adventures), Sol Sage (spiritual tours)
+
+#### **GetYourGuide**
+- **Commission Rate**: Starting at 8%
+- **Cookie Duration**: 31 days
+- **Products**: Tours, attractions, experiences
+- **Revenue Potential**: $15-60 per booking
+- **Best For**: Sol Artist (cultural experiences), Sol Innovator (unique activities)
+
+#### **G Adventures**
+- **Commission Rate**: 5% on confirmed sales
+- **Cookie Duration**: 90 days
+- **Average Order Value**: $2,600
+- **Revenue Potential**: $130+ per booking
+- **Best For**: Sol Traveler (adventure travel)
+
+### **Travel Gear & Equipment**
+
+#### **REI Co-op**
+- **Commission Rate**: 5% on all sales
+- **Cookie Duration**: 15-30 days
+- **Products**: Outdoor gear, travel equipment
+- **Average Order**: $120
+- **Revenue Potential**: $6-30 per order
+- **Best For**: Sol Traveler, Sol Builder (quality gear)
+
+#### **Travelpro Luggage**
+- **Commission Rate**: 8% (9% over $500, 10% over $1,000)
+- **Cookie Duration**: 45 days
+- **Average Order**: $165
+- **Revenue Potential**: $13+ per order
+- **Best For**: Sol Builder (quality construction), Sol Innovator (professional gear)
+
+### **Accommodation Alternatives**
+
+#### **Vrbo (Vacation Rentals)**
+- **Commission Rate**: Up to 6% (via Expedia Group)
+- **Cookie Duration**: 7 days
+- **Products**: 2M+ vacation rentals in 190 countries
+- **Revenue Potential**: $30-120 per booking
+- **Best For**: Sol Nurturer (family gatherings), Sol Artist (inspiring spaces)
+
+#### **Hotellook**
+- **Commission Rate**: Up to 50% of platform's earnings (~4.92%)
+- **Cookie Duration**: 30 days
+- **Products**: Meta-search comparing multiple platforms
+- **Revenue Potential**: $20-60 per booking
+- **Best For**: All archetypes (price comparison)
+
+### **Travel Insurance & Protection**
+
+#### **World Nomads**
+- **Commission Rate**: 10% on sales
+- **Cookie Duration**: 60 days
+- **Products**: Travel insurance, safety services sold in 100+ countries
+- **Revenue Potential**: $5-15 per policy
+- **Best For**: Sol Traveler (adventure protection), Sol Builder (risk management)
+
+### **Car Rentals**
+
+#### **Discover Cars**
+- **Commission Rate**: 70% of rental profit + 30% of full coverage revenue
+- **Cookie Duration**: 365 days (excellent!)
+- **Products**: Car rental comparison and booking
+- **Revenue Potential**: $25-100 per booking
+- **Best For**: Sol Traveler (road trips), Sol Builder (practical travel)
+
+### **Language Learning & Cultural Connection**
+
+#### **Duolingo Plus**
+- **Commission Rate**: 30-day free trial conversion
+- **Cookie Duration**: 30 days
+- **Products**: Language learning subscription
+- **Revenue Potential**: $5-12 per conversion
+- **Best For**: Sol Traveler (cultural connection), Sol Sage (language wisdom)
+
 ## 📸 Product Image Integration Strategy
 
 ### **Amazon Product Images**
@@ -230,6 +338,31 @@ interface RevenueProjection {
 - **Premium Products**: Higher AOV = $150+/month
 - **Multiple Programs**: Diversified revenue streams
 
+### **Travel-Specific Revenue Potential**
+```typescript
+interface TravelRevenueProjection {
+  assumptions: {
+    monthlyTravelUsers: 500;        // Sol Traveler + travel activities
+    averageBookingConversion: 2%;   // Higher intent for travel
+    averageBookingValue: 400;       // Higher AOV for travel
+    averageCommissionRate: 6;       // Travel industry average
+  };
+  
+  monthlyTravelRevenue: {
+    bookingConversions: 10;         // 500 * 0.02
+    totalBookingValue: 4000;        // 10 * $400
+    travelCommissions: 240;         // $4000 * 0.06
+    
+    // Additional revenue streams
+    gearPurchases: 50;              // 20 gear purchases at $25 avg commission
+    insurancePolicies: 25;          // 10 policies at $10 avg commission
+    totalTravelRevenue: 315;        // $240 + $50 + $25
+  };
+}
+```
+
+**Travel Monetization Summary**: Travel users could generate 3-4x higher revenue per user compared to general activities due to higher transaction values and purchase intent.
+
 ## 🎯 Archetype-Specific Strategies
 
 ### **Sol Innovator** 💡
@@ -263,9 +396,11 @@ interface RevenueProjection {
 - **Commission Opportunity**: Medium-high (4-25%)
 
 ### **Sol Traveler** 🧭
-- **Focus**: Language learning, travel gear, exploration tools
-- **High-Value Items**: Travel equipment, course subscriptions
-- **Commission Opportunity**: Medium (5-12%)
+- **Focus**: Travel bookings, gear, experiences, language learning
+- **High-Value Items**: International flights ($25-75), adventure tours ($130+), premium luggage ($13+)
+- **Top Programs**: Booking.com, G Adventures, Expedia, Viator, REI
+- **Commission Opportunity**: High (5-25% + high AOV)
+- **Special Strategy**: Complete travel ecosystem from planning to gear to experiences
 
 ## 🔧 Technical Implementation Details
 
