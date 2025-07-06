@@ -139,29 +139,39 @@ export default function SurpriseMePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
+            {/* Sunrise gradient overlay */}
+            <div className="absolute inset-0 bg-solara-sunrise" style={{ opacity: 0.6 }} />
+            
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              className="relative z-10 backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 p-6 max-w-[360px] w-full max-h-[90vh] overflow-y-auto"
             >
-              <div className="text-center mb-6">
-                <div className="text-4xl mb-2">🎲</div>
-                <h2 className="font-serif font-bold text-2xl text-amber-800 mb-2">
+              <div className="flex justify-between items-center mb-3">
+                <div className="text-xl font-serif font-bold" style={{ letterSpacing: '-0.06em' }}>
                   Cosmic Guidance Awaits
-                </h2>
-                <p className="font-mono text-sm uppercase text-amber-600 tracking-wide">
-                  How the Surprise Me game works
-                </p>
+                </div>
+                <button
+                  onClick={() => setShowGameExplanation(false)}
+                  aria-label="Close"
+                  className="text-gray-500 hover:text-gray-800 text-xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="text-xs font-mono text-gray-500 mb-5 tracking-widest uppercase text-center">
+                How the Surprise Me game works
               </div>
 
               <div className="space-y-4 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
                   <div className="text-xl flex-shrink-0">🌟</div>
                   <div>
-                    <div className="font-semibold text-amber-800 mb-1">Personalized for Your Archetype</div>
+                    <div className="font-semibold text-black mb-1">Personalized for Your Archetype</div>
                     <div>Every activity is tailored to your {userArchetype || 'Sol'} energy and cosmic blueprint.</div>
                   </div>
                 </div>
@@ -169,7 +179,7 @@ export default function SurpriseMePage() {
                 <div className="flex items-start gap-3">
                   <div className="text-xl flex-shrink-0">🎯</div>
                   <div>
-                    <div className="font-semibold text-amber-800 mb-1">Three Types of Guidance</div>
+                    <div className="font-semibold text-black mb-1">Three Types of Guidance</div>
                     <div>Receive <strong>activities</strong> to do, <strong>items</strong> to explore, or <strong>experiences</strong> to seek.</div>
                   </div>
                 </div>
@@ -177,7 +187,7 @@ export default function SurpriseMePage() {
                 <div className="flex items-start gap-3">
                   <div className="text-xl flex-shrink-0">✨</div>
                   <div>
-                    <div className="font-semibold text-amber-800 mb-1">Rarity & Magic</div>
+                    <div className="font-semibold text-black mb-1">Rarity & Magic</div>
                     <div>Most guidance is <span className="text-gray-600">common</span>, some is <span className="text-purple-600">rare</span>, and occasionally you'll receive <span className="text-yellow-600">legendary</span> cosmic wisdom.</div>
                   </div>
                 </div>
@@ -185,7 +195,7 @@ export default function SurpriseMePage() {
                 <div className="flex items-start gap-3">
                   <div className="text-xl flex-shrink-0">🚀</div>
                   <div>
-                    <div className="font-semibold text-amber-800 mb-1">Actionable Steps</div>
+                    <div className="font-semibold text-black mb-1">Actionable Steps</div>
                     <div>Each revelation comes with specific ways to take action - links, searches, prompts, and more.</div>
                   </div>
                 </div>
@@ -193,14 +203,14 @@ export default function SurpriseMePage() {
                 <div className="flex items-start gap-3">
                   <div className="text-xl flex-shrink-0">🌙</div>
                   <div>
-                    <div className="font-semibold text-amber-800 mb-1">Daily Renewal</div>
+                    <div className="font-semibold text-black mb-1">Daily Renewal</div>
                     <div>You get <strong>3 free rolls daily</strong>. Each dawn brings fresh cosmic possibilities.</div>
                   </div>
                 </div>
 
                 {/* Premium Teaser */}
-                <div className="border-t border-amber-200 pt-4">
-                  <div className="bg-gradient-to-r from-purple-50 to-amber-50 rounded-lg p-3 border border-purple-200">
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="bg-gradient-to-r from-purple-50 to-amber-50 rounded-none p-3 border border-purple-200">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="text-lg">🔮</div>
                       <div className="font-semibold text-purple-800 text-sm">Coming Soon: Solara+</div>
@@ -215,13 +225,13 @@ export default function SurpriseMePage() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowGameExplanation(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-mono text-sm uppercase tracking-wide"
+                  className="flex-1 px-4 py-2 border border-gray-400 bg-gray-100 text-gray-700 rounded-none uppercase tracking-widest font-mono text-sm hover:bg-gray-200 transition-colors"
                 >
                   Maybe Later
                 </button>
                 <button
                   onClick={handleStartGame}
-                  className="flex-1 px-4 py-2 bg-amber-400 hover:bg-amber-500 text-amber-900 rounded-lg font-serif font-bold transition-colors shadow-lg hover:shadow-xl"
+                  className="flex-1 px-4 py-2 bg-[#d4af37] text-black font-mono uppercase tracking-widest text-sm rounded-none hover:bg-[#e6c75a] transition-colors"
                 >
                   🎲 Start Rolling
                 </button>
