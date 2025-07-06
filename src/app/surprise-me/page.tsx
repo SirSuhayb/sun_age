@@ -2,12 +2,16 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSolarArchetype } from '~/lib/solarIdentity';
 import { surpriseMeFramework, DailyRoll } from '~/lib/surpriseMe';
+import { solarEarningsManager } from '~/lib/solarEarnings';
+import { useFrameSDK } from '~/hooks/useFrameSDK';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { RollEarnings } from '~/lib/solarEarnings';
 
 export default function SurpriseMePage() {
   const router = useRouter();
+  const { context, isInFrame, sdk } = useFrameSDK();
   const [userArchetype, setUserArchetype] = useState<string | null>(null);
   const [dailyRolls, setDailyRolls] = useState<number>(3);
   const [hasRolledToday, setHasRolledToday] = useState(false);
@@ -17,6 +21,18 @@ export default function SurpriseMePage() {
   const [rollHistory, setRollHistory] = useState<DailyRoll[]>([]);
   const [showGameExplanation, setShowGameExplanation] = useState(false);
   const [hasSeenExplanation, setHasSeenExplanation] = useState(false);
+  
+  // SOLAR earning system state
+  const [solarEarnings, setSolarEarnings] = useState({
+    totalEarned: 0,
+    todayEarned: 0,
+    streakDays: 0,
+    streakMultiplier: 1.0
+  });
+  const [lastRollEarnings, setLastRollEarnings] = useState<RollEarnings | null>(null);
+  
+  // Sharing state
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     // Get user's archetype from saved data
@@ -35,6 +51,10 @@ export default function SurpriseMePage() {
       // Check if user has seen the explanation before
       const seenExplanation = localStorage.getItem('surpriseMeExplanationSeen');
       setHasSeenExplanation(!!seenExplanation);
+      
+      // Initialize SOLAR earnings
+      const earnings = solarEarningsManager.getEarningsSummary();
+      setSolarEarnings(earnings);
     }
 
     // Check daily rolls status
@@ -91,6 +111,14 @@ export default function SurpriseMePage() {
       
       const roll = surpriseMeFramework.generatePersonalizedRoll(userProfile);
       
+      // Award SOLAR tokens for this roll
+      const rollEarnings = solarEarningsManager.awardSolar(roll.rarity, roll.title);
+      setLastRollEarnings(rollEarnings);
+      
+      // Update earnings display
+      const updatedEarnings = solarEarningsManager.getEarningsSummary();
+      setSolarEarnings(updatedEarnings);
+      
       setCurrentRoll(roll);
       setShowReveal(true);
       setIsRolling(false);
@@ -127,6 +155,38 @@ export default function SurpriseMePage() {
       case 'rare': return 'border-purple-300';
       case 'legendary': return 'border-yellow-300';
       default: return 'border-gray-300';
+    }
+  };
+
+  const handleShare = async () => {
+    if (!currentRoll || isSharing) return;
+    
+    setIsSharing(true);
+    const userName = context?.user?.displayName || 'TRAVELLER';
+    const solarEarned = lastRollEarnings?.totalEarned;
+    const streak = solarEarnings.streakDays;
+    
+    try {
+      const { shareRoll } = await import('~/lib/sharing');
+      await shareRoll(
+        {
+          title: currentRoll.title,
+          description: currentRoll.description,
+          archetype: currentRoll.archetype,
+          rarity: currentRoll.rarity,
+          icon: currentRoll.icon,
+          type: currentRoll.type,
+        },
+        userName,
+        solarEarned,
+        streak,
+        sdk,
+        isInFrame
+      );
+    } catch (err) {
+      console.error('Error sharing roll:', err);
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -271,6 +331,38 @@ export default function SurpriseMePage() {
         </div>
       </div>
 
+      {/* SOLAR Earnings Display */}
+      <div className="w-full bg-gradient-to-r from-amber-100 to-yellow-100 border-b border-amber-200 px-4 py-3">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <div className="text-sm font-mono font-bold text-amber-800">
+                {solarEarnings.totalEarned.toLocaleString()} $SOLAR
+              </div>
+              <div className="text-xs font-mono text-amber-600 uppercase tracking-wide">
+                Total Earned
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-mono font-bold text-amber-800 flex items-center gap-1">
+                {solarEarnings.streakDays} {solarEarnings.streakDays > 1 ? '🔥' : ''}
+              </div>
+              <div className="text-xs font-mono text-amber-600 uppercase tracking-wide">
+                Day Streak
+              </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-mono font-bold text-amber-800">
+              {solarEarnings.streakMultiplier.toFixed(1)}x
+            </div>
+            <div className="text-xs font-mono text-amber-600 uppercase tracking-wide">
+              Multiplier
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="max-w-md mx-auto px-4 py-8">
         {/* User Info */}
@@ -397,6 +489,52 @@ export default function SurpriseMePage() {
                 </div>
                 <div className="text-gray-700 text-center leading-relaxed mb-6">
                   {currentRoll.description}
+                </div>
+
+                {/* SOLAR Earnings Celebration */}
+                {lastRollEarnings && (
+                  <div className="bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-300 rounded-lg p-4 mb-6">
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">🎉</div>
+                      <div className="font-mono font-bold text-amber-800 text-lg">
+                        +{lastRollEarnings.totalEarned} $SOLAR EARNED!
+                      </div>
+                      <div className="text-xs font-mono text-amber-600 uppercase tracking-wide mt-1">
+                        Base: {lastRollEarnings.baseAmount} • Streak: {lastRollEarnings.streakMultiplier.toFixed(1)}x
+                      </div>
+                      {lastRollEarnings.newStreak > 1 && (
+                        <div className="text-sm font-mono text-amber-700 mt-2">
+                          🔥 {lastRollEarnings.newStreak} day streak! Keep rolling daily for higher multipliers!
+                        </div>
+                      )}
+                      {lastRollEarnings.streakBroken && (
+                        <div className="text-sm font-mono text-orange-600 mt-2">
+                          💔 Your streak was broken. Start fresh today!
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Share Button */}
+                <div className="flex justify-center mb-6">
+                  <button
+                    onClick={handleShare}
+                    disabled={isSharing}
+                    className="flex items-center gap-2 px-6 py-3 bg-[#d4af37] text-black font-mono uppercase tracking-widest text-sm rounded-none hover:bg-[#e6c75a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-black"
+                  >
+                    {isSharing ? (
+                      <>
+                        <span>Sharing...</span>
+                        <div className="animate-spin">🌟</div>
+                      </>
+                    ) : (
+                      <>
+                        <span>Share Roll</span>
+                        <span>📤</span>
+                      </>
+                    )}
+                  </button>
                 </div>
                 
                 {/* Actionable Steps */}

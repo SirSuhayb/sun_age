@@ -113,3 +113,43 @@ export async function sharePledge(
     isInFrame
   });
 }
+
+// Roll sharing with bot reference
+export async function shareRoll(
+  roll: {
+    title: string;
+    description: string;
+    archetype: string;
+    rarity: string;
+    icon: string;
+    type: string;
+  },
+  userName: string = 'TRAVELLER',
+  solarEarned?: number,
+  streak?: number,
+  sdk?: any,
+  isInFrame?: boolean
+) {
+  const url = process.env.NEXT_PUBLIC_URL || window.location.origin;
+  const baseUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+  
+  // Create OG image URL for the roll
+  const ogImageUrl = `${baseUrl}/api/og/roll?title=${encodeURIComponent(roll.title)}&archetype=${encodeURIComponent(roll.archetype)}&rarity=${encodeURIComponent(roll.rarity)}&icon=${encodeURIComponent(roll.icon)}&type=${encodeURIComponent(roll.type)}${solarEarned ? `&solarEarned=${solarEarned}` : ''}${streak ? `&streak=${streak}` : ''}`;
+  
+  // Create message text
+  const rarityEmoji = roll.rarity === 'legendary' ? '🌟' : roll.rarity === 'rare' ? '💎' : '✨';
+  const solarText = solarEarned ? ` (+${solarEarned} $SOLAR earned!)` : '';
+  const streakText = streak && streak > 1 ? ` • ${streak} day streak! 🔥` : '';
+  
+  const message = `The cosmos guided me to: "${roll.title}" ${roll.icon}\n\n${rarityEmoji} ${roll.rarity} ${roll.type} for ${roll.archetype}${solarText}${streakText}\n\nGet your daily cosmic guidance: https://www.solara.fyi/surprise-me`;
+  
+  const miniAppUrl = 'https://www.solara.fyi/surprise-me';
+  
+  return await composeWithBotReference({
+    text: message,
+    embeds: [ogImageUrl, miniAppUrl],
+    botPostType: 'sol_age_prompt', // Reuse existing bot post type or create new one
+    sdk,
+    isInFrame
+  });
+}
