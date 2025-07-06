@@ -190,7 +190,7 @@ export function useFrameSDK() {
       console.error('[useFrameSDK] Error refreshing context:', err);
       throw err;
     }
-  }, [sdk]);
+  }, []);
 
   return {
     isSDKLoaded,

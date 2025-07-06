@@ -190,7 +190,7 @@ export function SolAgeClaimModal({
             <div className="text-4xl mb-4">🔍</div>
             <h2 className="text-xl font-serif font-bold mb-2">Verifying Share</h2>
             <p className="text-gray-600 text-xs font-mono tracking-widest uppercase mb-6 max-w-xs mx-auto" style={{ letterSpacing: '0.15em' }}>
-              Checking if you've shared your sol age recently...
+              Checking if you&apos;ve shared your sol age recently...
             </p>
             {error && (
               <div className="text-red-500 text-sm font-mono mb-4">
@@ -297,7 +297,7 @@ export function SolAgeClaimModal({
             </p>
             <div className="p-4 bg-yellow-50 border border-yellow-200 mb-6">
               <p className="text-sm text-yellow-700 font-mono">
-                <strong>What's next?</strong> Your tokens will be deposited to your wallet within 24 hours.
+                <strong>What&apos;s next?</strong> Your tokens will be deposited to your wallet within 24 hours.
               </p>
             </div>
             <button
