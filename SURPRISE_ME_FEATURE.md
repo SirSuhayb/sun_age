@@ -52,6 +52,8 @@ Comprehensive activity database with:
 - **Anti-Repetition**: Filters out recently rolled activities
 - **Singleton Pattern**: Efficient memory management
 - **🎯 Actionable Steps**: Each activity includes specific next steps to enable immediate action
+- **💰 Affiliate Monetization**: Product images, pricing, and commission tracking
+- **⚖️ Legal Compliance**: FTC-compliant affiliate disclosure system
 
 ### 5. Actionable Recommendations System
 
@@ -109,6 +111,192 @@ Comprehensive activity database with:
 - **Enables Immediate Action**: One-click access to tools and resources
 - **Increases Completion Rates**: Clear, actionable guidance
 - **Drives Engagement**: Users can act on inspiration immediately
+
+### 6. Affiliate Monetization System
+
+**NEW FEATURE**: Comprehensive revenue generation through affiliate partnerships, product recommendations, and commission tracking while maintaining user trust and legal compliance.
+
+#### Revenue Streams
+
+##### 🥇 **Tier 1: High-Commission Partners**
+
+**Amazon Associates Program**
+- **Commission Rate**: Up to 10% (varies by category)
+- **Cookie Duration**: 24 hours  
+- **Product Integration**: Books, tools, supplies with product images
+- **Revenue Potential**: $90-900/month based on user engagement
+
+**Webflow Affiliate Program**
+- **Commission Rate**: 50% for first 12 months
+- **Cookie Duration**: 90 days
+- **Target Users**: Sol Builders, Sol Innovators
+- **Revenue Potential**: $174+ per conversion
+
+##### 🥈 **Tier 2: Lifetime Recurring Partners**
+
+**Visme Partner Program**
+- **Commission Rate**: 25% lifetime recurring
+- **Payment Threshold**: $150/month
+- **Target Users**: Sol Artists, Sol Builders
+
+**Notion Affiliate Program**
+- **Commission Rate**: Variable (typically 20-30%)
+- **Target Users**: Sol Builders, productivity-focused archetypes
+
+#### Visual Monetization Features
+
+##### 📸 **Product Image Integration**
+- **Amazon Product Images**: 80x80px thumbnails via Product Advertising API
+- **Visual Appeal**: Product images displayed alongside recommendations
+- **Error Handling**: Graceful fallback when images fail to load
+- **Performance**: Lazy loading for optimal page speed
+
+##### 💰 **Commission Display**
+- **Commission Badges**: Green badges showing earning potential ("💰 Up to 10%")
+- **Program Attribution**: Clear affiliate program identification
+- **Transparency**: Visible commission rates for user trust
+
+##### 💵 **Pricing Integration**
+- **Prominent Pricing**: Bold price display for purchasable items
+- **CTA Optimization**: "Buy Now" vs "Visit Link" based on product type
+- **Revenue Focus**: Emphasis on monetizable actions
+
+#### Legal Compliance
+
+##### ⚖️ **FTC Compliance**
+```html
+<!-- Required Disclosure -->
+<div class="affiliate-disclosure">
+  ⚖️ Disclosure: This post contains affiliate links. We may earn a commission 
+  when you purchase through these links at no additional cost to you. This helps 
+  support our cosmic guidance mission while bringing you carefully curated recommendations.
+</div>
+```
+
+- **Clear Disclosure**: Prominent affiliate relationship disclosure
+- **Adjacent Placement**: Disclosure near affiliate links
+- **User Transparency**: Clear explanation of commission structure
+- **No Additional Cost**: Explicit statement that users pay no extra
+
+##### 📊 **Tracking & Analytics**
+```typescript
+interface AffiliateAnalytics {
+  trackClick(stepId: string, affiliateProgram: string): void;
+  trackPurchase(orderId: string, commission: number): void;
+  trackRevenue(program: string, amount: number): void;
+}
+```
+
+#### Enhanced User Experience
+
+##### 🎯 **Actionable Steps with Monetization**
+```typescript
+interface EnhancedActionableStep {
+  type: 'link' | 'search' | 'prompt' | 'list';
+  label: string;
+  content: string;
+  url?: string;
+  affiliate?: {
+    program: string;          // "Amazon Associates"
+    commission: string;       // "Up to 10%"
+    tracking: string;         // "yourtag-20"
+  };
+  productImage?: string;      // Product thumbnail URL
+  price?: string;            // "$14.99"
+}
+```
+
+##### 🛍️ **Shopping Experience Integration**
+- **One-Click Purchase**: Direct links to Amazon product pages
+- **Instant Access**: Immediate tool access for free recommendations  
+- **Price Transparency**: Upfront pricing with no hidden fees
+- **Multiple Options**: Balance of free and paid recommendations
+
+#### Revenue Projections
+
+##### 📈 **Conservative Monthly Estimates**
+```typescript
+interface RevenueProjection {
+  assumptions: {
+    dailyActiveUsers: 1000;
+    averageClickThroughRate: 5%;
+    averageConversionRate: 3%;
+    averageOrderValue: 25;
+    averageCommissionRate: 8;
+  };
+  monthlyRevenue: {
+    totalClicks: 1500;        // 1000 * 30 * 0.05
+    totalPurchases: 45;       // 1500 * 0.03
+    totalGMV: 1125;          // 45 * $25
+    affiliateRevenue: 90;     // $1125 * 0.08
+  };
+}
+```
+
+##### 🚀 **Growth Scenarios**
+- **10x User Growth**: $900/month affiliate revenue
+- **Improved Conversion**: 6% conversion rate = $180/month  
+- **Premium Products**: Higher AOV = $150+/month
+- **Multiple Programs**: Diversified revenue streams
+
+#### Archetype-Specific Monetization
+
+##### 💡 **Sol Innovator**
+- **Focus**: Tech tools, innovation books, prototyping supplies
+- **High-Value Items**: Software subscriptions, professional tools
+- **Commission Opportunity**: Medium-high (5-15%)
+
+##### 🧘 **Sol Sage**  
+- **Focus**: Philosophy books, meditation equipment, courses
+- **High-Value Items**: Meditation retreats, premium books
+- **Commission Opportunity**: Medium (8-12%)
+
+##### 🌱 **Sol Nurturer**
+- **Focus**: Gardening supplies, wellness products, gift items  
+- **High-Value Items**: Organic products, care packages
+- **Commission Opportunity**: Medium (6-10%)
+
+##### ⚗️ **Sol Alchemist**
+- **Focus**: Psychology books, transformation tools, journals
+- **High-Value Items**: Therapy courses, premium journals  
+- **Commission Opportunity**: Medium-high (8-15%)
+
+##### 🏗️ **Sol Builder**
+- **Focus**: Productivity tools, business books, organization systems
+- **High-Value Items**: Software subscriptions, professional development
+- **Commission Opportunity**: High (10-50% for SaaS)
+
+##### 🎨 **Sol Artist** 
+- **Focus**: Art supplies, design tools, creative software
+- **High-Value Items**: Professional art equipment, design subscriptions
+- **Commission Opportunity**: Medium-high (4-25%)
+
+##### 🧭 **Sol Traveler**
+- **Focus**: Language learning, travel gear, exploration tools
+- **High-Value Items**: Travel equipment, course subscriptions  
+- **Commission Opportunity**: Medium (5-12%)
+
+#### Implementation Status
+
+##### ✅ **Completed**
+- Enhanced ActionableStep interface with affiliate data
+- Product image integration with fallback handling  
+- Commission badge and pricing display system
+- FTC-compliant affiliate disclosure
+- Visual monetization elements (badges, pricing, CTAs)
+- Multi-program affiliate link management
+
+##### 🚧 **In Progress**  
+- Amazon Associates account application
+- Amazon Product Advertising API integration
+- Click and conversion tracking analytics
+- Performance optimization algorithms
+
+##### 📋 **Planned**
+- Webflow, Visme, and Notion affiliate program applications
+- Machine learning for product matching
+- Dynamic pricing optimization
+- International affiliate program expansion
 
 ## Solar Archetype Personalization
 

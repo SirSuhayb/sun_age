@@ -250,58 +250,95 @@ export default function SurpriseMePage() {
                       {currentRoll.actionableSteps.map((step, index) => (
                         <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                           <div className="flex items-start gap-3">
-                            <div className="text-sm">
+                            <div className="text-sm flex-shrink-0">
                               {step.type === 'link' && '🔗'}
                               {step.type === 'search' && '🔍'}
                               {step.type === 'prompt' && '💭'}
                               {step.type === 'list' && '📋'}
                             </div>
                             <div className="flex-1">
-                              <div className="font-semibold text-gray-800 text-sm mb-1">
-                                {step.label}
-                              </div>
-                              {step.type === 'link' && step.url ? (
-                                <div>
-                                  <div className="text-gray-600 text-sm mb-2">{step.content}</div>
-                                  <a
-                                    href={step.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
-                                  >
-                                    Visit Link ↗
-                                  </a>
-                                </div>
-                              ) : step.type === 'search' ? (
-                                <div>
-                                  <div className="text-gray-600 text-sm mb-2">Search for:</div>
-                                  <div className="bg-white rounded border p-2 text-xs font-mono text-gray-700 mb-2 cursor-pointer" 
-                                       onClick={() => navigator.clipboard?.writeText(step.content)}>
-                                    {step.content}
-                                    <div className="text-xs text-gray-500 mt-1">↑ Click to copy search terms</div>
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <div className="font-semibold text-gray-800 text-sm mb-1">
+                                    {step.label}
+                                    {step.affiliate && (
+                                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                        💰 {step.affiliate.commission}
+                                      </span>
+                                    )}
                                   </div>
-                                  <a
-                                    href={`https://google.com/search?q=${encodeURIComponent(step.content)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
-                                  >
-                                    Google Search ↗
-                                  </a>
+                                  {step.type === 'link' && step.url ? (
+                                    <div>
+                                      <div className="text-gray-600 text-sm mb-2">{step.content}</div>
+                                      {step.price && (
+                                        <div className="text-lg font-bold text-green-600 mb-2">{step.price}</div>
+                                      )}
+                                      <a
+                                        href={step.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
+                                      >
+                                        {step.price ? 'Buy Now' : 'Visit Link'} ↗
+                                      </a>
+                                      {step.affiliate && (
+                                        <div className="text-xs text-gray-500 mt-2">
+                                          📈 Commission: {step.affiliate.commission} via {step.affiliate.program}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : step.type === 'search' ? (
+                                    <div>
+                                      <div className="text-gray-600 text-sm mb-2">Search for:</div>
+                                      <div className="bg-white rounded border p-2 text-xs font-mono text-gray-700 mb-2 cursor-pointer" 
+                                           onClick={() => navigator.clipboard?.writeText(step.content)}>
+                                        {step.content}
+                                        <div className="text-xs text-gray-500 mt-1">↑ Click to copy search terms</div>
+                                      </div>
+                                      <a
+                                        href={`https://google.com/search?q=${encodeURIComponent(step.content)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-amber-900 px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200"
+                                      >
+                                        Google Search ↗
+                                      </a>
+                                    </div>
+                                  ) : step.type === 'list' ? (
+                                    <div className="text-gray-600 text-sm whitespace-pre-line">
+                                      {step.content}
+                                    </div>
+                                  ) : (
+                                    <div className="text-gray-600 text-sm">
+                                      {step.content}
+                                    </div>
+                                  )}
                                 </div>
-                              ) : step.type === 'list' ? (
-                                <div className="text-gray-600 text-sm whitespace-pre-line">
-                                  {step.content}
-                                </div>
-                              ) : (
-                                <div className="text-gray-600 text-sm">
-                                  {step.content}
-                                </div>
-                              )}
+                                {/* Product Image */}
+                                {step.productImage && (
+                                  <div className="flex-shrink-0 w-20 h-20">
+                                    <img
+                                      src={step.productImage}
+                                      alt={step.label}
+                                      className="w-full h-full object-cover rounded-lg border border-gray-200 shadow-sm"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
                       ))}
+                    </div>
+                    
+                    {/* Affiliate Disclosure */}
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="text-xs text-amber-800">
+                        <strong>⚖️ Disclosure:</strong> This post contains affiliate links. We may earn a commission when you purchase through these links at no additional cost to you. This helps support our cosmic guidance mission while bringing you carefully curated recommendations.
+                      </div>
                     </div>
                   </div>
                 )}
