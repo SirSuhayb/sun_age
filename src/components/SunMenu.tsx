@@ -75,7 +75,7 @@ export function SunMenu({ isOpen, onClose, onConnectWallet, onClaimTokens }: Sun
 
   return (
     <div className="fixed top-14 right-4 z-50" ref={menuRef}>
-      <div className="bg-white border border-gray-200 shadow-lg min-w-[280px] max-w-[320px]">
+      <div className="bg-white border border-[#d4af37] shadow-sm min-w-[280px] max-w-[320px]" style={{ boxShadow: '0 2px 8px 0 #e6c75a22' }}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-serif font-bold">Solar Wallet</h3>
@@ -110,24 +110,25 @@ export function SunMenu({ isOpen, onClose, onConnectWallet, onClaimTokens }: Sun
                 </div>
               </div>
 
-              {/* Pending Claims */}
-              {hasPendingClaims && (
-                <div className="p-3 bg-orange-50 border border-orange-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-mono text-orange-600">PENDING CLAIM</span>
-                    <span className="text-xl">🎁</span>
-                  </div>
-                  <div className="text-sm text-orange-700 mb-2">
-                    You have tokens to claim!
-                  </div>
-                  <button
-                    onClick={onClaimTokens}
-                    className="w-full px-3 py-2 bg-orange-500 text-white font-mono text-xs hover:bg-orange-600 transition-colors"
-                  >
-                    CLAIM NOW
-                  </button>
-                </div>
-              )}
+                             {/* Pending Claims */}
+               {hasPendingClaims && (
+                 <div className="p-3 bg-orange-50 border border-orange-200">
+                   <div className="flex items-center justify-between mb-2">
+                     <span className="text-sm font-mono text-orange-600">PENDING CLAIM</span>
+                     <span className="text-xl">🎁</span>
+                   </div>
+                   <div className="text-sm text-orange-700 mb-2">
+                     You have tokens to claim!
+                   </div>
+                   <button
+                     onClick={onClaimTokens}
+                     className="w-full px-3 py-2 bg-orange-500 text-white font-mono text-xs font-bold hover:bg-orange-600 transition-colors rounded-none"
+                     style={{ letterSpacing: '0.1em' }}
+                   >
+                     CLAIM NOW
+                   </button>
+                 </div>
+               )}
 
               {/* Actions */}
               <div className="space-y-2">
@@ -136,7 +137,8 @@ export function SunMenu({ isOpen, onClose, onConnectWallet, onClaimTokens }: Sun
                     disconnect();
                     onClose();
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 font-mono text-sm hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 font-mono text-sm font-bold hover:bg-gray-50 transition-colors rounded-none"
+                  style={{ letterSpacing: '0.1em' }}
                 >
                   DISCONNECT
                 </button>
@@ -174,7 +176,8 @@ export function SunMenu({ isOpen, onClose, onConnectWallet, onClaimTokens }: Sun
 
               <button
                 onClick={onConnectWallet}
-                className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm hover:bg-[#e6c75a] transition-colors"
+                className="w-full px-4 py-3 bg-[#d4af37] text-black font-mono text-sm font-bold hover:bg-[#e6c75a] transition-colors rounded-none border border-[#d4af37]"
+                style={{ letterSpacing: '0.1em' }}
               >
                 CONNECT WALLET
               </button>
@@ -182,7 +185,7 @@ export function SunMenu({ isOpen, onClose, onConnectWallet, onClaimTokens }: Sun
           )}
 
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="text-xs text-gray-500 text-center">
+            <div className="text-xs text-gray-500 text-center font-mono tracking-widest uppercase" style={{ letterSpacing: '0.15em' }}>
               Earn $SOLAR tokens by sharing your cosmic journey
             </div>
           </div>
