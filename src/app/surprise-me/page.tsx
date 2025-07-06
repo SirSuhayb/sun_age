@@ -268,7 +268,7 @@ export default function SurpriseMePage() {
                   <div className="text-xl flex-shrink-0">✨</div>
                   <div>
                     <div className="font-semibold text-black mb-1">Rarity & Magic</div>
-                    <div>Most guidance is <span className="text-gray-600">common</span>, some is <span className="text-purple-600">rare</span>, and occasionally you'll receive <span className="text-yellow-600">legendary</span> cosmic wisdom.</div>
+                    <div>Most guidance is <span className="text-gray-600">common</span>, some is <span className="text-purple-600">rare</span>, and occasionally you&apos;ll receive <span className="text-yellow-600">legendary</span> cosmic wisdom.</div>
                   </div>
                 </div>
 
@@ -767,9 +767,11 @@ export default function SurpriseMePage() {
                                 {/* Product Image */}
                                 {step.productImage && (
                                   <div className="flex-shrink-0 w-20 h-20">
-                                    <img
+                                    <Image
                                       src={step.productImage}
                                       alt={step.label}
+                                      width={80}
+                                      height={80}
                                       className="w-full h-full object-cover border border-gray-200"
                                       onError={(e) => {
                                         e.currentTarget.style.display = 'none';
@@ -801,7 +803,7 @@ export default function SurpriseMePage() {
         {rollHistory.length > 0 && (
           <div className="mt-8">
             <h3 className="font-serif font-bold text-lg text-black mb-4 text-center" style={{ letterSpacing: '-0.06em' }}>
-              Today's Guidance
+              Today&apos;s Guidance
             </h3>
             <div className="space-y-3">
               {rollHistory.map((roll, index) => (
