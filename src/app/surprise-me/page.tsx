@@ -15,6 +15,8 @@ export default function SurpriseMePage() {
   const [currentRoll, setCurrentRoll] = useState<DailyRoll | null>(null);
   const [showReveal, setShowReveal] = useState(false);
   const [rollHistory, setRollHistory] = useState<DailyRoll[]>([]);
+  const [showGameExplanation, setShowGameExplanation] = useState(false);
+  const [hasSeenExplanation, setHasSeenExplanation] = useState(false);
 
   useEffect(() => {
     // Get user's archetype from saved data
@@ -29,6 +31,10 @@ export default function SurpriseMePage() {
           }
         } catch {}
       }
+
+      // Check if user has seen the explanation before
+      const seenExplanation = localStorage.getItem('surpriseMeExplanationSeen');
+      setHasSeenExplanation(!!seenExplanation);
     }
 
     // Check daily rolls status
@@ -41,6 +47,22 @@ export default function SurpriseMePage() {
       setHasRolledToday(parsed.history?.length > 0);
     }
   }, []);
+
+  const handleRollClick = () => {
+    if (!hasSeenExplanation) {
+      setShowGameExplanation(true);
+      return;
+    }
+    
+    handleRoll();
+  };
+
+  const handleStartGame = () => {
+    setShowGameExplanation(false);
+    setHasSeenExplanation(true);
+    localStorage.setItem('surpriseMeExplanationSeen', 'true');
+    handleRoll();
+  };
 
   const handleRoll = async () => {
     if (dailyRolls <= 0 || isRolling) return;
@@ -90,8 +112,6 @@ export default function SurpriseMePage() {
     }, 2000);
   };
 
-
-
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
       case 'common': return 'text-gray-600';
@@ -112,6 +132,105 @@ export default function SurpriseMePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+      {/* Game Explanation Modal */}
+      <AnimatePresence>
+        {showGameExplanation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+            >
+              <div className="text-center mb-6">
+                <div className="text-4xl mb-2">🎲</div>
+                <h2 className="font-serif font-bold text-2xl text-amber-800 mb-2">
+                  Cosmic Guidance Awaits
+                </h2>
+                <p className="font-mono text-sm uppercase text-amber-600 tracking-wide">
+                  How the Surprise Me game works
+                </p>
+              </div>
+
+              <div className="space-y-4 text-sm text-gray-700">
+                <div className="flex items-start gap-3">
+                  <div className="text-xl flex-shrink-0">🌟</div>
+                  <div>
+                    <div className="font-semibold text-amber-800 mb-1">Personalized for Your Archetype</div>
+                    <div>Every activity is tailored to your {userArchetype || 'Sol'} energy and cosmic blueprint.</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="text-xl flex-shrink-0">🎯</div>
+                  <div>
+                    <div className="font-semibold text-amber-800 mb-1">Three Types of Guidance</div>
+                    <div>Receive <strong>activities</strong> to do, <strong>items</strong> to explore, or <strong>experiences</strong> to seek.</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="text-xl flex-shrink-0">✨</div>
+                  <div>
+                    <div className="font-semibold text-amber-800 mb-1">Rarity & Magic</div>
+                    <div>Most guidance is <span className="text-gray-600">common</span>, some is <span className="text-purple-600">rare</span>, and occasionally you'll receive <span className="text-yellow-600">legendary</span> cosmic wisdom.</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="text-xl flex-shrink-0">🚀</div>
+                  <div>
+                    <div className="font-semibold text-amber-800 mb-1">Actionable Steps</div>
+                    <div>Each revelation comes with specific ways to take action - links, searches, prompts, and more.</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="text-xl flex-shrink-0">🌙</div>
+                  <div>
+                    <div className="font-semibold text-amber-800 mb-1">Daily Renewal</div>
+                    <div>You get <strong>3 free rolls daily</strong>. Each dawn brings fresh cosmic possibilities.</div>
+                  </div>
+                </div>
+
+                {/* Premium Teaser */}
+                <div className="border-t border-amber-200 pt-4">
+                  <div className="bg-gradient-to-r from-purple-50 to-amber-50 rounded-lg p-3 border border-purple-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="text-lg">🔮</div>
+                      <div className="font-semibold text-purple-800 text-sm">Coming Soon: Solara+</div>
+                    </div>
+                    <div className="text-xs text-purple-700">
+                      Unlock unlimited rolls, astrocartography travel guidance, and precision birth chart insights.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowGameExplanation(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-mono text-sm uppercase tracking-wide"
+                >
+                  Maybe Later
+                </button>
+                <button
+                  onClick={handleStartGame}
+                  className="flex-1 px-4 py-2 bg-amber-400 hover:bg-amber-500 text-amber-900 rounded-lg font-serif font-bold transition-colors shadow-lg hover:shadow-xl"
+                >
+                  🎲 Start Rolling
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="w-full bg-white border-b border-amber-200 px-4 py-6">
         <div className="max-w-md mx-auto flex items-center justify-between">
@@ -129,6 +248,15 @@ export default function SurpriseMePage() {
           <div className="flex items-center gap-2">
             <span className="text-amber-700">🎲</span>
             <span className="font-mono text-sm text-amber-700">{dailyRolls}</span>
+            {!hasSeenExplanation && (
+              <button
+                onClick={() => setShowGameExplanation(true)}
+                className="ml-2 text-amber-600 hover:text-amber-700 text-xs"
+                title="How it works"
+              >
+                ❓
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -148,10 +276,29 @@ export default function SurpriseMePage() {
           </div>
         )}
 
+        {/* How It Works - for first time users */}
+        {!hasSeenExplanation && !hasRolledToday && (
+          <div className="bg-gradient-to-r from-purple-50 to-amber-50 rounded-lg border border-purple-200 p-4 mb-6">
+            <div className="text-center">
+              <div className="text-2xl mb-2">✨</div>
+              <div className="font-serif font-bold text-lg text-purple-800 mb-2">New to Surprise Me?</div>
+              <div className="text-sm text-purple-700 mb-3">
+                Get personalized cosmic guidance tailored to your {userArchetype} energy.
+              </div>
+              <button
+                onClick={() => setShowGameExplanation(true)}
+                className="text-purple-700 hover:text-purple-800 underline font-mono text-xs uppercase tracking-wide"
+              >
+                Learn How It Works
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Roll Button */}
         <div className="text-center mb-8">
           <motion.button
-            onClick={handleRoll}
+            onClick={handleRollClick}
             disabled={dailyRolls <= 0 || isRolling}
             className={`relative overflow-hidden px-8 py-4 rounded-full font-serif font-bold text-lg transition-all duration-200 ${
               dailyRolls <= 0 || isRolling
