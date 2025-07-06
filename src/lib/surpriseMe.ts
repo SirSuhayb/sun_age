@@ -5,6 +5,13 @@ export interface ActionableStep {
   label: string;
   content: string;
   url?: string;
+  affiliate?: {
+    program: string;
+    commission: string;
+    tracking: string;
+  };
+  productImage?: string;
+  price?: string;
 }
 
 export interface DailyRoll {
@@ -76,7 +83,25 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Digital Prototyping Tool',
               content: 'Start sketching with Figma (free)',
-              url: 'https://figma.com'
+              url: 'https://figma.com',
+              affiliate: {
+                program: 'Direct',
+                commission: 'Free Tool',
+                tracking: 'organic'
+              }
+            },
+            {
+              type: 'link',
+              label: 'Prototyping Kit on Amazon',
+              content: 'Physical sketching and wireframing kit',
+              url: 'https://amazon.com/dp/B08CY2QZ43?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71Q4bYhWTxL._AC_UL300_SR300,300_.jpg',
+              price: '$24.99'
             },
             {
               type: 'search',
@@ -109,6 +134,19 @@ export class SurpriseMeFramework {
               label: 'MIT Technology Review',
               content: 'Latest breakthroughs and analysis',
               url: 'https://www.technologyreview.com/'
+            },
+            {
+              type: 'link',
+              label: 'Research Journal - Amazon',
+              content: 'Premium notebook for tech research notes',
+              url: 'https://amazon.com/dp/B07NVWBLZR?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71VkL9dKqBL._AC_UL300_SR300,300_.jpg',
+              price: '$19.95'
             },
             {
               type: 'prompt',
@@ -169,19 +207,38 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Buy: "The Innovator\'s Dilemma" by Clayton Christensen',
               content: 'Revolutionary book on disruptive innovation',
-              url: 'https://amazon.com/dp/0062060244'
+              url: 'https://amazon.com/dp/0062060244?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51T2K3QQz2L._SX329_BO1,204,203,200_.jpg',
+              price: '$14.99'
             },
             {
               type: 'link',
               label: 'Buy: "Zero to One" by Peter Thiel',
               content: 'Building the future through monopoly',
-              url: 'https://amazon.com/dp/0804139296'
+              url: 'https://amazon.com/dp/0804139296?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71p5V6HQFHL._SX329_BO1,204,203,200_.jpg',
+              price: '$16.99'
             },
             {
               type: 'link',
-              label: 'Free Tool: Miro Brainstorming',
-              content: 'Visual collaboration for breakthrough thinking',
-              url: 'https://miro.com'
+              label: 'Webflow Website Builder',
+              content: 'Build your innovation showcase',
+              url: 'https://webflow.com?aff=referral-link',
+              affiliate: {
+                program: 'Webflow Affiliate',
+                commission: '50% for 12 months',
+                tracking: 'referral-link'
+              }
             },
             {
               type: 'search',
@@ -211,7 +268,14 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Buy: Indoor Herb Garden Kit',
               content: 'Easy-to-grow herbs for beginners',
-              url: 'https://amazon.com/s?k=indoor+herb+garden+kit'
+              url: 'https://amazon.com/dp/B082PQJZ6L?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71G2hNJH6zL._AC_SL1500_.jpg',
+              price: '$39.95'
             },
             {
               type: 'search',
@@ -300,7 +364,14 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Buy: "Man\'s Search for Meaning" by Viktor Frankl',
               content: 'Finding purpose in the darkest times',
-              url: 'https://amazon.com/dp/080701429X'
+              url: 'https://amazon.com/dp/080701429X?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/61U6-9iL-TL._SX329_BO1,204,203,200_.jpg',
+              price: '$12.99'
             }
           ]
         },
@@ -333,7 +404,14 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Buy: "Meeting the Shadow" by Connie Zweig',
               content: 'Comprehensive guide to shadow work',
-              url: 'https://amazon.com/dp/0874776864'
+              url: 'https://amazon.com/dp/0874776864?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51JHbFhO3sL._SX331_BO1,204,203,200_.jpg',
+              price: '$19.95'
             }
           ]
         }
@@ -358,13 +436,27 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Buy: "Meditations" by Marcus Aurelius',
               content: 'Timeless Stoic wisdom from a Roman Emperor',
-              url: 'https://amazon.com/dp/0486298043'
+              url: 'https://amazon.com/dp/0486298043?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51fL3AeDL6L._SX331_BO1,204,203,200_.jpg',
+              price: '$8.95'
             },
             {
               type: 'link',
               label: 'Buy: "The Tao of Physics" by Fritjof Capra',
               content: 'Where ancient wisdom meets modern science',
-              url: 'https://amazon.com/dp/1570627681'
+              url: 'https://amazon.com/dp/1570627681?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51HElE7FoxL._SX331_BO1,204,203,200_.jpg',
+              price: '$16.99'
             },
             {
               type: 'link',
@@ -412,7 +504,14 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Buy: "Thinking, Fast and Slow" by Daniel Kahneman',
               content: 'Understand how your mind makes decisions',
-              url: 'https://amazon.com/dp/0374533555'
+              url: 'https://amazon.com/dp/0374533555?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/61fdrEuPJwL._SX329_BO1,204,203,200_.jpg',
+              price: '$17.00'
             }
           ]
         },
@@ -442,6 +541,19 @@ export class SurpriseMeFramework {
               label: 'Free: Wim Hof Breathing Method',
               content: 'Powerful breathwork technique (YouTube)',
               url: 'https://youtube.com/watch?v=tybOi4hjZFQ'
+            },
+            {
+              type: 'link',
+              label: 'Meditation Cushion Set',
+              content: 'Professional zabuton and zafu set',
+              url: 'https://amazon.com/dp/B01LXFMLEI?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/71VXqsGjRcL._AC_SL1500_.jpg',
+              price: '$89.95'
             },
             {
               type: 'search',
@@ -474,13 +586,27 @@ export class SurpriseMeFramework {
               type: 'link',
               label: 'Buy: "The Power of Now" by Eckhart Tolle',
               content: 'Profound guide to spiritual awakening',
-              url: 'https://amazon.com/dp/1577314808'
+              url: 'https://amazon.com/dp/1577314808?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/51A2BH5THhL._SX331_BO1,204,203,200_.jpg',
+              price: '$14.99'
             },
             {
               type: 'link',
               label: 'Buy: "Sapiens" by Yuval Noah Harari',
               content: 'Mind-expanding view of human consciousness',
-              url: 'https://amazon.com/dp/0062316095'
+              url: 'https://amazon.com/dp/0062316095?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/713jIoMO3UL._SX329_BO1,204,203,200_.jpg',
+              price: '$15.99'
             },
             {
               type: 'link',
@@ -523,9 +649,14 @@ export class SurpriseMeFramework {
             },
             {
               type: 'link',
-              label: 'Free: Notion Templates',
+              label: 'Notion Workspace Templates',
               content: 'Build organized systems',
-              url: 'https://notion.so/templates'
+              url: 'https://notion.so/templates?utm_source=affiliate',
+              affiliate: {
+                program: 'Notion Affiliate',
+                commission: 'Varies',
+                tracking: 'affiliate'
+              }
             }
           ]
         }
@@ -547,9 +678,16 @@ export class SurpriseMeFramework {
           actionableSteps: [
             {
               type: 'link',
-              label: 'Free: Procreate for iPad',
-              content: 'Professional digital art creation',
-              url: 'https://procreate.art'
+              label: 'Professional Art Supply Kit',
+              content: 'Everything needed to start creating',
+              url: 'https://amazon.com/dp/B0811P8KJV?tag=yourtag-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: 'yourtag-20'
+              },
+              productImage: 'https://images-na.ssl-images-amazon.com/images/I/81MZo7mK%2BiL._AC_SL1500_.jpg',
+              price: '$49.99'
             },
             {
               type: 'search',
@@ -563,9 +701,14 @@ export class SurpriseMeFramework {
             },
             {
               type: 'link',
-              label: 'Buy: Beginner Art Supply Kit',
-              content: 'Everything needed to start creating',
-              url: 'https://amazon.com/s?k=beginner+art+supplies+kit'
+              label: 'Visme Design Tool',
+              content: 'Create stunning visual content',
+              url: 'https://visme.co?aff=partner-link',
+              affiliate: {
+                program: 'Visme Partner',
+                commission: '25% lifetime',
+                tracking: 'partner-link'
+              }
             }
           ]
         }
