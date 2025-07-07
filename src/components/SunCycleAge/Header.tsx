@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { useFrameSDK } from "~/hooks/useFrameSDK";
+import { SunMenu } from "../SunMenu";
+import { useConnect } from "wagmi";
 
 interface HeaderProps {
   formattedDate: string;
@@ -11,6 +13,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ formattedDate, onAboutClick, onSolarClick, onLogoClick }) => {
   const { sdk, isInFrame } = useFrameSDK();
+  const [sunMenuOpen, setSunMenuOpen] = useState(false);
+  const { connect, connectors } = useConnect();
 
   const handleSwapClick = async () => {
     if (!isInFrame || !sdk) return;
@@ -25,6 +29,33 @@ const Header: React.FC<HeaderProps> = ({ formattedDate, onAboutClick, onSolarCli
       sellToken: usdcTokenAddress,
       sellAmount: '1000000', // 1 USDC with 6 decimals
     });
+  };
+
+  const handleSunClick = () => {
+    // For farcaster mini app, keep existing swap functionality
+    if (isInFrame && sdk) {
+      handleSwapClick();
+    } else {
+      // For web users, open the sun menu
+      setSunMenuOpen(!sunMenuOpen);
+    }
+  };
+
+  const handleConnectWallet = async () => {
+    try {
+      if (connectors && connectors.length > 0) {
+        await connect({ connector: connectors[0] });
+      }
+    } catch (error) {
+      console.error('Failed to connect wallet:', error);
+    }
+  };
+
+  const handleClaimTokens = () => {
+    // This would trigger the Sol Age claim modal
+    if (onSolarClick) {
+      onSolarClick();
+    }
   };
 
   return (
@@ -60,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ formattedDate, onAboutClick, onSolarCli
           </div>
           {/* $SOLAR token link */}
           <button
-            onClick={handleSwapClick}
+            onClick={handleSunClick}
             aria-label="$SOLAR Token"
             className="w-10 h-10 flex items-center justify-center border border-gray-300 bg-white shadow-sm hover:bg-yellow-100 transition-colors"
             style={{ fontSize: 18, borderRadius: 0 }}
@@ -75,6 +106,14 @@ const Header: React.FC<HeaderProps> = ({ formattedDate, onAboutClick, onSolarCli
       </div>
       {/* Divider line below header */}
       <div className="w-full h-px bg-gray-200" />
+      
+      {/* Sun Menu for web users */}
+      <SunMenu
+        isOpen={sunMenuOpen}
+        onClose={() => setSunMenuOpen(false)}
+        onConnectWallet={handleConnectWallet}
+        onClaimTokens={handleClaimTokens}
+      />
     </header>
   );
 };
