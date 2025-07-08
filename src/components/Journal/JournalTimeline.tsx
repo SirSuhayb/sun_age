@@ -13,7 +13,7 @@ interface JournalTimelineProps {
   onRead: (entry: JournalEntry) => void;
 }
 
-const PreservationStatus = ({ status }: { status: 'local' | 'synced' | 'preserved' | 'private' }) => {
+export const PreservationStatus = ({ status }: { status: 'local' | 'synced' | 'preserved' | 'private' }) => {
   let color = 'text-gray-500';
   let dot = 'bg-gray-400';
   let label = status.toUpperCase();

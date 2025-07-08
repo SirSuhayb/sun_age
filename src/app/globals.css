@@ -116,3 +116,16 @@ body {
 .spin-slow {
   animation: spin-slow 8s linear infinite;
 }
+
+@font-face {
+  font-family: 'GT Alpina';
+  src: url('/fonts/GT-Alpina-Standard-Regular-Italic-Trial.otf') format('opentype');
+  font-style: italic;
+  font-weight: normal;
+  font-display: swap;
+}
+
+.font-gt-alpina-italic {
+  font-family: 'GT Alpina', serif;
+  font-style: italic;
+}

@@ -13,6 +13,8 @@ import { PulsingStarSpinner } from "~/components/ui/PulsingStarSpinner";
 import { useFrameSDK } from '~/hooks/useFrameSDK';
 import { composeAndShareEntry } from '~/lib/journal';
 import EntryPreviewModalClient from './EntryPreviewModalClient';
+import { format } from 'date-fns';
+import { PreservationStatus } from '~/components/Journal/JournalTimeline';
 
 interface JournalProps {
   solAge: number;
@@ -82,6 +84,26 @@ export function Journal({ solAge }: JournalProps) {
     return matchesSearch && matchesFilter;
   });
 
+  // Group entries by month and year
+  const groupedEntries = filteredEntries.reduce((acc, entry) => {
+    const date = new Date(entry.created_at);
+    const month = format(date, 'MMMM');
+    const year = format(date, 'yyyy');
+    const key = `${month} ${year}`;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(entry);
+    return acc;
+  }, {} as Record<string, JournalEntry[]>);
+
+  // Sort months by most recent first
+  const sortedMonthKeys = Object.keys(groupedEntries).sort((a, b) => {
+    const [monthA, yearA] = a.split(' ');
+    const [monthB, yearB] = b.split(' ');
+    const dateA = new Date(`${monthA} 1, ${yearA}`);
+    const dateB = new Date(`${monthB} 1, ${yearB}`);
+    return dateB.getTime() - dateA.getTime();
+  });
+
   const handleStartWriting = () => {
     setEditingEntry({
       id: '',
@@ -100,13 +122,19 @@ export function Journal({ solAge }: JournalProps) {
 
   const handleSave = async (entryToSave: { id?: string, content: string }) => {
     if (editingEntry && editingEntry.id) {
+      // Update existing entry
       await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid);
     } else {
-      // Create a new entry and update the editor state with the new entry (so future autosaves update, not create)
+      // Create a new entry and immediately update the editor state
       const newEntry = await createEntry({ content: entryToSave.content, sol_day: solAge }, userFid);
+      // Update the editing entry state so future auto-saves update this entry, not create new ones
       setEditingEntry(newEntry);
     }
-    // Don't close the editor for autosave
+  };
+
+  const handleAutoSave = async (entryToSave: { id?: string, content: string }) => {
+    // Use the same logic as handleSave to prevent duplicates
+    await handleSave(entryToSave);
   };
 
   const handleCancel = () => {
@@ -342,7 +370,7 @@ export function Journal({ solAge }: JournalProps) {
       <JournalEntryEditor
         entry={editingEntry}
         onSave={handleSave}
-        onAutoSave={handleSave}
+        onAutoSave={handleAutoSave}
         onFinish={handleCancel}
         mode="edit"
       />
@@ -354,7 +382,7 @@ export function Journal({ solAge }: JournalProps) {
       <JournalEntryEditor
         entry={readingEntry}
         onSave={handleSave}
-        onAutoSave={handleSave}
+        onAutoSave={handleAutoSave}
         onFinish={() => setReadingEntry(null)}
         onEdit={() => handleSwitchToEdit(readingEntry)}
         mode="read"
@@ -368,7 +396,7 @@ export function Journal({ solAge }: JournalProps) {
       <JournalEntryEditor
         entry={sharingEntry}
         onSave={handleSave}
-        onAutoSave={handleSave}
+        onAutoSave={handleAutoSave}
         onFinish={() => setSharingEntry(null)}
         mode="edit"
       />
@@ -691,18 +719,68 @@ export function Journal({ solAge }: JournalProps) {
         </div>
       )}
       
-      {entries.length > 0 ? (
-        <JournalTimeline 
-          entries={filteredEntries}
-          loading={loading}
-          onEdit={handleEdit} 
-          onDelete={handleDeleteRequest} 
-          onStartWriting={handleStartWriting} 
-          onShare={handleShare} 
-          onRead={handleRead} 
-        />
-      ) : (
+      {/* Grouped journal entries by month */}
+      {sortedMonthKeys.length === 0 ? (
         <JournalEmptyState />
+      ) : (
+        <div className="space-y-12">
+          {sortedMonthKeys.map((monthKey) => (
+            <div key={monthKey} className="mb-8">
+              <div className="flex justify-between items-center mb-4 mt-2">
+                <h2 className="text-2xl font-serif font-normal">{monthKey.split(' ')[0] + "'s Wisdom"}</h2>
+                <span className="text-xl font-serif font-normal text-gray-700">({groupedEntries[monthKey].length} entries)</span>
+              </div>
+              <div className="space-y-2">
+                {groupedEntries[monthKey].map((entry) => (
+                  <div key={entry.id}>
+                    {/* Render the journal card as before (reuse the card rendering logic) */}
+                    <div
+                      className="border border-gray-300 p-6 bg-white/90"
+                      style={{ marginBottom: 0 }}
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-mono text-xs">SOL {entry.sol_day}</span>
+                        <PreservationStatus status={entry.preservation_status} />
+                      </div>
+                      <p className="text-gray-800 font-serif text-xl mb-6 leading-snug line-clamp-3">
+                        {entry.content}
+                      </p>
+                      <div className="flex justify-between items-center text-xs font-mono uppercase tracking-widest">
+                        <div className="flex gap-4">
+                          {entry.preservation_status === 'local' && (
+                            <button
+                              onClick={() => handleEdit(entry)}
+                              className="text-gray-500 hover:text-black underline underline-offset-2"
+                            >EDIT</button>
+                          )}
+                          {entry.preservation_status === 'local' && (
+                            <button
+                              onClick={() => {/* preserve logic here */}}
+                              className="text-[#BFA12A] hover:text-[#8c7a2a] underline underline-offset-2"
+                            >PRESERVE</button>
+                          )}
+                          {entry.preservation_status === 'preserved' && (
+                            <button
+                              onClick={() => {/* share logic here */}}
+                              className="text-[#BFA12A] hover:text-[#8c7a2a] underline underline-offset-2"
+                            >SHARE</button>
+                          )}
+                          {entry.preservation_status === 'preserved' && (
+                            <button
+                              onClick={() => handleRead(entry)}
+                              className="text-gray-500 hover:text-black underline underline-offset-2"
+                            >READ</button>
+                          )}
+                        </div>
+                        <span className="text-gray-400">{entry.word_count} words</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       <ConfirmationModal

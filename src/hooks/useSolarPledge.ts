@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract, useWalletClient, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import { useFrameSDK } from './useFrameSDK';
-import { stringToBytes, bytesToHex } from 'viem';
+import { stringToBytes, bytesToHex, bytesToString, hexToBytes } from 'viem';
 
-import { SOLAR_PLEDGE_ADDRESS, USDC_ADDRESS, SolarPledgeABI, USDC_ABI } from '~/lib/contracts';
+import { SOLAR_PLEDGE_ADDRESS, USDC_ADDRESS, SolarPledgeABI, USDC_ABI, SOLAR_PLEDGE_V1_ADDRESS, SolarPledgeV1ABI, SolarPledgeV3ABI } from '~/lib/contracts';
 
 // Utility to encode a string as bytes32 (like Solidity's stringToBytes32)
 function encodeBytes32String(str: string): `0x${string}` {
@@ -45,6 +45,7 @@ export interface UseSolarPledgeResult {
   onChainVow?: string;
   refetchOnChainPledge: (...args: any[]) => Promise<any>;
   onChainPledge: Pledge | undefined;
+  onChainPledgeV1: Pledge | undefined;
 }
 
 export function useSolarPledge(): UseSolarPledgeResult {
@@ -83,14 +84,23 @@ export function useSolarPledge(): UseSolarPledgeResult {
     query: { enabled: !!address },
   });
 
-  // Fetch on-chain pledge details
-  const { data: onChainPledge, refetch: refetchOnChainPledge } = useReadContract({
+  // Fetch on-chain pledge details (v3)
+  const { data: onChainPledgeRaw, refetch: refetchOnChainPledge } = useReadContract({
     address: SOLAR_PLEDGE_ADDRESS,
-    abi: SolarPledgeABI,
+    abi: SolarPledgeV3ABI,
     functionName: 'getPledge',
     args: address ? [address] : ['0x0000000000000000000000000000000000000000'],
     query: { enabled: !!address },
   });
+
+  // Decode farcasterHandle from bytes32 to string for v3
+  let onChainPledge: Pledge | undefined = undefined;
+  if (onChainPledgeRaw && typeof onChainPledgeRaw === 'object' && 'farcasterHandle' in onChainPledgeRaw) {
+    onChainPledge = {
+      ...onChainPledgeRaw,
+      farcasterHandle: bytesToString(hexToBytes(onChainPledgeRaw.farcasterHandle as `0x${string}`)),
+    } as Pledge;
+  }
 
   const onChainVow = (onChainPledge as Pledge | undefined)?.commitmentText;
 
@@ -99,6 +109,25 @@ export function useSolarPledge(): UseSolarPledgeResult {
     onChainPledge,
     onChainVow
   });
+
+  // Fetch on-chain pledge details (v1)
+  const { data: onChainPledgeV1Raw, refetch: refetchOnChainPledgeV1 } = useReadContract({
+    address: SOLAR_PLEDGE_V1_ADDRESS,
+    abi: SolarPledgeV1ABI,
+    functionName: 'getPledge',
+    args: address ? [address] : ['0x0000000000000000000000000000000000000000'],
+    query: { enabled: !!address },
+  });
+  console.log('[useSolarPledge] onChainPledgeV1Raw', onChainPledgeV1Raw);
+
+  // Decode farcasterHandle from bytes32 to string for v1
+  let onChainPledgeV1: Pledge | undefined = undefined;
+  if (onChainPledgeV1Raw && typeof onChainPledgeV1Raw === 'object' && 'farcasterHandle' in onChainPledgeV1Raw) {
+    onChainPledgeV1 = {
+      ...onChainPledgeV1Raw,
+      farcasterHandle: bytesToString(hexToBytes(onChainPledgeV1Raw.farcasterHandle as `0x${string}`)),
+    } as Pledge;
+  }
 
   // Approve USDC for a given amount
   const approveUSDC = async (amount: bigint) => {
@@ -343,5 +372,6 @@ export function useSolarPledge(): UseSolarPledgeResult {
     onChainVow,
     refetchOnChainPledge,
     onChainPledge: onChainPledge as Pledge | undefined,
+    onChainPledgeV1: onChainPledgeV1 as Pledge | undefined,
   };
 } 

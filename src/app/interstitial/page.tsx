@@ -187,7 +187,7 @@ export default function InterstitialPage() {
                 router.push('/soldash?tab=sol%20sign');
               }}
             >
-              <Image src="/tabIcons/radiance.svg" alt="Radiance" width={40} height={40} className="object-contain" />
+              <Image src="/tabIcons/radiance.svg" alt="Radiance" width={80} height={80} className="object-contain" />
               <div className="text-left">
                 <div className="font-serif font-bold text-lg text-black mb-2">Dive into your inner sol</div>
                 <div className="font-mono text-sm uppercase text-gray-600 leading-tight">DISCOVER THE LAYERS OF YOUR SOLAR POWER AND BECOME MORE RADIANT WITH TIME.</div>
@@ -199,10 +199,10 @@ export default function InterstitialPage() {
               style={{ backgroundColor: '#E9D6FF' }}
               onClick={() => {
                 handleBookmark();
-                router.push('/soldash?tab=sol%20age');
+                router.push('/soldash/journey');
               }}
             >
-              <Image src="/tabIcons/outstar.svg" alt="Outstar" width={40} height={40} className="object-contain" />
+              <Image src="/tabIcons/outstar_group.svg" alt="Outstar" width={80} height={80} className="object-contain" />
               <div className="text-left">
                 <div className="font-serif font-bold text-lg text-black mb-2">Track your milestones</div>
                 <div className="font-mono text-sm uppercase text-gray-600 leading-tight">THE COSMOS KNOWS WHERE YOU&#39;RE HEADED. FOLLOW YOUR THREADS IN THE STARS.</div>
@@ -217,7 +217,7 @@ export default function InterstitialPage() {
                 router.push('/soldash?tab=journal');
               }}
             >
-              <Image src="/tabIcons/galaxy.svg" alt="Galaxy" width={40} height={40} className="object-contain" />
+              <Image src="/tabIcons/galaxy.svg" alt="Galaxy" width={80} height={80} className="object-contain" />
               <div className="text-left">
                 <div className="font-serif font-bold text-lg text-black mb-2">Inscribe what inspires you</div>
                 <div className="font-mono text-sm uppercase text-gray-600 leading-tight">TRANSMUTE YOUR INNER WISDOM INTO WORDS. SHARE THEM FOR OTHERS TO LEARN FROM.</div>
@@ -238,7 +238,7 @@ export default function InterstitialPage() {
                 }
               }}
             >
-              <Image src="/tabIcons/starburst.svg" alt="Starburst" width={40} height={40} className="object-contain" />
+              <Image src="/tabIcons/starburst.svg" alt="Starburst" width={80} height={80} className="object-contain" />
               <div className="text-left">
                 <div className="font-serif font-bold text-lg text-black mb-2">Make a sacred vow</div>
                 <div className="font-mono text-sm uppercase text-gray-600 leading-tight">THE BEGINNING TO YOUR BRIGHTEST SELF. A PLEDGE TO BECOME BETTER, TOGETHER.</div>
