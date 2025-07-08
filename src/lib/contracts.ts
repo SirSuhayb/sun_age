@@ -2,6 +2,10 @@ export const SOLAR_PLEDGE_ADDRESS = process.env.NEXT_PUBLIC_SOLAR_PLEDGE_ADDRESS
 export const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`;
 export const SOLAR_PLEDGE_V1_ADDRESS = '0x860434EA4e4114B63F44C70a304fa3eD2B32E77c';
 
+// New contract addresses for v3 and additional contracts
+export const SOLAR_UTILITY_ADDRESS = process.env.NEXT_PUBLIC_SOLAR_UTILITY_ADDRESS as `0x${string}`;
+export const MORPHO_ADDRESS = process.env.NEXT_PUBLIC_MORPHO_ADDRESS as `0x${string}`;
+
 // Define ABIs directly instead of importing artifacts
 export const SolarPledgeABI = [
   {
@@ -367,6 +371,284 @@ export const USDC_ABI = [
   }
 ] as const;
 
+// Solar Utility Contract ABI - Basic utility tracking functions
+export const SolarUtilityABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getUserUtilityData",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "usage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "credit",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "recordUsage",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "addCredit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTotalUtilityMetrics",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalUsage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalCredits",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+] as const;
+
+// Morpho Contract ABI - DeFi lending protocol functions
+export const MorphoABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "onBehalf",
+        "type": "address"
+      }
+    ],
+    "name": "supply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "supplied",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "onBehalf",
+        "type": "address"
+      }
+    ],
+    "name": "borrow",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "borrowed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "onBehalf",
+        "type": "address"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "withdrawn",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "onBehalf",
+        "type": "address"
+      }
+    ],
+    "name": "repay",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "repaid",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "borrowBalanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "borrowBalance",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "getSupplyRate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "supplyRate",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "getBorrowRate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "borrowRate",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+] as const;
+
 export const SolarPledgeV1ABI = [
   {
     "inputs": [
@@ -425,4 +707,4 @@ export const SolarPledgeV3ABI = [
     "stateMutability": "view",
     "type": "function"
   }
-]; 
+];

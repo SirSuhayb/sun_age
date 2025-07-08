@@ -244,6 +244,24 @@ export default function InterstitialPage() {
                 <div className="font-mono text-sm uppercase text-gray-600 leading-tight">THE BEGINNING TO YOUR BRIGHTEST SELF. A PLEDGE TO BECOME BETTER, TOGETHER.</div>
               </div>
             </button>
+            {/* 5. Surprise Me Button */}
+            <button
+              className="w-full border-2 border-dashed border-amber-300 px-4 py-6 text-center rounded-none flex items-center justify-center gap-4 transition-all duration-200 hover:border-amber-400 hover:bg-amber-50 active:scale-95"
+              style={{ marginTop: '16px' }}
+              onClick={() => {
+                handleBookmark();
+                router.push('/surprise-me');
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🎲</span>
+                <div className="text-left">
+                  <div className="font-serif font-bold text-lg text-amber-800">Surprise me</div>
+                  <div className="font-mono text-sm uppercase text-amber-600 leading-tight">LET THE COSMOS GUIDE YOUR DAILY EXPERIENCE</div>
+                </div>
+                <span className="text-2xl">✨</span>
+              </div>
+            </button>
           </div>
         </div>
         {/* --- FADE-IN KEYFRAMES --- */}
