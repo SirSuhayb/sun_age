@@ -62,9 +62,16 @@ export function SunMenu({ isOpen, onClose, onConnectWallet, onClaimTokens }: Sun
   const checkPendingClaims = () => {
     const storedShare = localStorage.getItem('latest_solage_share');
     if (storedShare) {
-      const shareData = JSON.parse(storedShare);
-      const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000);
-      return shareData.timestamp > thirtyMinutesAgo;
+      try {
+        const shareData = JSON.parse(storedShare);
+        const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000);
+        return shareData.timestamp > thirtyMinutesAgo;
+      } catch (error) {
+        console.error('Failed to parse stored share data:', error);
+        // Clear corrupted data
+        localStorage.removeItem('latest_solage_share');
+        return false;
+      }
     }
     return false;
   };

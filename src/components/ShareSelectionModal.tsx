@@ -79,7 +79,19 @@ export function ShareSelectionModal({
           
         case 'copy':
           const copyText = `I'm a ${archetype || 'Solar Being'} powered by ${solAge} days of pure sunlight ☀️\n\nDiscover your Solar Identity: ${baseUrl}`;
-          await navigator.clipboard.writeText(copyText);
+          
+          // Check if Clipboard API is available
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(copyText);
+          } else {
+            // Fallback for browsers that don't support Clipboard API
+            const textArea = document.createElement('textarea');
+            textArea.value = copyText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+          }
           break;
       }
       

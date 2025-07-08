@@ -41,14 +41,21 @@ export function SolAgeClaimModal({
       const checkShare = () => {
         const storedShare = localStorage.getItem('latest_solage_share');
         if (storedShare) {
-          const shareData = JSON.parse(storedShare);
-          const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000);
-          
-          if (shareData.timestamp > thirtyMinutesAgo && shareData.solAge === solAge) {
-            setIsVerified(true);
-            setStep('connect');
-          } else {
-            setError('No recent share found. Please share your sol age first.');
+          try {
+            const shareData = JSON.parse(storedShare);
+            const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000);
+            
+            if (shareData.timestamp > thirtyMinutesAgo && shareData.solAge === solAge) {
+              setIsVerified(true);
+              setStep('connect');
+            } else {
+              setError('No recent share found. Please share your sol age first.');
+            }
+          } catch (error) {
+            console.error('Failed to parse stored share data:', error);
+            // Clear corrupted data
+            localStorage.removeItem('latest_solage_share');
+            setError('No share found. Please share your sol age first.');
           }
         } else {
           setError('No share found. Please share your sol age first.');
