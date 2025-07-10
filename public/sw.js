@@ -174,13 +174,52 @@ async function handlePageRequest(request) {
   }
 }
 
-// Background sync for future sol age calculations
+// Background sync for journal entries and sol age calculations
 self.addEventListener('sync', (event) => {
-  if (event.tag === 'solara-calc-sync') {
+  if (event.tag === 'journal-sync') {
+    console.log('📝 Background syncing journal entries...');
+    event.waitUntil(syncJournalEntries());
+  } else if (event.tag === 'solara-calc-sync') {
     console.log('🔄 Background syncing sol age calculations...');
     event.waitUntil(syncSolAgeCalculations());
   }
 });
+
+async function syncJournalEntries() {
+  console.log('📝 Syncing offline journal entries');
+  
+  try {
+    // Get local journal entries from localStorage
+    const stored = self.localStorage?.getItem?.('solara_journal_entries');
+    if (!stored) return;
+    
+    const entries = JSON.parse(stored);
+    const localEntries = entries.filter(e => e.preservation_status === 'local');
+    
+    if (localEntries.length === 0) {
+      console.log('📝 No local journal entries to sync');
+      return;
+    }
+    
+    console.log(`📝 Found ${localEntries.length} local journal entries to sync`);
+    
+    // Note: Actual migration would happen when user opens app
+    // Service worker can't directly call the migration API without userFid
+    // But we can notify the app to trigger sync
+    
+    // Send message to all clients to trigger sync
+    const clients = await self.clients.matchAll();
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'JOURNAL_SYNC_NEEDED',
+        count: localEntries.length
+      });
+    });
+    
+  } catch (error) {
+    console.error('📝 Error syncing journal entries:', error);
+  }
+}
 
 async function syncSolAgeCalculations() {
   // This would sync any offline calculations when connection returns
