@@ -76,14 +76,15 @@ export async function POST(req: NextRequest) {
         console.log('[API] Request body type:', typeof body);
         console.log('[API] Request body keys:', Object.keys(body));
         
-        const { content, sol_day, userFid } = body;
+        const { content, sol_day, userFid, parentEntryId } = body;
 
         console.log('[API] Extracted fields:', { 
             content: !!content, 
             contentLength: content?.length,
             sol_day, 
             userFid, 
-            userFidType: typeof userFid 
+            userFidType: typeof userFid,
+            parentEntryId
         });
 
         // Validate content
@@ -100,6 +101,22 @@ export async function POST(req: NextRequest) {
         // Always use service role client since Farcaster users aren't authenticated with Supabase
         console.log('[API] Using service role client');
         const supabase = createServiceRoleClient();
+
+        // Validate parentEntryId (if provided) and fetch parent details
+        let parentEntry: any = null;
+        if (parentEntryId) {
+          const { data: parent, error: parentErr } = await supabase
+            .from('journal_entries')
+            .select('id, merkle_root')
+            .eq('id', parentEntryId)
+            .single();
+
+          if (parentErr || !parent) {
+            console.error('[API] Invalid parentEntryId:', parentEntryId, parentErr);
+            return NextResponse.json({ error: 'Invalid parentEntryId' }, { status: 400 });
+          }
+          parentEntry = parent;
+        }
         
         // Get userFid from request body or use authenticated user if available
         let finalUserFid: number;
@@ -124,12 +141,25 @@ export async function POST(req: NextRequest) {
           console.log('[API] Using authenticated user FID:', finalUserFid);
         }
 
+        // Compute entry_hash (sha256 of content)
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - dynamic import to avoid requiring node types in edge runtime
+        const { createHash } = await import('crypto');
+        const entryHash = createHash('sha256').update(content).digest('hex');
+
+        // Compute merkle_root (entryHash if no parent, else sha256(entryHash + parentRoot))
+        const merkleRoot = parentEntry && parentEntry.merkle_root
+          ? createHash('sha256').update(entryHash + parentEntry.merkle_root).digest('hex')
+          : entryHash;
+
         const newEntry = {
-            user_fid: finalUserFid,
-            content,
-            sol_day,
-            word_count: content.trim().split(/\s+/).length,
-            preservation_status: userFid ? 'synced' : 'local',
+          user_fid: finalUserFid,
+          content,
+          sol_day,
+          word_count: content.trim().split(/\s+/).length,
+          preservation_status: userFid ? 'synced' : 'local',
+          entry_hash: entryHash,
+          merkle_root: merkleRoot,
         };
 
         console.log('[API] Creating new entry:', newEntry);
@@ -143,6 +173,18 @@ export async function POST(req: NextRequest) {
         if (error) {
             console.error('[API] Error creating journal entry:', error);
             return NextResponse.json({ error: 'Failed to create journal entry' }, { status: 500 });
+        }
+
+        // If parentEntryId provided, create link in journal_entry_links
+        if (parentEntryId) {
+          const { error: linkError } = await supabase
+            .from('journal_entry_links')
+            .insert({ parent_id: parentEntryId, child_id: entry.id });
+
+          if (linkError) {
+            console.error('[API] Error creating entry link:', linkError);
+            // Not fatal; continue
+          }
         }
 
         console.log('[API] Entry created successfully:', entry);
