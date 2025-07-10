@@ -16,6 +16,8 @@ interface EntryPreviewModalProps {
   userEntryCount?: number;
   authorUsername?: string | null;
   authorDisplayName?: string | null;
+  ancestors?: string[];
+  childCount?: number;
 }
 
 export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
@@ -30,6 +32,8 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
   userEntryCount,
   authorUsername,
   authorDisplayName,
+  ancestors = [],
+  childCount = 0,
 }) => {
   const [showFull, setShowFull] = useState(false);
 
@@ -114,6 +118,17 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
                 <span className="text-gray-400">•</span>
                 <span className="font-mono text-xs px-2 py-0.5 border rounded-none bg-yellow-50 border-yellow-300 text-yellow-700" style={{ fontWeight: 500, fontSize: '0.75rem' }}>{entry.preservation_status.toUpperCase()}</span>
               </div>
+              {/* Relationship row */}
+              {(ancestors.length > 0 || childCount > 0) && (
+                <div className="px-8 py-2 text-xs font-mono tracking-widest text-purple-700 flex gap-2 items-center">
+                  {ancestors.length > 0 && (
+                    <span>↱ Inspired by {ancestors.length}</span>
+                  )}
+                  {childCount > 0 && (
+                    <span>↳ {childCount} reflection{childCount>1?'s':''}</span>
+                  )}
+                </div>
+              )}
               {/* Divider */}
               <div className="border-t border-gray-200 w-full mb-2" />
               {/* Content area (scrollable if needed) */}

@@ -453,6 +453,16 @@ export function Journal({ solAge, parentEntryId }: JournalProps) {
         isOnboarded={true}
         userSolAge={solAge}
         userEntryCount={entries.length}
+        ancestors={(() => {
+          const arr: string[] = [];
+          let cur = parentMap[previewEntry.id];
+          while (cur) {
+            arr.push(cur);
+            cur = parentMap[cur];
+          }
+          return arr;
+        })()}
+        childCount={childCounts[previewEntry.id] || 0}
       />
     );
   }
