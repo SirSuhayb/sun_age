@@ -66,71 +66,86 @@ export function PWAInstallPrompt() {
 
   if (isInstalled) {
     return (
-      <div className="bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-center">
-        <p className="text-yellow-800 dark:text-yellow-200 font-medium">
-          ✨ Solara is installed! Launch it from your home screen.
-        </p>
+      <div className="backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 p-6 text-center">
+        <div className="text-lg font-serif font-bold mb-2" style={{ letterSpacing: '-0.06em' }}>
+          ✨ Solara Installed
+        </div>
+        <div className="text-xs font-mono text-gray-500 tracking-widest uppercase">
+          Launch from your home screen
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-      <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-          📱 Add Solara to Your Home Screen
-        </h3>
-        <p className="text-gray-600 dark:text-gray-300 text-sm">
-          Get quick access to track your sol age anytime!
-        </p>
+    <div className="backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 p-6">
+      <div className="text-center mb-6">
+        <div className="text-xl font-serif font-bold mb-3" style={{ letterSpacing: '-0.06em' }}>
+          📱 Add Solara to Home Screen
+        </div>
+        <div className="text-xs font-mono text-gray-500 tracking-widest uppercase">
+          Get quick access to track your sol age anytime
+        </div>
       </div>
 
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-6">
         <button
           onClick={handleInstallClick}
-          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors shadow-lg"
+          className="w-full max-w-xs bg-[#7C65C1] text-white py-3 px-6 transition-colors hover:bg-[#6952A3] font-mono text-sm tracking-widest uppercase"
         >
-          {isInstallable ? '📲 Install App' : '📖 Show Install Instructions'}
+          {isInstallable ? '📲 Install App' : '📖 Show Instructions'}
         </button>
       </div>
 
       {(showInstructions || isIOS) && (
-        <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
-            How to install Solara:
-          </h4>
+        <div className="mt-6 p-4 bg-white/80 border border-gray-300">
+          <div className="text-lg font-serif font-bold mb-4" style={{ letterSpacing: '-0.06em' }}>
+            Installation Guide
+          </div>
           
           {isIOS ? (
-            <div className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
-              <p className="flex items-center">
-                <span className="mr-2">1.</span>
-                Tap the Share button 
-                <span className="mx-1 text-lg">⎋</span>
-                in Safari
-              </p>
-              <p className="flex items-center">
-                <span className="mr-2">2.</span>
-                Scroll down and tap "Add to Home Screen"
-                <span className="mx-1 text-lg">➕</span>
-              </p>
-              <p className="flex items-center">
-                <span className="mr-2">3.</span>
-                Tap "Add" to confirm
-              </p>
+            <div className="space-y-3">
+              <div className="flex items-start">
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Step 1</span>
+                <div className="text-sm">
+                  Tap the Share button <span className="text-lg mx-1">⎋</span> in Safari
+                </div>
+              </div>
+              <div className="flex items-start">
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Step 2</span>
+                <div className="text-sm">
+                  Scroll down and tap "Add to Home Screen" <span className="text-lg mx-1">➕</span>
+                </div>
+              </div>
+              <div className="flex items-start">
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Step 3</span>
+                <div className="text-sm">
+                  Tap "Add" to confirm installation
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
-              <p><strong>Chrome/Edge:</strong> Look for the install icon ⚡ in the address bar</p>
-              <p><strong>Firefox:</strong> Use the three-dot menu → "Install" or "Add to Home Screen"</p>
-              <p><strong>Safari (macOS):</strong> File menu → "Add to Dock"</p>
+            <div className="space-y-3">
+              <div className="flex items-start">
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Chrome</span>
+                <div className="text-sm">Look for the install icon ⚡ in the address bar</div>
+              </div>
+              <div className="flex items-start">
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Firefox</span>
+                <div className="text-sm">Use the three-dot menu → "Install" or "Add to Home Screen"</div>
+              </div>
+              <div className="flex items-start">
+                <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Safari</span>
+                <div className="text-sm">File menu → "Add to Dock" (macOS only)</div>
+              </div>
             </div>
           )}
           
           <button
             onClick={() => setShowInstructions(false)}
-            className="mt-3 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
+            className="mt-4 text-xs font-mono text-gray-500 hover:text-gray-700 tracking-widest uppercase transition-colors"
           >
-            ← Close Instructions
+            ← Close Guide
           </button>
         </div>
       )}
