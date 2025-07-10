@@ -37,7 +37,7 @@ function WarpcastEmbed({ url }: { url: string }) {
   );
 }
 
-function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onRecalculate, onClear, isRecalculating, sinceLastVisit, milestoneCard, showMilestoneModal, setShowMilestoneModal, nextNumericalMilestones, onShare, isSharing, initialTab, hasPledged, vow, onSolVowsTab, isLoading, onChainPledge }: {
+function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onRecalculate, onClear, isRecalculating, sinceLastVisit, milestoneCard, showMilestoneModal, setShowMilestoneModal, nextNumericalMilestones, onShare, isSharing, initialTab, hasPledged, vow, onSolVowsTab, isLoading, onChainPledge, parentEntryId }: {
   bookmark: any;
   milestone: any;
   milestoneDate: any;
@@ -58,6 +58,7 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
   onSolVowsTab?: any;
   isLoading?: boolean;
   onChainPledge?: Pledge;
+  parentEntryId?: string | null;
 }) {
   const { context, isInFrame, sdk } = useFrameSDK();
   const [tab, setTab] = useState<'sol age' | 'sol vows' | 'journal' | 'sol sign'>(initialTab || 'sol age');
@@ -343,7 +344,7 @@ function BookmarkCard({ bookmark, milestone, milestoneDate, daysToMilestone, onR
 
         {tab === 'journal' && (
           <div className="w-full text-sm font-mono space-y-3">
-            <Journal solAge={bookmark.days} />
+            <Journal solAge={bookmark.days} parentEntryId={parentEntryId} />
           </div>
         )}
 

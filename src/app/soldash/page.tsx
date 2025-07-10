@@ -64,6 +64,9 @@ export default function SolDashPage() {
 
   const initialTab = getInitialTab();
 
+  // Capture parentEntryId from URL params (if coming from "Add a reflection" CTA)
+  const parentEntryId = searchParams.get('parentEntryId') || null;
+
   console.log('[SolDashPage] Render with:', {
     address,
     onChainHasPledged,
@@ -298,6 +301,7 @@ export default function SolDashPage() {
             onSolVowsTab={handleSolVowsTab}
             isLoading={isLoading}
             onChainPledge={onChainPledge}
+            parentEntryId={parentEntryId || undefined}
           />
         </div>
       </div>

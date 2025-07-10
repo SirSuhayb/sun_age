@@ -52,6 +52,15 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
   }
 
   const handleAddReflection = () => {
+    // Fire-and-forget analytics
+    try {
+      fetch('/api/analytics/reflection-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ parentEntryId: entry.id })
+      });
+    } catch {}
+
     // Pass the current entry's id as parentEntryId so the journal editor can link reflections
     const url = `/soldash?tab=journal&parentEntryId=${encodeURIComponent(entry.id)}`;
     window.location.href = url;

@@ -16,6 +16,7 @@ import EntryPreviewModalClient from './EntryPreviewModalClient';
 
 interface JournalProps {
   solAge: number;
+  parentEntryId?: string | null;
 }
 
 function JournalEmptyState() {
@@ -39,7 +40,8 @@ function JournalEmptyState() {
   );
 }
 
-export function Journal({ solAge }: JournalProps) {
+export function Journal({ solAge, parentEntryId }: JournalProps) {
+  // parentEntryId not yet used; will be handled in future implementation
   const [editingEntry, setEditingEntry] = useState<JournalEntry | null>(null);
   const [readingEntry, setReadingEntry] = useState<JournalEntry | null>(null);
   const [sharingEntry, setSharingEntry] = useState<JournalEntry | null>(null);
@@ -102,9 +104,37 @@ export function Journal({ solAge }: JournalProps) {
     if (editingEntry && editingEntry.id) {
       await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid);
     } else {
-      // Create a new entry and update the editor state with the new entry (so future autosaves update, not create)
-      const newEntry = await createEntry({ content: entryToSave.content, sol_day: solAge }, userFid);
-      setEditingEntry(newEntry);
+      // Decide whether to create entry directly via API (when userFid and parentEntryId present) or locally
+      if (userFid && parentEntryId) {
+        try {
+          const response = await fetch('/api/journal/entries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: entryToSave.content,
+              sol_day: solAge,
+              userFid: userFid,
+              parentEntryId
+            })
+          });
+          if (!response.ok) {
+            const errorBody = await response.json();
+            throw new Error(errorBody.error || 'Failed to create entry');
+          }
+          const { entry: newEntry } = await response.json();
+          // Refresh entries from API so newly created entry appears
+          await loadEntries(undefined, userFid);
+          setEditingEntry(newEntry);
+        } catch (err) {
+          console.error('[Journal] Direct API create failed, falling back to local:', err);
+          const newEntry = await createEntry({ content: entryToSave.content, sol_day: solAge }, userFid);
+          setEditingEntry(newEntry);
+        }
+      } else {
+        // Create locally
+        const newEntry = await createEntry({ content: entryToSave.content, sol_day: solAge }, userFid);
+        setEditingEntry(newEntry);
+      }
     }
     // Don't close the editor for autosave
   };
