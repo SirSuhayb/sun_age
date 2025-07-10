@@ -1,3 +1,5 @@
+'use client';
+
 export default function OfflinePage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -5,7 +7,7 @@ export default function OfflinePage() {
         <div className="text-6xl mb-6">🌙</div>
         
         <div className="text-2xl font-serif font-bold mb-4" style={{ letterSpacing: '-0.06em' }}>
-          You're in Solar Eclipse Mode
+          You&apos;re in Solar Eclipse Mode
         </div>
         
         <div className="text-xs font-mono text-gray-500 tracking-widest uppercase mb-6">
@@ -13,7 +15,7 @@ export default function OfflinePage() {
         </div>
         
         <div className="text-sm text-gray-600 mb-8 leading-relaxed">
-          Don't worry - your cosmic journey continues! We've saved your last sol age calculation 
+          Don&apos;t worry - your cosmic journey continues! We&apos;ve saved your last sol age calculation 
           and you can still browse previously loaded pages.
         </div>
         
@@ -33,7 +35,7 @@ export default function OfflinePage() {
             Connection Status
           </div>
           <div className="text-sm text-yellow-600">
-            Your calculations will sync automatically when you're back online
+            Your calculations will sync automatically when you&apos;re back online
           </div>
         </div>
         

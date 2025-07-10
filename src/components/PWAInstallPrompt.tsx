@@ -114,13 +114,13 @@ export function PWAInstallPrompt() {
               <div className="flex items-start">
                 <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Step 2</span>
                 <div className="text-sm">
-                  Scroll down and tap "Add to Home Screen" <span className="text-lg mx-1">➕</span>
+                  Scroll down and tap &quot;Add to Home Screen&quot; <span className="text-lg mx-1">➕</span>
                 </div>
               </div>
               <div className="flex items-start">
                 <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Step 3</span>
                 <div className="text-sm">
-                  Tap "Add" to confirm installation
+                  Tap &quot;Add&quot; to confirm installation
                 </div>
               </div>
             </div>
@@ -132,11 +132,11 @@ export function PWAInstallPrompt() {
               </div>
               <div className="flex items-start">
                 <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Firefox</span>
-                <div className="text-sm">Use the three-dot menu → "Install" or "Add to Home Screen"</div>
+                <div className="text-sm">Use the three-dot menu → &quot;Install&quot; or &quot;Add to Home Screen&quot;</div>
               </div>
               <div className="flex items-start">
                 <span className="text-xs font-mono text-gray-500 tracking-widest uppercase mr-4 mt-1 flex-shrink-0">Safari</span>
-                <div className="text-sm">File menu → "Add to Dock" (macOS only)</div>
+                <div className="text-sm">File menu → &quot;Add to Dock&quot; (macOS only)</div>
               </div>
             </div>
           )}
