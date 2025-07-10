@@ -52,7 +52,9 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
   }
 
   const handleAddReflection = () => {
-    window.location.href = '/soldash?tab=journal';
+    // Pass the current entry's id as parentEntryId so the journal editor can link reflections
+    const url = `/soldash?tab=journal&parentEntryId=${encodeURIComponent(entry.id)}`;
+    window.location.href = url;
   };
   const handleViewJourney = () => {
     window.location.href = '/soldash';
