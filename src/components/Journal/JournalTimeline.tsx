@@ -6,6 +6,7 @@ import type { JournalEntry } from '~/types/journal';
 interface JournalTimelineProps {
   entries: JournalEntry[];
   loading?: boolean;
+  parentMap?: Record<string, string | null>; // childId -> parentId
   onStartWriting: () => void;
   onEdit: (entry: JournalEntry) => void;
   onDelete: (id: string) => void;
@@ -56,7 +57,7 @@ const EntrySkeleton = () => (
   </div>
 );
 
-export function JournalTimeline({ entries, loading = false, onStartWriting, onEdit, onDelete, onShare, onRead }: JournalTimelineProps) {
+export function JournalTimeline({ entries, loading = false, parentMap = {}, onStartWriting, onEdit, onDelete, onShare, onRead }: JournalTimelineProps) {
   // Show skeleton loading when loading and no entries
   if (loading && entries.length === 0) {
     return (
@@ -93,7 +94,9 @@ export function JournalTimeline({ entries, loading = false, onStartWriting, onEd
 
   return (
     <div className="space-y-4">
-      {entries.map((entry) => (
+      {entries.map((entry) => {
+        const hasParent = !!parentMap[entry.id];
+        return (
         <div
           key={entry.id}
           className="border border-gray-300 p-6 bg-white/90 cursor-pointer group"
@@ -105,7 +108,10 @@ export function JournalTimeline({ entries, loading = false, onStartWriting, onEd
         >
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-mono text-xs">SOL {entry.sol_day}</h4>
-            <PreservationStatus status={entry.preservation_status} />
+            <div className="flex items-center gap-2">
+              {hasParent && <span title="Inspired reflection" className="text-sm">↳</span>}
+              <PreservationStatus status={entry.preservation_status} />
+            </div>
           </div>
           <p className="text-gray-800 font-serif text-xl mb-6 leading-snug line-clamp-3">
             {entry.content}
@@ -130,7 +136,8 @@ export function JournalTimeline({ entries, loading = false, onStartWriting, onEd
             <span className="text-gray-500">{entry.word_count} words</span>
           </div>
         </div>
-      ))}
+      );
+      })}
     </div>
   );
 }

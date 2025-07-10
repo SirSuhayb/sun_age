@@ -77,6 +77,27 @@ export function Journal({ solAge, parentEntryId }: JournalProps) {
   // Compute local entries from the returned entries
   const localEntries = entries.filter(entry => entry.preservation_status === 'local');
 
+  // Parent link map
+  const [parentMap, setParentMap] = useState<Record<string, string | null>>({});
+
+  // Load links once userFid available
+  useEffect(() => {
+    const loadLinks = async () => {
+      if (!userFid) return;
+      try {
+        const resp = await fetch(`/api/journal/links?userFid=${userFid}`);
+        if (!resp.ok) return;
+        const { links } = await resp.json();
+        const map: Record<string, string | null> = {};
+        links.forEach((l: { parent_id: string; child_id: string }) => {
+          map[l.child_id] = l.parent_id;
+        });
+        setParentMap(map);
+      } catch {}
+    };
+    loadLinks();
+  }, [userFid]);
+
   // Filter entries based on search query and preservation status
   const filteredEntries = entries.filter(entry => {
     const matchesSearch = entry.content.toLowerCase().includes(searchQuery.toLowerCase());
@@ -725,6 +746,7 @@ export function Journal({ solAge, parentEntryId }: JournalProps) {
         <JournalTimeline 
           entries={filteredEntries}
           loading={loading}
+          parentMap={parentMap}
           onEdit={handleEdit} 
           onDelete={handleDeleteRequest} 
           onStartWriting={handleStartWriting} 
