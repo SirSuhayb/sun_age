@@ -7,6 +7,7 @@ interface JournalTimelineProps {
   entries: JournalEntry[];
   loading?: boolean;
   parentMap?: Record<string, string | null>; // childId -> parentId
+  childCounts?: Record<string, number>; // parentId -> number of children
   onStartWriting: () => void;
   onEdit: (entry: JournalEntry) => void;
   onDelete: (id: string) => void;
@@ -57,7 +58,7 @@ const EntrySkeleton = () => (
   </div>
 );
 
-export function JournalTimeline({ entries, loading = false, parentMap = {}, onStartWriting, onEdit, onDelete, onShare, onRead }: JournalTimelineProps) {
+export function JournalTimeline({ entries, loading = false, parentMap = {}, childCounts = {}, onStartWriting, onEdit, onDelete, onShare, onRead }: JournalTimelineProps) {
   // Show skeleton loading when loading and no entries
   if (loading && entries.length === 0) {
     return (
@@ -96,6 +97,7 @@ export function JournalTimeline({ entries, loading = false, parentMap = {}, onSt
     <div className="space-y-4">
       {entries.map((entry) => {
         const hasParent = !!parentMap[entry.id];
+        const numChildren = childCounts[entry.id] || 0;
         return (
         <div
           key={entry.id}
@@ -110,6 +112,9 @@ export function JournalTimeline({ entries, loading = false, parentMap = {}, onSt
             <h4 className="font-mono text-xs">SOL {entry.sol_day}</h4>
             <div className="flex items-center gap-2">
               {hasParent && <span title="Inspired reflection" className="text-sm">↳</span>}
+              {numChildren > 0 && (
+                <span title={`${numChildren} follow-up${numChildren>1?'s':''}`} className="text-xs text-purple-600">{numChildren}</span>
+              )}
               <PreservationStatus status={entry.preservation_status} />
             </div>
           </div>

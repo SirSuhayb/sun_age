@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceRoleClient } from '~/utils/supabase/server';
 

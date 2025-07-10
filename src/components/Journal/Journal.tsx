@@ -89,14 +89,19 @@ export function Journal({ solAge, parentEntryId }: JournalProps) {
         if (!resp.ok) return;
         const { links } = await resp.json();
         const map: Record<string, string | null> = {};
+        const counts: Record<string, number> = {};
         links.forEach((l: { parent_id: string; child_id: string }) => {
           map[l.child_id] = l.parent_id;
+          counts[l.parent_id] = (counts[l.parent_id] || 0) + 1;
         });
         setParentMap(map);
+        setChildCounts(counts);
       } catch {}
     };
     loadLinks();
   }, [userFid]);
+
+  const [childCounts, setChildCounts] = useState<Record<string, number>>({});
 
   // Filter entries based on search query and preservation status
   const filteredEntries = entries.filter(entry => {
@@ -747,6 +752,7 @@ export function Journal({ solAge, parentEntryId }: JournalProps) {
           entries={filteredEntries}
           loading={loading}
           parentMap={parentMap}
+          childCounts={childCounts}
           onEdit={handleEdit} 
           onDelete={handleDeleteRequest} 
           onStartWriting={handleStartWriting} 
