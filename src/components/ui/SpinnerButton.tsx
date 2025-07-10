@@ -18,7 +18,7 @@ export function SpinnerButton({ onClick, children, isSubmitting, delay = 500, cl
     }
   }, [isSubmitting]);
 
-  const handleClick = async (e) => {
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (isSubmitting === undefined) {
       setIsLoading(true);
     }
