@@ -11,6 +11,7 @@ import { Info } from "lucide-react";
 // import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "~/components/ui/tooltip";
 import HeaderClient from "../components/SunCycleAge/HeaderClient";
 import { SocialTagToastProvider } from "../components/SocialTagToastProvider";
+import { ServiceWorkerRegistration } from "../components/ServiceWorkerRegistration";
 // import { Inter } from "next/font/google";
 // import { PostHogIdentify } from "~/components/posthog-identify";
 
@@ -96,6 +97,7 @@ export default function RootLayout({
       <body>
         <SocialTagToastProvider>
           <Providers>
+            <ServiceWorkerRegistration />
             {/* <PostHogIdentify /> */}
             {/* Screenshot detection for @solaracosmos tagging */}
             <ScreenshotDetector />
