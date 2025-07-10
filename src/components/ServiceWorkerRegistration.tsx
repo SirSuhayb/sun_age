@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { OfflineDataManager } from '../lib/offlineDataManager';
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
@@ -12,6 +13,12 @@ export function ServiceWorkerRegistration() {
       })
       .then((registration) => {
         console.log('🌞 Solara Service Worker registered successfully:', registration.scope);
+        
+        // Initialize offline data cache
+        const offlineManager = OfflineDataManager.getInstance();
+        offlineManager.initializeOfflineCache().catch(error => {
+          console.warn('⚠️ Offline cache initialization failed:', error);
+        });
         
         // Check for updates
         registration.addEventListener('updatefound', () => {
@@ -38,6 +45,22 @@ export function ServiceWorkerRegistration() {
           console.log('📦 Cache updated:', event.data.payload);
         }
       });
+
+      // Sync offline caches when coming back online
+      const offlineManager = OfflineDataManager.getInstance();
+      const handleOnline = () => {
+        console.log('🌐 Back online - syncing offline caches...');
+        offlineManager.syncWhenOnline().catch(error => {
+          console.warn('⚠️ Cache sync failed:', error);
+        });
+      };
+      
+      window.addEventListener('online', handleOnline);
+      
+      // Cleanup listener
+      return () => {
+        window.removeEventListener('online', handleOnline);
+      };
     } else {
       console.log('⚠️ Service Workers not supported in this browser');
     }
