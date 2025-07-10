@@ -91,7 +91,7 @@ export function PWAInstallPrompt() {
       <div className="flex justify-center mb-6">
         <button
           onClick={handleInstallClick}
-          className="w-full max-w-xs bg-[#7C65C1] text-white py-3 px-6 transition-colors hover:bg-[#6952A3] font-mono text-sm tracking-widest uppercase"
+          className="w-full max-w-xs btn-gold py-3 px-6 font-mono text-sm tracking-widest uppercase"
         >
           {isInstallable ? '📲 Install App' : '📖 Show Instructions'}
         </button>
