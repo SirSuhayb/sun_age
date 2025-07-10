@@ -11,6 +11,7 @@ import { Info } from "lucide-react";
 // import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "~/components/ui/tooltip";
 import HeaderClient from "../components/SunCycleAge/HeaderClient";
 import { SocialTagToastProvider } from "../components/SocialTagToastProvider";
+import { ServiceWorkerRegistration } from "../components/ServiceWorkerRegistration";
 // import { Inter } from "next/font/google";
 // import { PostHogIdentify } from "~/components/posthog-identify";
 
@@ -33,10 +34,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico" },
-      { url: "/icon.png", type: "image/png" },
+      { url: "/icons/icon-72x72.png", sizes: "72x72", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-touch-icon.png" },
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180" },
     ],
     other: [
       {
@@ -95,6 +97,7 @@ export default function RootLayout({
       <body>
         <SocialTagToastProvider>
           <Providers>
+            <ServiceWorkerRegistration />
             {/* <PostHogIdentify /> */}
             {/* Screenshot detection for @solaracosmos tagging */}
             <ScreenshotDetector />
