@@ -10,8 +10,6 @@ import { ConfirmationModal } from '~/components/ui/ConfirmationModal';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { useAccount, useWalletClient, usePublicClient, useConnect } from 'wagmi';
-import { paymentProcessor } from '~/lib/paymentProcessor';
-import { ethers } from 'ethers';
 import { useFrameSDK } from '~/hooks/useFrameSDK';
 import { DaimoPayButton } from '@daimo/pay';
 import { useRef } from 'react';
