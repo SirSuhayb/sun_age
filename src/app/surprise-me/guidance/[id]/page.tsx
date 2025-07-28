@@ -50,7 +50,7 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
     if (todayGuidance.length > 0) {
       setHasCompletedGuidance(true);
     }
-  }, [id]); // Removed rollData from dependencies to prevent infinite loop
+  }, [id, rollData]); // Added rollData back to dependencies
 
   // Migration function to handle old data structure
   const migrateOldStructure = (roll: any): DailyRoll => {
@@ -173,7 +173,7 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
 
           {/* Quote */}
           <div className="border border-gray-300 bg-white/80 italic font-serif text-xl text-gray-700 px-3 py-4 mb-4 text-center">
-            "{rollData.quote || 'Let the cosmos guide your next step.'}"
+            &ldquo;{rollData.quote || 'Let the cosmos guide your next step.'}&rdquo;
           </div>
 
           {/* Description */}
@@ -309,7 +309,7 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
 
         {/* ONCE YOU'VE FINISHED Section */}
         <div className="mb-8">
-          <h2 className="font-mono text-sm uppercase tracking-widest text-center mb-4">ONCE YOU'VE FINISHED</h2>
+          <h2 className="font-mono text-sm uppercase tracking-widest text-center mb-4">ONCE YOU&apos;VE FINISHED</h2>
           
           <div 
             className="w-full"

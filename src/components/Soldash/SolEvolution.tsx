@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { getSunSign, getSolPhase, getSolarArchetype, dayRangeToAgeRange } from '../../lib/solarIdentity';
 import { getNextMilestone } from '../../lib/milestones';
 
@@ -127,7 +128,7 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
       <div className="text-2xl font-serif font-semibold text-center">Your current Sol evolution</div>
       {/* Current Phase */}
       <div className="flex gap-3 items-start mb-2">
-        <img src="/you/little_light.svg" alt="Current Phase Icon" className="w-8 h-8" />
+        <Image src="/you/little_light.svg" alt="Current Phase Icon" width={32} height={32} className="w-8 h-8" />
         <div>
           <div className="font-mono text-[#E67803] text-lg font-medium uppercase tracking-tight mb-1">{phaseLabel}</div>
           <div className="font-serif text-lg text-black leading-snug">{phaseDescription}</div>
@@ -135,7 +136,7 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
       </div>
       {/* Key Themes */}
       <div className="flex gap-3 items-start mb-2">
-        <img src="/you/little_star.svg" alt="Key Themes Icon" className="w-8 h-8 mt-1" />
+        <Image src="/you/little_star.svg" alt="Key Themes Icon" width={32} height={32} className="w-8 h-8 mt-1" />
         <div>
           <div className="font-mono text-[#E67803] text-lg font-medium uppercase tracking-tight mb-1">KEY THEMES THIS SOLAR YEAR</div>
           <div className="font-serif text-lg text-black leading-snug">{keyTheme}</div>
@@ -143,7 +144,7 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
       </div>
       {/* Upcoming Milestone */}
       <div className="flex gap-3 items-start">
-        <img src="/you/little_nova.svg" alt="Upcoming Milestone Icon" className="w-8 h-8 mt-1" />
+        <Image src="/you/little_nova.svg" alt="Upcoming Milestone Icon" width={32} height={32} className="w-8 h-8 mt-1" />
         <div>
           <div className="font-mono text-[#E67803] text-lg font-medium uppercase tracking-tight mb-1">{milestoneLabel}</div>
           <div className="font-serif text-lg text-black leading-snug">{milestoneDescription}</div>

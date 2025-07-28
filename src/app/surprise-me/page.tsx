@@ -629,7 +629,7 @@ export default function SurpriseMePage() {
                 angle.set(planetAngles[angleKey]);
               }
               return () => controls && controls.stop();
-            }, [isRolling, planetAngles[angleKey]]);
+            }, [isRolling, planetAngles, angleKey]);
             const left = useTransform(angle, a => `${cx + radius * Math.cos((a * Math.PI) / 180)}px`);
             const top = useTransform(angle, a => `${cy + radius * Math.sin((a * Math.PI) / 180)}px`);
             return (
@@ -678,7 +678,7 @@ export default function SurpriseMePage() {
           <div className="absolute bottom-24 left-0 right-0 flex justify-center z-20">
             <div className="backdrop-blur-sm border px-6 py-4 max-w-sm w-full text-center"
               style={{ borderRadius: 0, borderColor: '#E0D09D', background: 'rgba(255,255,255,0.5)' }}>
-              <div className="font-serif italic text-xl text-center mb-3">Today's Guidance</div>
+              <div className="font-serif italic text-xl text-center mb-3">Today&apos;s Guidance</div>
               {rollHistory.map((roll, idx) => (
                 <div key={roll.id} className="flex items-center justify-between border-b border-gray-200 last:border-b-0 py-3">
                   <div className="flex items-center gap-3">

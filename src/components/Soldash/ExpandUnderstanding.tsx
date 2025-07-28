@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 const features = [
   { icon: '🎯', label: 'Life Focus' },
@@ -17,7 +18,7 @@ const ExpandUnderstanding: React.FC = () => {
         Add your birth time & location for deeper insights on your inner sol
       </div>
       <div className="w-full flex justify-center items-center mb-6">
-        <img src="/you/solChart.svg" alt="Sol Chart" className="w-full max-w-md border border-[#E5E1D8] bg-[#FCF6E5] p-8" />
+        <Image src="/you/solChart.svg" alt="Sol Chart" width={400} height={300} className="w-full max-w-md border border-[#E5E1D8] bg-[#FCF6E5] p-8" />
       </div>
       <div className="text-[#444] text-lg font-serif text-left w-full mb-6">
         Your complete Sol Chart reveals the intricate layers of your cosmic signature, timing, and evolutionary path.

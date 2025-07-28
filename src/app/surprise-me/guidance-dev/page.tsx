@@ -65,9 +65,9 @@ export default function GuidanceDevPage() {
                       {activity.description}
                     </div>
                     {activity.quote && (
-                      <div className="italic text-gray-700 text-sm">
-                        "{activity.quote}"
-                      </div>
+                                          <div className="italic text-gray-700 text-sm">
+                      &ldquo;{activity.quote}&rdquo;
+                    </div>
                     )}
                   </div>
                 </div>

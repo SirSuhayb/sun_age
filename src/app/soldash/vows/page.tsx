@@ -124,7 +124,7 @@ export default function VowsPage() {
                   <span className="font-mono text-xs text-blue-900">SOL {onChainPledge.pledgeNumber?.toString() || ''}</span>
                   <span className="font-mono text-xs text-blue-900 font-bold uppercase">COSMIC</span>
                 </div>
-                <div className="font-serif italic text-base text-blue-900 mb-2">"{onChainPledge.commitmentText}"</div>
+                <div className="font-serif italic text-base text-blue-900 mb-2">&ldquo;{onChainPledge.commitmentText}&rdquo;</div>
                 <div className="border border-green-200 bg-[#EFFDF4] rounded-none p-3 mt-2">
                   <div className="font-mono text-xs text-green-800 mb-1">EPOCH 0 - GENESIS</div>
                   <div className="font-mono text-xs text-green-800 mb-1">VOW ENERGY: ${Number(onChainPledge.usdcPaid) / 1e6}</div>
@@ -138,7 +138,7 @@ export default function VowsPage() {
                   <span className="font-mono text-xs text-blue-900">SOL {onChainPledgeV1.pledgeNumber?.toString() || ''}</span>
                   <span className="font-mono text-xs text-blue-900 font-bold uppercase">COSMIC</span>
                 </div>
-                <div className="font-serif italic text-base text-blue-900 mb-2">"{onChainPledgeV1.commitmentText}"</div>
+                <div className="font-serif italic text-base text-blue-900 mb-2">&ldquo;{onChainPledgeV1.commitmentText}&rdquo;</div>
                 <div className="border border-green-200 bg-[#EFFDF4] rounded-none p-3 mt-2">
                   <div className="font-mono text-xs text-green-800 mb-1">EPOCH 0 - GENESIS</div>
                   <div className="font-mono text-xs text-green-800 mb-1">VOW ENERGY: ${Number(onChainPledgeV1.usdcPaid) / 1e6}</div>

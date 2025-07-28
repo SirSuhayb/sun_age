@@ -51,10 +51,10 @@ export default function CosmicCodex() {
 
           {/* Callout & Description */}
           <div className="text-lg font-serif text-[#555] font-bold mb-3 text-left" style={{ letterSpacing: '-0.01em' }}>
-            The stars remember what you've forgotten.
+            The stars remember what you&apos;ve forgotten.
           </div>
           <div className="text-lg font-serif text-[#555] leading-tight text-left mb-8" style={{ letterSpacing: '-0.01em', maxWidth: 480 }}>
-            Every moment of your journey through time carries encoded wisdom—patterns that reveal not just where you've been, but where you're destined to go. The cosmos doesn't just witness your story; it holds the keys to unlock your future.
+            Every moment of your journey through time carries encoded wisdom—patterns that reveal not just where you&apos;ve been, but where you&apos;re destined to go. The cosmos doesn&apos;t just witness your story; it holds the keys to unlock your future.
           </div>
 
           {/* Coming Soon Button */}

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { getSunSign, getSolPhase, getSolarArchetype, solarArchetypeCoreQuotes, generateSolarIdentityDescription } from '../../lib/solarIdentity';
 
 interface Bookmark {
@@ -59,7 +60,7 @@ const SolProfilePreview: React.FC<SolProfilePreviewProps> = ({ bookmark }) => {
       {/* Header Row */}
       <div className="flex items-center justify-between gap-4">
         {sunSignSvg ? (
-          <img src={sunSignSvg} alt={sunSign} className="w-14 h-14 object-contain" style={{ borderRadius: 0 }} />
+          <Image src={sunSignSvg} alt={sunSign} width={56} height={56} className="w-14 h-14 object-contain" style={{ borderRadius: 0 }} />
         ) : (
           <div className="w-14 h-14" />
         )}
@@ -71,7 +72,7 @@ const SolProfilePreview: React.FC<SolProfilePreviewProps> = ({ bookmark }) => {
             {solArchetype || ''}
           </div>
         </div>
-        <img src={radiantSunSvg} alt="Radiant Sun" className="w-14 h-14 object-contain" style={{ borderRadius: 0 }} />
+        <Image src={radiantSunSvg} alt="Radiant Sun" width={56} height={56} className="w-14 h-14 object-contain" style={{ borderRadius: 0 }} />
       </div>
 
       {/* Subheader: Foundation & Depth */}
