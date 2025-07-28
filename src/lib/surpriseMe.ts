@@ -20,6 +20,8 @@ export interface DailyRoll {
   type: 'activity' | 'item' | 'experience';
   title: string;
   description: string;
+  quote?: string;
+  journalPrompt?: string;
   archetype: string;
   rarity: 'common' | 'rare' | 'legendary';
   icon: string;
@@ -29,6 +31,8 @@ export interface DailyRoll {
   difficulty?: 'easy' | 'medium' | 'hard';
   timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'anytime';
   actionableSteps: ActionableStep[];
+  freeItems?: string[];
+  nicheItems?: ActionableStep[];
 }
 
 export interface UserProfile {
@@ -59,6 +63,490 @@ export class SurpriseMeFramework {
 
   private initializeActivities() {
     this.activities = {
+      'Sol Innovator': [
+        // Common Activities (70% probability)
+        {
+          id: 'innovator-1',
+          type: 'activity',
+          title: 'Dawn Lightning Session',
+          description: 'Set your alarm for sunrise. Go outside for 20 minutes and capture every wild idea that comes to you. Your Sol Innovator frequency peaks when the earth tilts toward light.',
+          quote: 'At first light, tomorrow\'s secrets descend like cosmic downloads.',
+          journalPrompt: 'What impossible idea downloaded during your lightning session?',
+          archetype: 'Sol Innovator',
+          rarity: 'common',
+          icon: '⚡',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['morning', 'creativity', 'ideation'],
+          duration: '30 minutes',
+          difficulty: 'easy',
+          timeOfDay: 'morning',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Set alarm for 30 minutes before sunrise',
+              content: 'Set alarm for 30 minutes before sunrise'
+            },
+            {
+              type: 'prompt',
+              label: 'Go outside facing east with recording device',
+              content: 'Go outside facing east with recording device of your choice'
+            },
+            {
+              type: 'prompt',
+              label: 'Capture every idea for 20 minutes',
+              content: 'Capture every idea for 20 minutes—no editing allowed'
+            },
+            {
+              type: 'prompt',
+              label: 'Review and pick your favorite breakthrough',
+              content: 'Review and pick your favorite breakthrough'
+            },
+            {
+              type: 'link',
+              label: 'Headless Brands Research',
+              content: 'Explore how decentralized brands emerge and evolve without central control',
+              url: 'https://otherinter.net/research/headless-brands/'
+            }
+          ],
+          freeItems: [
+            'Voice memo app on your phone'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Teenage Engineering TP7 Field Recorder',
+              content: 'Professional audio recorder for capturing breakthrough ideas and interviews',
+              url: 'https://amzn.to/4nPXlbc',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/71wWHYYD4SL._AC_SX679_.jpg',
+              price: '$1,499',
+              category: 'tools'
+            },
+            {
+              type: 'product',
+              label: "The Innovator's Dilemma by Clayton Christensen",
+              content: 'Essential reading for innovators understanding disruption and breakthrough',
+              url: 'https://amzn.to/4lCnLfa',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/618BdBwK5ML._SY522_.jpg',
+              price: '$37.05',
+              category: 'books'
+            }
+          ]
+        },
+        {
+          id: 'innovator-2',
+          type: 'activity',
+          title: 'Reverse Archaeology',
+          description: 'Find something everyone says "will never work" and architect exactly how it could. Spend 2 hours building the impossible blueprint.',
+          quote: 'I excavate breakthrough from the ruins of \'never possible\'.',
+          journalPrompt: 'What "impossible" breakthrough did you architect? What resistance did you overcome?',
+          archetype: 'Sol Innovator',
+          rarity: 'common',
+          icon: '🏺',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['research', 'problem-solving', 'innovation'],
+          duration: '2 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'link',
+              label: 'Research failed inventions',
+              content: 'Research "failed" inventions on Reddit or tech forums',
+              url: 'https://www.reddit.com/r/technology/search/?q=failed%20inventions&restrict_sr=1&sort=new'
+            },
+            {
+              type: 'link',
+              label: 'Explore Google Patents',
+              content: 'Explore Google Patents for "failed" inventions from 1990-2010',
+              url: 'https://patents.google.com/'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose one that still excites you',
+              content: 'Choose one that still excites you'
+            },
+            {
+              type: 'prompt',
+              label: 'Sketch or wireframe how it could work',
+              content: 'Sketch or wireframe how it could actually work'
+            },
+            {
+              type: 'prompt',
+              label: 'Document your breakthrough path',
+              content: 'Document your breakthrough path'
+            }
+          ],
+          freeItems: [
+            'Wikipedia\'s "List of Hypothetical Technologies" page',
+            'Google Patents database and Internet Archive'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Rhodia Webnotebook A5 - French-made dot grid notebook',
+              content: 'French-made dot grid notebook for innovation journaling',
+              url: 'https://amzn.to/3UfJ8H3',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/71NJrY7ob4L._SY522_.jpg',
+              price: '$24.40',
+              category: 'tools'
+            },
+            {
+              type: 'product',
+              label: 'Leuchtturm1917 Bauhaus Edition Notebook',
+              content: 'Bauhaus Edition notebook for creative breakthroughs',
+              url: 'https://amzn.to/3Iv4vS9',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/51kk3zFKSQL._AC_SX679_.jpg',
+              price: '$25.46',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'innovator-3',
+          type: 'activity',
+          title: 'Micro-Disruption Lab',
+          description: 'Find one tiny inconvenience in your daily routine and engineer a micro-solution. Sometimes the smallest innovations create the biggest waves.',
+          quote: 'Small sparks ignite the greatest revolutions.',
+          journalPrompt: 'How did solving a tiny problem reveal a massive opportunity?',
+          archetype: 'Sol Innovator',
+          rarity: 'common',
+          icon: '🔧',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['problem-solving', 'prototyping', 'innovation'],
+          duration: '1 hour',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Document 5 daily micro-annoyances',
+              content: 'Document 5 daily micro-annoyances'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose the most solvable one',
+              content: 'Choose the most solvable one'
+            },
+            {
+              type: 'prompt',
+              label: 'Create a 10-minute solution prototype',
+              content: 'Create a 10-minute solution prototype'
+            },
+            {
+              type: 'prompt',
+              label: 'Test it for 24 hours',
+              content: 'Test it for 24 hours'
+            }
+          ],
+          freeItems: [
+            'Cardboard and tape for rapid prototyping'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Sugru Moldable Glue 8-pack',
+              content: 'Self-setting rubber for micro-innovation prototyping',
+              url: 'https://amzn.to/4kGQQog',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/71Vwdmn+OyL._SX522_.jpg',
+              price: '$26.35',
+              category: 'tools'
+            }
+          ]
+        },
+        // Rare Activities (25% probability)
+        {
+          id: 'innovator-4',
+          type: 'activity',
+          title: 'Innovation Constellation',
+          description: 'Convene 3 people from completely different fields around one problem none of you can solve alone. Meet outdoors under actual stars.',
+          quote: 'Lightning strikes twice when separate brilliances align under starlight.',
+          journalPrompt: 'How did different perspectives create breakthrough? What emerged from the collision of minds?',
+          archetype: 'Sol Innovator',
+          rarity: 'rare',
+          icon: '⭐',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['collaboration', 'networking', 'innovation'],
+          duration: '3 hours',
+          difficulty: 'hard',
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify one impossible problem',
+              content: 'Identify one impossible problem that excites you'
+            },
+            {
+              type: 'prompt',
+              label: 'Recruit diverse trio',
+              content: 'Recruit artist + engineer + philosopher (or equivalent diverse trio)'
+            },
+            {
+              type: 'prompt',
+              label: 'Meet outdoors under stars',
+              content: 'Meet outdoors where you can see actual constellations'
+            },
+            {
+              type: 'prompt',
+              label: 'Document the breakthrough',
+              content: 'Document the breakthrough that emerges from collision'
+            }
+          ],
+          freeItems: [
+            'Blanket + thermos for outdoor meetings'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Celestron SkyMaster 15x70 Binoculars',
+              content: 'Astronomy binoculars for stargazing and idea mapping',
+              url: 'https://amzn.to/44PXz9P',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/51OwHKeZOEL._AC_SX679_.jpg',
+              price: '$89',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'innovator-5',
+          type: 'activity',
+          title: 'Solar Prototype Racing',
+          description: 'Challenge another innovator to build competing prototypes of the same idea in 3 hours. Test with real users the same day.',
+          quote: 'Speed of light thinking requires speed of light building.',
+          journalPrompt: 'What did rapid prototyping reveal about your idea? How did competition change your thinking?',
+          archetype: 'Sol Innovator',
+          rarity: 'rare',
+          icon: '🏁',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['competition', 'prototyping', 'testing'],
+          duration: '3 hours',
+          difficulty: 'hard',
+          timeOfDay: 'afternoon',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Find your innovation rival',
+              content: 'Find your innovation rival through maker spaces or online'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose shared impossible idea',
+              content: 'Choose one shared "impossible" idea'
+            },
+            {
+              type: 'prompt',
+              label: 'Set 3-hour timer and build',
+              content: 'Set 3-hour timer and build competing prototypes'
+            },
+            {
+              type: 'prompt',
+              label: 'Test with real users',
+              content: 'Test both with 5 real users immediately'
+            }
+          ],
+          freeItems: [
+            'Cardboard, tape, and basic crafting supplies'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Instax Mini Link 2 Instant Printer',
+              content: 'Instant printer for rapid prototyping feedback',
+              url: 'https://amzn.to/3GMaIsr',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/717HaP3bttL._AC_SX679_.jpg',
+              price: '$149.95',
+              category: 'tools'
+            }
+          ]
+        },
+
+        // Legendary Activities (5% probability)
+        {
+          id: 'innovator-7',
+          type: 'activity',
+          title: 'Prometheus Protocol',
+          description: 'Identify a technology that only exists in sci-fi. Recruit a team of 5+ people to build a working prototype within 90 days. Document the entire journey.',
+          quote: 'I steal fire from the gods of impossibility and gift it to humanity.',
+          journalPrompt: 'What will you steal from the gods? How will you gift it to humanity?',
+          archetype: 'Sol Innovator',
+          rarity: 'legendary',
+          icon: '🔥',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['team-building', 'prototyping', 'documentation'],
+          duration: '90 days',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose sci-fi technology',
+              content: 'Choose sci-fi technology that excites you most'
+            },
+            {
+              type: 'prompt',
+              label: 'Recruit diverse team',
+              content: 'Recruit diverse team through YC network, university labs, maker spaces'
+            },
+            {
+              type: 'prompt',
+              label: 'Break into 90-day milestones',
+              content: 'Break impossible into 90-day milestones'
+            },
+            {
+              type: 'prompt',
+              label: 'Document every breakthrough',
+              content: 'Document every breakthrough and failure'
+            }
+          ],
+          freeItems: [
+            'Discord server for team coordination'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Make: Electronics',
+              content: 'Hands-on electronics book for innovators',
+              url: 'https://amzn.to/4m2qoqz',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/71v+rxNWFEL._SY522_.jpg',
+              price: '$19.29',
+              category: 'books'
+            },
+            {
+              type: 'product',
+              label: 'Vilros Raspberry Pi 4 Complete Starter Kit',
+              content: 'Raspberry Pi kit for rapid prototyping',
+              url: 'https://amzn.to/453vMUx',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/91BoSluMdjL._AC_SX679_.jpg',
+              price: '$117.99',
+              category: 'tools'
+            },
+            {
+              type: 'product',
+              label: 'FLASHFORGE Adventurer 5M 3D Printer',
+              content: '3D printer for building prototypes',
+              url: 'https://amzn.to/4lARt4h',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/71lL+5cwJLL._AC_SX679_.jpg',
+              price: '$259',
+              category: 'tools'
+            },
+            {
+              type: 'product',
+              label: 'Futuria: Art of the Sci-Fi Age',
+              content: 'Book on sci-fi art and future technology',
+              url: 'https://amzn.to/4kJt9fg',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: 'https://m.media-amazon.com/images/I/71+Rulg5SLL._SY522_.jpg',
+              price: '$34.78',
+              category: 'books'
+            }
+          ]
+        },
+        {
+          id: 'innovator-8',
+          type: 'activity',
+          title: 'Reality Distortion Field',
+          description: 'Choose one "impossible" idea and make it feel inevitable by documenting your conviction so powerfully that others start believing too. Use pure belief as your reality-bending tool.',
+          quote: 'I bend the laws of \'practical\' until impossible becomes inevitable.',
+          journalPrompt: 'How did documenting your conviction change others\' belief in the impossible? What happens when you refuse to accept "can\'t be done"?',
+          archetype: 'Sol Innovator',
+          rarity: 'legendary',
+          icon: '🌀',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['impossible', 'breakthrough', 'public'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose one impossible idea you genuinely believe could work',
+              content: 'Choose one impossible idea you genuinely believe could work'
+            },
+            {
+              type: 'prompt',
+              label: 'Create compelling documentation: write, video, or visual proof of concept',
+              content: 'Create compelling documentation: write, video, or visual proof of concept'
+            },
+            {
+              type: 'prompt',
+              label: 'Share with increasing conviction across different platforms/communities',
+              content: 'Share with increasing conviction across different platforms/communities'
+            },
+            {
+              type: 'prompt',
+              label: 'Track how your certainty influences others\' perception of possibility',
+              content: 'Track how your certainty influences others\' perception of possibility'
+            }
+          ],
+          freeItems: [
+            'Phone camera + social media platforms for documentation'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Screen Studio',
+              content: 'Video documentation tool that thought leaders use to make ideas feel inevitable',
+              url: 'https://screen.studio/',
+              productImage: '/api/placeholder/200/200',
+              price: '$96/year',
+              category: 'tools'
+            }
+          ]
+        }
+      ],
       'Sol Traveler': [
         // Common Activities
         {
@@ -285,345 +773,2770 @@ export class SurpriseMeFramework {
         }
       ],
       'Sol Sage': [
-        // Common Activities
+        // Common Activities (70% probability)
         {
-          id: 'sag-1',
+          id: 'sage-1',
           type: 'activity',
-          title: 'Seek Ancient Wisdom',
-          description: 'Read or listen to teachings from a philosopher, mystic, or wisdom tradition new to you. Take notes on key insights.',
+          title: 'Solstice Knowledge Quest',
+          description: 'Time your learning to cosmic events. Study ancient wisdom traditions during solstices, practical philosophy during equinoxes. Let celestial timing guide your curriculum.',
+          quote: 'I align my learning with the cosmic calendar of wisdom.',
+          journalPrompt: 'How did cosmic timing enhance your wisdom gathering?',
           archetype: 'Sol Sage',
           rarity: 'common',
-          icon: '📚',
-          color: 'bg-orange-100 border-orange-300',
-          tags: ['wisdom', 'learning', 'philosophy'],
-          duration: '45 minutes',
-          difficulty: 'medium',
-          timeOfDay: 'morning',
+          icon: '☀️',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['wisdom', 'cosmic', 'learning'],
+          duration: '2 hours',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
           actionableSteps: [
             {
-              type: 'link',
-              label: 'Buy: "Meditations" by Marcus Aurelius',
-              content: 'Timeless Stoic wisdom from a Roman Emperor',
-              url: 'https://amazon.com/dp/0486298043?tag=yourtag-20',
+              type: 'prompt',
+              label: 'Check next solstice/equinox date and meaning',
+              content: 'Check next solstice/equinox date and meaning'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose wisdom tradition that aligns with the season',
+              content: 'Choose wisdom tradition that aligns with the season'
+            },
+            {
+              type: 'prompt',
+              label: 'Study outside during the actual cosmic event',
+              content: 'Study outside during the actual cosmic event'
+            },
+            {
+              type: 'prompt',
+              label: 'Document insights that emerge from cosmic timing',
+              content: 'Document insights that emerge from cosmic timing'
+            }
+          ],
+          freeItems: [
+            'Access to sunrise/sunset times',
+            'Basic knowledge of solstices and equinoxes'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'The Old Farmer\'s Almanac Astronomy Calendar',
+              content: 'Charts celestial events that indigenous cultures used for wisdom timing',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
               affiliate: {
                 program: 'Amazon Associates',
                 commission: 'Up to 10%',
                 tracking: '24 hours'
               },
-              productImage: '/api/placeholder/200/250',
-              price: '$8.99',
+              productImage: '/api/placeholder/200/200',
+              price: '$12',
               category: 'books'
             },
             {
-              type: 'search',
-              label: 'Google Search: "Daily Stoic practices"',
-              content: 'daily stoic practices morning routine wisdom philosophy',
-              url: 'https://www.google.com/search?q=daily+stoic+practices+morning+routine+wisdom'
-            },
-            {
-              type: 'link',
-              label: 'Free: "Tao Te Ching" (Public Domain)',
-              content: 'Ancient Chinese philosophical text on natural harmony',
-              url: 'https://www.gutenberg.org/ebooks/216',
-              price: 'Free'
-            },
-            {
-              type: 'prompt',
-              label: 'Reflection Journal',
-              content: 'After reading, write down 3 insights that resonate with your current life situation. How can you apply this wisdom today?'
+              type: 'product',
+              label: 'The Art of Possibility by Rosamund Stone Zander',
+              content: 'Transformational book that wisdom seekers use to unlock new perspectives',
+              url: 'https://amazon.com/dp/0142001104?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$15',
+              category: 'books'
             }
           ]
         },
-        // Continue with other Sol Sage activities...
         {
-          id: 'sag-2',
-          type: 'experience',
-          title: 'Temple or Sacred Space Visit',
-          description: 'Visit a place of worship, meditation center, or natural sacred space to connect with deeper wisdom.',
-          archetype: 'Sol Sage',
-          rarity: 'rare',
-          icon: '🏛️',
-          color: 'bg-orange-100 border-orange-300',
-          tags: ['sacred', 'meditation', 'pilgrimage'],
-          duration: '2 hours',
-          difficulty: 'easy',
-          timeOfDay: 'morning',
-          actionableSteps: [
-            {
-              type: 'search',
-              label: 'Find Sacred Spaces Near You',
-              content: 'meditation centers temples sacred spaces near me spiritual retreats',
-              url: 'https://www.google.com/search?q=meditation+centers+temples+sacred+spaces+near+me'
-            },
-            {
-              type: 'booking',
-              label: 'Book Spiritual Experiences',
-              content: 'Find meditation retreats and spiritual tours worldwide',
-              url: 'https://www.viator.com/tours/Spiritual-Tours/d4-g6045?pid=yourtag',
-              affiliate: {
-                program: 'Viator',
-                commission: '8%',
-                tracking: '30 days'
-              },
-              category: 'experiences'
-            },
-            {
-              type: 'product',
-              label: 'Travel Meditation Cushion',
-              content: 'Portable meditation cushion for sacred space visits',
-              url: 'https://www.amazon.com/dp/B07MXZQXJH?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 8%',
-                tracking: '24 hours'
-              },
-              productImage: '/api/placeholder/200/250',
-              price: '$39.99',
-              category: 'gear'
-            }
-          ]
-        }
-      ],
-      'Sol Innovator': [
-        // Common Activities
-        {
-          id: 'inn-1',
+          id: 'sage-2',
           type: 'activity',
-          title: 'Prototype Something New',
-          description: 'Spend 30 minutes creating a rough prototype or sketch of an idea that excites you.',
-          archetype: 'Sol Innovator',
+          title: 'Intergenerational Wisdom Bridge',
+          description: 'Find someone 20+ years older who\'s lived something you\'re facing. Extract their wisdom, then teach something you know to someone 20+ years younger.',
+          quote: 'I bridge time by honoring both ancient wisdom and future possibility.',
+          journalPrompt: 'What wisdom crossed generational lines? How did the exchange change your perspective?',
+          archetype: 'Sol Sage',
           rarity: 'common',
-          icon: '🔧',
-          color: 'bg-blue-100 border-blue-300',
-          tags: ['creation', 'innovation', 'prototype'],
-          duration: '30 minutes',
-          difficulty: 'easy',
-          timeOfDay: 'afternoon',
+          icon: '🌉',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['wisdom', 'generations', 'teaching'],
+          duration: '1 hour',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
           actionableSteps: [
             {
-              type: 'link',
-              label: 'Free: Design with Figma',
-              content: 'Professional design tool with free tier',
-              url: 'https://www.figma.com/pricing/?pid=yourtag',
-              affiliate: {
-                program: 'Figma',
-                commission: 'Referral program',
-                tracking: 'Varies'
-              }
-            },
-            {
-              type: 'product',
-              label: 'Moleskine Sketchbook',
-              content: 'High-quality sketching notebook for innovators',
-              url: 'https://www.amazon.com/dp/B00AZZY8LG?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 8%',
-                tracking: '24 hours'
-              },
-              productImage: '/api/placeholder/200/250',
-              price: '$18.95',
-              category: 'tools'
-            },
-            {
-              type: 'search',
-              label: 'Google Search: "Rapid prototyping techniques"',
-              content: 'rapid prototyping techniques design thinking innovation methods',
-              url: 'https://www.google.com/search?q=rapid+prototyping+techniques+design+thinking'
+              type: 'prompt',
+              label: 'Identify current life challenge or decision',
+              content: 'Identify current life challenge or decision'
             },
             {
               type: 'prompt',
-              label: 'Innovation Framework',
-              content: 'Use the "How Might We..." framework. Pick a problem you\'ve noticed today and ask: "How might we solve this in a completely new way?"'
+              label: 'Find elder who navigated similar experience',
+              content: 'Find elder who navigated similar experience'
+            },
+            {
+              type: 'prompt',
+              label: 'Conduct wisdom extraction interview',
+              content: 'Conduct wisdom extraction interview'
+            },
+            {
+              type: 'prompt',
+              label: 'Find younger person to teach your knowledge to',
+              content: 'Find younger person to teach your knowledge to'
+            }
+          ],
+          freeItems: [
+            'Access to different age groups (family, neighbors, coworkers)',
+            'Open mind for wisdom exchange'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Rocketbook Flip',
+              content: 'Reversible notebook where one side captures wisdom received, other side records wisdom given',
+              url: 'https://amazon.com/dp/B07DGR98VQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$34',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'sage-3',
+          type: 'activity',
+          title: 'Question Everything Audit',
+          description: 'Choose one belief you\'ve held for years and question it from multiple perspectives. Research it like a detective seeking truth, not confirmation.',
+          quote: 'I seek truth beyond the comfort of my own assumptions.',
+          journalPrompt: 'What belief did you question? How did it change your understanding?',
+          archetype: 'Sol Sage',
+          rarity: 'common',
+          icon: '🔍',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['questioning', 'research', 'truth'],
+          duration: '2 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'List 5 beliefs you\'ve never questioned',
+              content: 'List 5 beliefs you\'ve never questioned'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose the most foundational one',
+              content: 'Choose the most foundational one'
+            },
+            {
+              type: 'prompt',
+              label: 'Research opposing viewpoints with genuine curiosity',
+              content: 'Research opposing viewpoints with genuine curiosity'
+            },
+            {
+              type: 'prompt',
+              label: 'Document how your understanding evolved',
+              content: 'Document how your understanding evolved'
+            }
+          ],
+          freeItems: [
+            'Internet access for research',
+            'Open mind for challenging assumptions'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Devil\'s Advocate: A Handbook of Chatbot Prompts',
+              content: 'Curated questions that philosophers use to challenge their own assumptions',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$19',
+              category: 'books'
+            }
+          ]
+        },
+        // Rare Activities (25% probability)
+        {
+          id: 'sage-4',
+          type: 'activity',
+          title: 'Philosophy Fight Club',
+          description: 'Organize monthly debates where participants must argue for positions they personally disagree with. Rotate topics monthly based on lunar cycles.',
+          quote: 'I find wisdom in the collision of opposing truths.',
+          journalPrompt: 'How did arguing against your beliefs change your perspective?',
+          archetype: 'Sol Sage',
+          rarity: 'rare',
+          icon: '🥊',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['debate', 'philosophy', 'community'],
+          duration: '2 hours',
+          difficulty: 'hard',
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Recruit 6-8 diverse thinkers from different backgrounds',
+              content: 'Recruit 6-8 diverse thinkers from different backgrounds'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose controversial topic with clear opposing sides',
+              content: 'Choose controversial topic with clear opposing sides'
+            },
+            {
+              type: 'prompt',
+              label: 'Assign people to argue against their personal beliefs',
+              content: 'Assign people to argue against their personal beliefs'
+            },
+            {
+              type: 'prompt',
+              label: 'Meet outdoors where ideas can breathe freely',
+              content: 'Meet outdoors where ideas can breathe freely'
+            }
+          ],
+          freeItems: [
+            'Outdoor meeting space',
+            'Diverse group of thinkers'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Tibetan Singing Bowl 7-inch',
+              content: 'Sacred sound instrument that debate moderators use to maintain respectful discourse',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$67',
+              category: 'tools'
+            },
+            {
+              type: 'product',
+              label: 'The Republic by Plato',
+              content: 'Foundational philosophy text that wisdom seekers study for timeless insights',
+              url: 'https://amazon.com/dp/0872201368?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$12',
+              category: 'books'
+            }
+          ]
+        },
+        {
+          id: 'sage-5',
+          type: 'activity',
+          title: 'Wisdom Mapping Expedition',
+          description: 'Create a physical map of your knowledge gaps. Use different colored pins for different types of wisdom you seek. Plan expeditions to fill each gap.',
+          quote: 'I chart the unknown territories of my own understanding.',
+          journalPrompt: 'What knowledge gaps did you discover? How will you navigate to fill them?',
+          archetype: 'Sol Sage',
+          rarity: 'common',
+          icon: '🗺️',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['mapping', 'knowledge', 'planning'],
+          duration: '3 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'List 10 areas where you feel knowledge gaps exist',
+              content: 'List 10 areas where you feel knowledge gaps exist'
+            },
+            {
+              type: 'prompt',
+              label: 'Categorize gaps by type: practical, philosophical, creative, technical',
+              content: 'Categorize gaps by type: practical, philosophical, creative, technical'
+            },
+            {
+              type: 'prompt',
+              label: 'For each gap, identify 3 specific resources or people who could help',
+              content: 'For each gap, identify 3 specific resources or people who could help'
+            }
+          ],
+          freeItems: [
+            'Large paper or whiteboard for mapping',
+            'Colored markers or pins',
+            'Research tools (internet, library access)'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Mind Mapping Notebook',
+              content: 'Specialized notebook for wisdom mapping with guided prompts',
+              url: 'https://amazon.com/dp/B08N5WRWNW?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$18',
+              category: 'books'
+            },
+            {
+              type: 'product',
+              label: 'Knowledge Gap Analysis Template',
+              content: 'Digital template to systematically identify and plan knowledge acquisition',
+              url: 'https://amazon.com/dp/B09KQZQZQZ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$12',
+              category: 'books'
+            }
+          ]
+        },
+        {
+          id: 'sage-6',
+          type: 'activity',
+          title: 'Wisdom Keeper Interview Project',
+          description: 'Find 3 people whose knowledge is at risk of being lost (elders, craftspeople, immigrants). Record their stories and wisdom for future generations.',
+          quote: 'I preserve wisdom that would otherwise fade into silence.',
+          journalPrompt: 'What wisdom did you capture? How did their stories change your understanding?',
+          archetype: 'Sol Sage',
+          rarity: 'rare',
+          icon: '📝',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['preservation', 'interviews', 'wisdom'],
+          duration: '3 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify local wisdom keepers',
+              content: 'Identify local wisdom keepers (barbers, librarians, immigrants, elders)'
+            },
+            {
+              type: 'prompt',
+              label: 'Request permission to record their stories',
+              content: 'Request permission to record their stories'
+            },
+            {
+              type: 'prompt',
+              label: 'Ask about wisdom they wish younger generations knew',
+              content: 'Ask about wisdom they wish younger generations knew'
+            },
+            {
+              type: 'prompt',
+              label: 'Create archive of their knowledge',
+              content: 'Create archive of their knowledge'
+            }
+          ],
+          freeItems: [
+            'Recording device (phone works)',
+            'Notebook for notes',
+            'Respectful approach and genuine curiosity'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Sanken COS-11D Lavalier Microphone',
+              content: 'Professional interview microphone that oral historians use to capture subtle vocal nuances',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$389',
+              category: 'tools'
+            }
+          ]
+        },
+        // Legendary Activities (5% probability)
+        {
+          id: 'sage-7',
+          type: 'activity',
+          title: 'Paradox Investigation Bureau',
+          description: 'Collect life paradoxes (like "you must spend money to save money") and investigate why they exist. Create a database of life\'s beautiful contradictions.',
+          quote: 'I find wisdom in the spaces between opposing truths.',
+          journalPrompt: 'What paradoxes did you discover? How did investigating contradictions reveal deeper wisdom?',
+          archetype: 'Sol Sage',
+          rarity: 'rare',
+          icon: '🔄',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['paradox', 'investigation', 'wisdom'],
+          duration: '2 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Collect 20+ paradoxes from different life areas',
+              content: 'Collect 20+ paradoxes from different life areas'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose 3 that genuinely puzzle you',
+              content: 'Choose 3 that genuinely puzzle you'
+            },
+            {
+              type: 'prompt',
+              label: 'Research why these contradictions exist',
+              content: 'Research why these contradictions exist'
+            },
+            {
+              type: 'prompt',
+              label: 'Document the deeper truths they reveal',
+              content: 'Document the deeper truths they reveal'
+            }
+          ],
+          freeItems: [
+            'Notebook for paradox collection',
+            'Research tools (internet, library)',
+            'Curiosity and open mind'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Field Notes Pitch Black Notebook 3-Pack',
+              content: 'Notebooks that counterintuitive thinkers use to capture contradictions',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$12',
+              category: 'books'
+            }
+          ]
+        },
+        {
+          id: 'sage-8',
+          type: 'activity',
+          title: 'Living Library Architect',
+          description: 'Create a "Human Library" where people check out conversations with living books - experts whose knowledge is at risk of being lost. Organize quarterly community events.',
+          quote: 'I build bridges between wisdom seekers and wisdom keepers.',
+          journalPrompt: 'How did creating a living library change your community? What wisdom was preserved?',
+          archetype: 'Sol Sage',
+          rarity: 'legendary',
+          icon: '📚',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['library', 'community', 'wisdom'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Partner with libraries, universities, senior centers',
+              content: 'Partner with libraries, universities, senior centers'
+            },
+            {
+              type: 'prompt',
+              label: 'Recruit "human books" with endangered knowledge',
+              content: 'Recruit "human books" with endangered knowledge'
+            },
+            {
+              type: 'prompt',
+              label: 'Train them in conversation skills and story structure',
+              content: 'Train them in conversation skills and story structure'
+            },
+            {
+              type: 'prompt',
+              label: 'Host quarterly events where people "check out" wisdom',
+              content: 'Host quarterly events where people "check out" wisdom'
+            }
+          ],
+          freeItems: [
+            'Community spaces (libraries, community centers)',
+            'Volunteer network',
+            'Event planning skills'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Rode Wireless GO II Dual-Channel System',
+              content: 'Wireless mic system that human libraries use to amplify whispered wisdom',
+              url: 'https://amazon.com/dp/B08N5WRWNW?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$299',
+              category: 'tools'
             }
           ]
         }
       ],
       'Sol Artist': [
-        // Common Activities  
+        // Common Activities (70% probability)
         {
-          id: 'art-1',
+          id: 'artist-1',
           type: 'activity',
-          title: 'Create Beauty',
-          description: 'Make something beautiful today - a drawing, photo, poem, or any creative expression that moves you.',
+          title: 'Golden Hour Alchemy',
+          description: 'During golden hour, find the ugliest thing in your vicinity and reveal its hidden beauty through light, angle, or framing. Transform what others overlook.',
+          quote: 'I reveal beauty hidden in the shadows of the overlooked.',
+          journalPrompt: 'What hidden beauty did you discover? How did perspective change everything?',
+          archetype: 'Sol Artist',
+          rarity: 'common',
+          icon: '🌅',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['photography', 'beauty', 'transformation'],
+          duration: '1 hour',
+          difficulty: 'easy',
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Check golden hour timing',
+              content: 'Check golden hour timing (1 hour before sunset)'
+            },
+            {
+              type: 'prompt',
+              label: 'Find the ugliest object',
+              content: 'Find the ugliest object, building, or space near you'
+            },
+            {
+              type: 'prompt',
+              label: 'Use natural light and creative angles',
+              content: 'Use natural light and creative angles to reveal beauty'
+            },
+            {
+              type: 'prompt',
+              label: 'Document the transformation',
+              content: 'Document the transformation'
+            }
+          ],
+          freeItems: [
+            'Camera or phone',
+            'Golden hour timing app'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Westcott Flex 5-in-1 Reflector',
+              content: 'Collapsible light reflector that street photographers use to bend harsh light into silk',
+              url: 'https://amazon.com/dp/B002ZIMEMW?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$31',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'artist-2',
+          type: 'activity',
+          title: 'Cosmic Color Alchemy',
+          description: 'Choose one color that represents your current emotional state. Create art using only that color in 50 different shades. Let the color tell your story.',
+          quote: 'I paint my soul\'s journey through the language of light.',
+          journalPrompt: 'What story did your chosen color reveal? How did working with one color change your perspective?',
           archetype: 'Sol Artist',
           rarity: 'common',
           icon: '🎨',
           color: 'bg-purple-100 border-purple-300',
-          tags: ['creativity', 'beauty', 'expression'],
-          duration: '1 hour',
+          tags: ['color', 'emotion', 'art'],
+          duration: '2 hours',
           difficulty: 'easy',
-          timeOfDay: 'afternoon',
+          timeOfDay: 'anytime',
           actionableSteps: [
             {
-              type: 'product',
-              label: 'Professional Art Supplies',
-              content: 'High-quality art materials for creative expression',
-              url: 'https://www.amazon.com/dp/B07QXHZQZV?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 8%',
-                tracking: '24 hours'
-              },
-              productImage: '/api/placeholder/200/250',
-              price: '$49.99',
-              category: 'tools'
-            },
-            {
-              type: 'search',
-              label: 'Google Search: "Daily art prompts"',
-              content: 'daily art prompts creative exercises inspiration drawing ideas',
-              url: 'https://www.google.com/search?q=daily+art+prompts+creative+exercises+inspiration'
-            },
-            {
-              type: 'link',
-              label: 'Free: Adobe Creative Cloud Trial',
-              content: 'Professional creative software suite',
-              url: 'https://www.adobe.com/creativecloud/free-trial.html?pid=yourtag',
-              affiliate: {
-                program: 'Adobe',
-                commission: 'Varies',
-                tracking: '30 days'
-              },
-              price: 'Free trial'
+              type: 'prompt',
+              label: 'Choose one color that represents your current emotional state',
+              content: 'Choose one color that represents your current emotional state'
             },
             {
               type: 'prompt',
-              label: 'Creative Challenge',
-              content: 'Set a timer for 15 minutes and create something without stopping to judge or edit. Focus on the pure joy of creation.'
+              label: 'Create 50 different shades of that color',
+              content: 'Create 50 different shades of that color using any medium'
+            },
+            {
+              type: 'prompt',
+              label: 'Use only those shades to create art',
+              content: 'Use only those shades to create art that tells your story'
+            }
+          ],
+          freeItems: [
+            'Any art supplies you have',
+            'Paper or canvas',
+            'Your emotional awareness'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Professional Color Wheel',
+              content: 'Professional color wheel for artists to explore color relationships',
+              url: 'https://amazon.com/dp/B08N5WRWNW?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$15',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'artist-3',
+          type: 'activity',
+          title: 'Synesthetic Jam Session',
+          description: 'Create art that blends two senses - paint what music looks like, compose what sunset sounds like, or sculpt what wind feels like.',
+          quote: 'I translate the language of one sense into the poetry of another.',
+          journalPrompt: 'What did you discover about the relationship between senses? How did synesthesia change your art?',
+          archetype: 'Sol Artist',
+          rarity: 'common',
+          icon: '🎶',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['art', 'music', 'senses'],
+          duration: '1 hour',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose two senses to blend',
+              content: 'Choose two senses to blend (sight + sound, touch + taste, etc.)'
+            },
+            {
+              type: 'prompt',
+              label: 'Record or experience your chosen sensory input',
+              content: 'Record or experience your chosen sensory input'
+            },
+            {
+              type: 'prompt',
+              label: 'Translate it into a different sensory medium',
+              content: 'Translate it into a different sensory medium'
+            },
+            {
+              type: 'prompt',
+              label: 'Create art that captures the crossover',
+              content: 'Create art that captures the crossover'
+            }
+          ],
+          freeItems: [
+            'Any art supplies you have',
+            'Recording device (phone works)',
+            'Your senses and imagination'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Korg Volca Keys',
+              content: 'Analog synthesizer that lets you paint sounds and compose with color frequencies',
+              url: 'https://amazon.com/dp/B00HH62VB6?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$149',
+              category: 'tools'
+            }
+          ]
+        },
+        // Rare Activities (25% probability)
+        {
+          id: 'artist-4',
+          type: 'activity',
+          title: 'Beauty Intervention Squad',
+          description: 'Assemble 3-5 other artists for a coordinated beauty intervention in a neglected public space. Leave it transformed but don\'t get arrested.',
+          archetype: 'Sol Artist',
+          rarity: 'rare',
+          icon: '🧑‍🎨',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['public art', 'community', 'beauty'],
+          duration: '2 hours',
+          difficulty: 'medium',
+          timeOfDay: 'afternoon',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Scout neglected public spaces',
+              content: 'Scout neglected public spaces that need beauty'
+            },
+            {
+              type: 'prompt',
+              label: 'Recruit 3-5 local artists',
+              content: 'Recruit 3-5 local artists through Instagram or community boards'
+            },
+            {
+              type: 'prompt',
+              label: 'Plan temporary (legal) transformation',
+              content: 'Plan temporary (legal) transformation using removable materials'
+            },
+            {
+              type: 'prompt',
+              label: 'Document before/after and community reactions',
+              content: 'Document before/after and community reactions'
+            },
+            {
+              type: 'product',
+              label: 'Montana Chalk Spray Paint',
+              content: 'Temporary street art medium that disappears with rain but photographs beautifully',
+              url: 'https://amazon.com/dp/B00K6QFQ1A?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$8/can',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'artist-5',
+          type: 'activity',
+          title: 'Imperfection Celebration',
+          description: 'Create art that intentionally celebrates flaws, mistakes, and imperfections. Turn "errors" into the most beautiful parts of your work.',
+          quote: 'I find beauty in the cracks where light gets in.',
+          journalPrompt: 'What imperfections did you celebrate? How did embracing flaws change your creative process?',
+          archetype: 'Sol Artist',
+          rarity: 'common',
+          icon: '✨',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['imperfection', 'beauty', 'art'],
+          duration: '1 hour',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Start with a "perfect" piece of art',
+              content: 'Start with a "perfect" piece of art'
+            },
+            {
+              type: 'prompt',
+              label: 'Intentionally add "mistakes"',
+              content: 'Intentionally add "mistakes" or imperfections'
+            },
+            {
+              type: 'prompt',
+              label: 'Make those imperfections the focal point',
+              content: 'Make those imperfections the focal point of your art'
+            }
+          ],
+          freeItems: [
+            'Any art supplies you have',
+            'Willingness to make "mistakes"',
+            'Open mind about beauty'
+          ]
+        },
+        {
+          id: 'artist-6',
+          type: 'activity',
+          title: 'Empathy Canvas Project',
+          description: 'Interview 5 people about the same emotional experience. Create a collaborative art piece that reveals the universal pattern underneath their unique stories.',
+          quote: 'I paint the invisible threads that connect all human hearts.',
+          journalPrompt: 'What universal patterns did you discover? How did empathy change your art?',
+          archetype: 'Sol Artist',
+          rarity: 'rare',
+          icon: '🖌️',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['empathy', 'collaboration', 'art'],
+          duration: '3 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose one universal emotion',
+              content: 'Choose one universal emotion (heartbreak, joy, fear, wonder)'
+            },
+            {
+              type: 'prompt',
+              label: 'Interview 5 diverse people',
+              content: 'Interview 5 diverse people about their experience with it'
+            },
+            {
+              type: 'prompt',
+              label: 'Find the common threads and unique expressions',
+              content: 'Find the common threads and unique expressions'
+            },
+            {
+              type: 'prompt',
+              label: 'Create art that shows both unity and diversity',
+              content: 'Create art that shows both unity and diversity'
+            }
+          ],
+          freeItems: [
+            'Interview skills and empathy',
+            'Recording device (phone works)',
+            'Art supplies for collaborative piece',
+            'Open heart and listening skills'
+          ]
+        },
+        {
+          id: 'artist-7',
+          type: 'activity',
+          title: 'Temporal Beauty Mapping',
+          description: 'Document how beauty changes throughout one day. Create art that captures the evolution of light, mood, and aesthetic from dawn to dusk.',
+          quote: 'I capture the fleeting moments of beauty that dance across time.',
+          journalPrompt: 'How did beauty transform throughout the day? What patterns did you discover in temporal aesthetics?',
+          archetype: 'Sol Artist',
+          rarity: 'rare',
+          icon: '⏰',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['time', 'beauty', 'observation'],
+          duration: '1 day',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose one location to observe',
+              content: 'Choose one location to observe throughout the day'
+            },
+            {
+              type: 'prompt',
+              label: 'Document beauty at 6 different times',
+              content: 'Document beauty at 6 different times (dawn, morning, noon, afternoon, dusk, night)'
+            },
+            {
+              type: 'prompt',
+              label: 'Create art that shows the evolution',
+              content: 'Create art that shows the evolution of beauty over time'
+            }
+          ],
+          freeItems: [
+            'Camera or phone for documentation',
+            'Notebook for observations',
+            'Art supplies for final piece',
+            'Patience to observe throughout the day'
+          ]
+        },
+        // Legendary Activities (5% probability)
+        {
+          id: 'artist-7',
+          type: 'activity',
+          title: 'Living Mandala Ceremony',
+          description: 'Design and direct 50+ people in creating a temporary living mandala that can only be seen from above. Document its creation and natural dissolution.',
+          archetype: 'Sol Artist',
+          rarity: 'legendary',
+          icon: '🌀',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['community', 'ceremony', 'art'],
+          duration: '1 day',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Design mandala pattern',
+              content: 'Design mandala pattern that works with 50+ people'
+            },
+            {
+              type: 'prompt',
+              label: 'Coordinate through community centers, yoga studios, art collectives',
+              content: 'Coordinate through community centers, yoga studios, art collectives'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose location where pattern harmonizes with landscape',
+              content: 'Choose location where pattern harmonizes with landscape'
+            },
+            {
+              type: 'prompt',
+              label: 'Document from above as it forms and dissolves',
+              content: 'Document from above as it forms and dissolves'
+            },
+            {
+              type: 'product',
+              label: 'DJI Mini 3 Drone',
+              content: 'Compact drone that captures the cosmic perspective of human art formations',
+              url: 'https://amazon.com/dp/B0B5N8L6Z2?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$489',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'artist-8',
+          type: 'activity',
+          title: 'Transgenerational Art Bridge',
+          description: 'Design an art project that requires collaboration between people who are 50+ years apart in age. Create something that bridges generational divides through shared creativity.',
+          quote: 'I dance with the muse of unexpected partnerships.',
+          journalPrompt: 'How did collaboration with a different discipline change your art? What cosmic synchronicity emerged?',
+          archetype: 'Sol Artist',
+          rarity: 'legendary',
+          icon: '🌟',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['collaboration', 'synchronicity', 'art'],
+          duration: '4 hours',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Find someone from a different creative discipline',
+              content: 'Find someone from a different creative discipline (musician, dancer, writer, etc.)'
+            },
+            {
+              type: 'prompt',
+              label: 'Share your creative processes with each other',
+              content: 'Share your creative processes with each other'
+            },
+            {
+              type: 'prompt',
+              label: 'Create art that blends both disciplines',
+              content: 'Create art that blends both disciplines in unexpected ways'
+            },
+            {
+              type: 'prompt',
+              label: 'Let cosmic synchronicity guide your choices',
+              content: 'Let cosmic synchronicity guide your choices throughout the process'
+            }
+          ],
+          freeItems: [
+            'Open mind and willingness to collaborate',
+            'Art supplies for both disciplines',
+            'Space for creative experimentation',
+            'Trust in the creative process'
+          ]
+        },
+        {
+          id: 'artist-4',
+          type: 'activity',
+          title: 'Emotional Archaeology',
+          description: 'Dig through old photos, letters, or memories to find a forgotten emotion. Create art that resurrects and honors that feeling.',
+          quote: 'I excavate the buried treasures of my heart.',
+          journalPrompt: 'What forgotten emotion did you discover? How did resurrecting it change your art?',
+          archetype: 'Sol Artist',
+          rarity: 'common',
+          icon: '🖼️',
+          color: 'bg-purple-100 border-purple-300',
+          tags: ['emotion', 'memory', 'art'],
+          duration: '1 hour',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Browse old photos/letters/journals',
+              content: 'Browse old photos/letters/journals for emotional artifacts'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose one forgotten feeling',
+              content: 'Choose one forgotten feeling that still moves you'
+            },
+            {
+              type: 'prompt',
+              label: 'Create art that embodies that emotion',
+              content: 'Create art that embodies that exact emotion'
+            },
+            {
+              type: 'prompt',
+              label: 'Share with someone who knew you during that time',
+              content: 'Share with someone who knew you during that time'
+            }
+          ],
+          freeItems: [
+            'Old photos, letters, or journals',
+            'Art supplies',
+            'Emotional courage'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Prismacolor Premier Soft Core Colored Pencils',
+              content: 'Wax-based pencils that professional illustrators use for emotional depth',
+              url: 'https://amazon.com/dp/B00006IEEU?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$47',
+              category: 'tools'
             }
           ]
         }
       ],
       'Sol Builder': [
-        // Common Activities
+        // Common Activities (70% probability)
         {
-          id: 'bui-1',
+          id: 'builder-1',
           type: 'activity',
-          title: 'Build Your Foundation',
-          description: 'Strengthen one area of your life infrastructure - health, finances, relationships, or skills.',
+          title: 'Dawn Foundation Ritual',
+          description: 'Every sunrise for 30 days, spend 15 minutes strengthening one foundational area. Track which sunrise energy builds which foundation best.',
+          quote: 'I build lasting foundations with the energy of first light.',
+          journalPrompt: 'Which foundation did you strengthen? How did sunrise energy enhance your building?',
           archetype: 'Sol Builder',
           rarity: 'common',
-          icon: '🏗️',
+          icon: '🌅',
           color: 'bg-yellow-100 border-yellow-300',
-          tags: ['foundation', 'stability', 'growth'],
-          duration: '1 hour',
+          tags: ['foundation', 'ritual', 'building'],
+          duration: '30 days',
           difficulty: 'medium',
           timeOfDay: 'morning',
           actionableSteps: [
             {
-              type: 'search',
-              label: 'Google Search: "Foundation building habits"',
-              content: 'foundation building habits life infrastructure personal development',
-              url: 'https://www.google.com/search?q=foundation+building+habits+life+infrastructure'
+              type: 'prompt',
+              label: 'Choose one foundation area',
+              content: 'Choose one foundation area: health, finances, relationships, or skills'
             },
             {
-              type: 'link',
-              label: 'Buy: "Atomic Habits" by James Clear',
-              content: 'The definitive guide to building good habits',
-              url: 'https://amazon.com/dp/0735211299?tag=yourtag-20',
+              type: 'prompt',
+              label: 'Set sunrise alarm for 30 consecutive days',
+              content: 'Set sunrise alarm for 30 consecutive days'
+            },
+            {
+              type: 'prompt',
+              label: 'Face east during your 15-minute foundation work',
+              content: 'Face east during your 15-minute foundation work'
+            },
+            {
+              type: 'prompt',
+              label: 'Track which sunrise conditions enhance your building energy',
+              content: 'Track which sunrise conditions enhance your building energy'
+            }
+          ],
+          freeItems: [
+            'Sunrise alarm',
+            'East-facing space'
+          ],
+          nicheItems: [
+            {
+              type: 'product',
+              label: 'Himalayan Salt Lamp with Timer',
+              content: 'Natural light therapy that circadian rhythm researchers use to regulate building energy',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
               affiliate: {
                 program: 'Amazon Associates',
                 commission: 'Up to 10%',
                 tracking: '24 hours'
               },
-              productImage: '/api/placeholder/200/250',
-              price: '$14.99',
-              category: 'books'
+              productImage: '/api/placeholder/200/200',
+              price: '$34',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'builder-2',
+          type: 'activity',
+          title: 'Legacy Blueprint Design',
+          description: 'Design a project that will outlive you by 100 years. Create detailed blueprints for something that future generations will thank you for building.',
+          quote: 'I build foundations that will shelter generations yet unborn.',
+          journalPrompt: 'What legacy project did you design? How did thinking 100 years ahead change your building approach?',
+          archetype: 'Sol Builder',
+          rarity: 'common',
+          icon: '🏗️',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['legacy', 'planning', 'building'],
+          duration: '3 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose a project that could last 100 years',
+              content: 'Choose a project that could last 100 years (community garden, library, art installation)'
             },
             {
               type: 'prompt',
-              label: 'Foundation Assessment',
-              content: 'Rate these areas 1-10: Health, Finances, Relationships, Skills, Home Environment. Pick your lowest score and take one small action to improve it today.'
+              label: 'Design detailed blueprints',
+              content: 'Design detailed blueprints with materials that will last'
+            },
+            {
+              type: 'prompt',
+              label: 'Consider how future generations will use it',
+              content: 'Consider how future generations will use and maintain it'
             }
+          ],
+          freeItems: [
+            'Paper and drawing supplies',
+            'Research on long-lasting materials',
+            'Imagination for future scenarios',
+            'Community input and feedback'
+          ]
+        },
+        {
+          id: 'builder-3',
+          type: 'activity',
+          title: 'Legacy Seed Planting',
+          description: 'Start something designed to outlast you by decades. Plant actual trees, start educational funds, create institutions, or build lasting infrastructure.',
+          quote: 'I plant seeds today that will grow into forests for tomorrow.',
+          journalPrompt: 'What legacy project did you start? How did thinking beyond your lifetime change your perspective?',
+          archetype: 'Sol Builder',
+          rarity: 'common',
+          icon: '🌱',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['legacy', 'planting', 'future'],
+          duration: '1 day',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Research what your community will need in 50 years',
+              content: 'Research what your community will need in 50 years'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose one legacy project that excites you',
+              content: 'Choose one legacy project that excites you'
+            },
+            {
+              type: 'prompt',
+              label: 'Take the first concrete action today',
+              content: 'Take the first concrete action today'
+            },
+            {
+              type: 'prompt',
+              label: 'Involve younger people in the planning process',
+              content: 'Involve younger people in the planning process'
+            }
+          ],
+          freeItems: [
+            'Research tools (internet, library)',
+            'Community connections',
+            'Long-term thinking mindset',
+            'Willingness to start small'
+          ]
+        },
+        // Rare Activities (25% probability)
+        {
+          id: 'builder-4',
+          type: 'activity',
+          title: 'System Architecture Audit',
+          description: 'Identify one chaotic area of your life and build a system that runs automatically. Focus on systems that improve with use, not just organization.',
+          quote: 'I architect order from chaos, one system at a time.',
+          journalPrompt: 'What system did you build? How did creating automatic order change your daily life?',
+          archetype: 'Sol Builder',
+          rarity: 'common',
+          icon: '🏗️',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['systems', 'organization', 'automation'],
+          duration: '2 weeks',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'List 5 areas of life that feel chaotic or inefficient',
+              content: 'List 5 areas of life that feel chaotic or inefficient'
+            },
+            {
+              type: 'prompt',
+              label: 'Choose one with the highest daily impact',
+              content: 'Choose one with the highest daily impact'
+            },
+            {
+              type: 'prompt',
+              label: 'Design system that runs without your constant attention',
+              content: 'Design system that runs without your constant attention'
+            },
+            {
+              type: 'prompt',
+              label: 'Test and refine for 2 weeks',
+              content: 'Test and refine for 2 weeks'
+            }
+          ],
+          freeItems: [
+            'Notebook for system design',
+            'Patience to test and refine',
+            'Willingness to experiment',
+            'Focus on one area at a time'
+          ]
+        },
+        {
+          id: 'builder-5',
+          type: 'activity',
+          title: 'Apprentice Master Program',
+          description: 'Design a formal apprenticeship to transfer your core skill to 3 people over 6 months. Include graduation ceremony and skill certification.',
+          archetype: 'Sol Builder',
+          rarity: 'rare',
+          icon: '🎓',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['teaching', 'apprenticeship', 'skills'],
+          duration: '6 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify your most valuable transferable skill',
+              content: 'Identify your most valuable transferable skill'
+            },
+            {
+              type: 'prompt',
+              label: 'Create structured curriculum with measurable milestones',
+              content: 'Create structured curriculum with measurable milestones'
+            },
+            {
+              type: 'prompt',
+              label: 'Recruit 3 apprentices through professional networks',
+              content: 'Recruit 3 apprentices through professional networks'
+            },
+            {
+              type: 'prompt',
+              label: 'Design graduation ceremony with skill demonstration',
+              content: 'Design graduation ceremony with skill demonstration'
+            },
+            {
+              type: 'product',
+              label: 'Personalized Certificate Maker Kit',
+              content: 'Professional certification materials that trade guilds use for apprentice graduations',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$67',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'builder-6',
+          type: 'activity',
+          title: 'Intergenerational Project Bridge',
+          description: 'Create a project that requires collaboration between people 40+ years apart in age. Build something that honors both traditional wisdom and modern innovation.',
+          archetype: 'Sol Builder',
+          rarity: 'rare',
+          icon: '🌉',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['generations', 'collaboration', 'building'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Connect with both senior centers and youth programs',
+              content: 'Connect with both senior centers and youth programs'
+            },
+            {
+              type: 'prompt',
+              label: 'Design project requiring both traditional and modern skills',
+              content: 'Design project requiring both traditional and modern skills'
+            },
+            {
+              type: 'prompt',
+              label: 'Facilitate intergenerational building sessions',
+              content: 'Facilitate intergenerational building sessions'
+            },
+            {
+              type: 'prompt',
+              label: 'Document how different generations approach construction',
+              content: 'Document how different generations approach construction'
+            },
+            {
+              type: 'product',
+              label: 'Traditional Japanese Wood Joinery Tools Set',
+              content: 'Hand tools that connect traditional building wisdom with modern creativity',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$89',
+              category: 'tools'
+            }
+          ]
+        },
+        // Legendary Activities (5% probability)
+        {
+          id: 'builder-7',
+          type: 'activity',
+          title: 'Generational Architecture',
+          description: 'Lead a community project to build something designed to be enhanced by each generation - libraries that expand, gardens that evolve, traditions that adapt.',
+          archetype: 'Sol Builder',
+          rarity: 'legendary',
+          icon: '🏛️',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['generations', 'community', 'architecture'],
+          duration: '1 year',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Include all ages in design process',
+              content: 'Include all ages in design process - children to elders'
+            },
+            {
+              type: 'prompt',
+              label: 'Create expansion plans for future generations',
+              content: 'Create expansion plans for future generations'
+            },
+            {
+              type: 'prompt',
+              label: 'Build with materials that age beautifully',
+              content: 'Build with materials that age beautifully'
+            },
+            {
+              type: 'prompt',
+              label: 'Establish governance structure for ongoing enhancement',
+              content: 'Establish governance structure for ongoing enhancement'
+            },
+            {
+              type: 'product',
+              label: 'Community Planning Board Game',
+              content: 'Simulation tool that urban planners use to design multi-generational infrastructure',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$78',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'builder-8',
+          type: 'activity',
+          title: 'Intergenerational Bridge Construction',
+          description: 'Build something that requires collaboration between people who are 50+ years apart in age. Create infrastructure that bridges generational divides.',
+          quote: 'I construct bridges that span the gaps between generations.',
+          journalPrompt: 'What intergenerational project did you build? How did bridging age gaps change your construction approach?',
+          archetype: 'Sol Builder',
+          rarity: 'legendary',
+          icon: '🌉',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['generations', 'collaboration', 'building'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Connect with senior centers and youth programs',
+              content: 'Connect with senior centers and youth programs'
+            },
+            {
+              type: 'prompt',
+              label: 'Design project that requires both traditional and modern skills',
+              content: 'Design project that requires both traditional and modern skills'
+            },
+            {
+              type: 'prompt',
+              label: 'Facilitate intergenerational construction sessions',
+              content: 'Facilitate intergenerational construction sessions'
+            },
+            {
+              type: 'prompt',
+              label: 'Document how different generations approach building',
+              content: 'Document how different generations approach building'
+            }
+          ],
+          freeItems: [
+            'Community connections',
+            'Facilitation skills',
+            'Building materials',
+            'Patience for intergenerational learning'
+          ]
+        },
+        {
+          id: 'builder-5',
+          type: 'activity',
+          title: 'Community Infrastructure Hacking',
+          description: 'Identify missing infrastructure that would benefit 100+ people. Build the minimum viable version and test community adoption.',
+          quote: 'I build bridges where others see only gaps.',
+          journalPrompt: 'What infrastructure did you create? How did serving the community change your building approach?',
+          archetype: 'Sol Builder',
+          rarity: 'rare',
+          icon: '🏘️',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['community', 'infrastructure', 'building'],
+          duration: '1 month',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Survey 20+ community members about daily frustrations',
+              content: 'Survey 20+ community members about daily frustrations'
+            },
+            {
+              type: 'prompt',
+              label: 'Identify infrastructure gap that affects many people',
+              content: 'Identify infrastructure gap that affects many people'
+            },
+            {
+              type: 'prompt',
+              label: 'Build simple prototype solution',
+              content: 'Build simple prototype solution'
+            },
+            {
+              type: 'prompt',
+              label: 'Test with community and iterate',
+              content: 'Test with community and iterate'
+            }
+          ],
+          freeItems: [
+            'Community survey tools',
+            'Prototyping materials',
+            'Community connections',
+            'Willingness to serve others'
+          ]
+        },
+        {
+          id: 'builder-6',
+          type: 'activity',
+          title: 'Resilience Engineering',
+          description: 'Build something that gets stronger when stressed or broken. Create systems that learn from failure and become more robust through adversity.',
+          quote: 'I forge strength through the fires of challenge.',
+          journalPrompt: 'What resilient system did you build? How did designing for failure make it stronger?',
+          archetype: 'Sol Builder',
+          rarity: 'rare',
+          icon: '🛡️',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['resilience', 'engineering', 'strength'],
+          duration: '2 weeks',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify a system that fails under stress',
+              content: 'Identify a system that fails under stress'
+            },
+            {
+              type: 'prompt',
+              label: 'Design it to get stronger when stressed',
+              content: 'Design it to get stronger when stressed'
+            },
+            {
+              type: 'prompt',
+              label: 'Test it under various stress conditions',
+              content: 'Test it under various stress conditions'
+            },
+            {
+              type: 'prompt',
+              label: 'Document how it improves through failure',
+              content: 'Document how it improves through failure'
+            }
+          ],
+          freeItems: [
+            'Engineering mindset',
+            'Testing tools and methods',
+            'Documentation skills',
+            'Willingness to fail and learn'
+          ]
+        },
+        {
+          id: 'builder-7',
+          type: 'activity',
+          title: 'Cosmic Architecture Studio',
+          description: 'Design a building or space that responds to cosmic events. Create architecture that changes with lunar phases, solar cycles, or celestial alignments.',
+          quote: 'I build structures that dance with the rhythms of the cosmos.',
+          journalPrompt: 'What cosmic-responsive architecture did you design? How did aligning with celestial cycles change your building approach?',
+          archetype: 'Sol Builder',
+          rarity: 'legendary',
+          icon: '🌌',
+          color: 'bg-yellow-100 border-yellow-300',
+          tags: ['cosmic', 'architecture', 'design'],
+          duration: '1 month',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose a cosmic event to respond to',
+              content: 'Choose a cosmic event to respond to (lunar phases, solar cycles, celestial alignments)'
+            },
+            {
+              type: 'prompt',
+              label: 'Design architecture that changes with the event',
+              content: 'Design architecture that changes with the event'
+            },
+            {
+              type: 'prompt',
+              label: 'Create detailed blueprints and models',
+              content: 'Create detailed blueprints and models'
+            },
+            {
+              type: 'prompt',
+              label: 'Consider how occupants will experience the changes',
+              content: 'Consider how occupants will experience the changes'
+            }
+          ],
+          freeItems: [
+            'Architectural drawing tools',
+            'Astronomical knowledge',
+            'Model-making materials',
+            'Imagination for cosmic integration'
           ]
         }
       ],
       'Sol Nurturer': [
-        // Common Activities
+        // Common Activities (70% probability)
         {
-          id: 'nur-1',
+          id: 'nurturer-1',
           type: 'activity',
-          title: 'Nurture Connection',
-          description: 'Reach out to someone you care about with genuine intention to support, listen, or simply connect.',
+          title: 'Emotional Weather Station',
+          description: 'Create a daily ritual to check in with your emotional climate. Track patterns like a meteorologist, predicting storms and celebrating sunny days.',
+          quote: 'I tend to the garden of my heart with daily care and attention.',
+          journalPrompt: 'What emotional patterns did you discover? How did tracking your emotional weather change your self-care?',
           archetype: 'Sol Nurturer',
           rarity: 'common',
-          icon: '🤗',
-          color: 'bg-pink-100 border-pink-300',
-          tags: ['connection', 'support', 'empathy'],
+          icon: '🌤️',
+          color: 'bg-green-100 border-green-300',
+          tags: ['emotions', 'self-care', 'ritual'],
           duration: '30 minutes',
           difficulty: 'easy',
-          timeOfDay: 'afternoon',
+          timeOfDay: 'morning',
           actionableSteps: [
             {
               type: 'prompt',
-              label: 'Connection Ritual',
-              content: 'Think of 3 people you haven\'t spoken to in a while. Choose one and send them a thoughtful message asking how they\'re really doing.'
+              label: 'Create a daily emotional check-in ritual',
+              content: 'Create a daily emotional check-in ritual'
             },
             {
-              type: 'search',
-              label: 'Google Search: "Meaningful conversation starters"',
-              content: 'meaningful conversation starters deep questions connection friendship',
-              url: 'https://www.google.com/search?q=meaningful+conversation+starters+deep+questions+connection'
+              type: 'prompt',
+              label: 'Track your emotional patterns for 2 weeks',
+              content: 'Track your emotional patterns for 2 weeks'
             },
             {
-              type: 'link',
-              label: 'Buy: "The Art of Gathering" by Priya Parker',
-              content: 'Transform how you connect with others',
-              url: 'https://amazon.com/dp/1594634920?tag=yourtag-20',
-              affiliate: {
-                program: 'Amazon Associates',
-                commission: 'Up to 10%',
-                tracking: '24 hours'
-              },
-              productImage: '/api/placeholder/200/250',
-              price: '$16.99',
-              category: 'books'
+              type: 'prompt',
+              label: 'Identify triggers and positive influences',
+              content: 'Identify triggers and positive influences'
+            },
+            {
+              type: 'prompt',
+              label: 'Develop strategies for emotional storms',
+              content: 'Develop strategies for emotional storms'
             }
+          ],
+          freeItems: [
+            'Journal or notebook',
+            'Daily commitment to self-care',
+            'Honesty about your emotions',
+            'Patience with the process'
           ]
-        }
-      ],
-      'Sol Alchemist': [
-        // Common Activities
+        },
         {
-          id: 'alc-1',
+          id: 'nurturer-2',
           type: 'activity',
-          title: 'Transform Something',
-          description: 'Take something in your life that feels stuck or stagnant and consciously transform it into something better.',
-          archetype: 'Sol Alchemist',
+          title: 'Emotional Weather Tracking',
+          description: 'For one week, track the emotional weather of 5 people in your life. Offer support before they ask for it, based on what you observe.',
+          quote: 'I read the subtle signs of others\' hearts before they speak.',
+          journalPrompt: 'What emotional patterns did you observe in others? How did offering preemptive support change your relationships?',
+          archetype: 'Sol Nurturer',
           rarity: 'common',
-          icon: '⚗️',
-          color: 'bg-indigo-100 border-indigo-300',
-          tags: ['transformation', 'change', 'growth'],
-          duration: '45 minutes',
+          icon: '🌤️',
+          color: 'bg-green-100 border-green-300',
+          tags: ['emotion', 'support', 'observation'],
+          duration: '1 week',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose 5 people across different life areas',
+              content: 'Choose 5 people across different life areas (family, friends, work, neighbors)'
+            },
+            {
+              type: 'prompt',
+              label: 'Note their emotional patterns without judgment',
+              content: 'Note their emotional patterns without judgment'
+            },
+            {
+              type: 'prompt',
+              label: 'Offer support before they ask for it',
+              content: 'Offer support before they ask for it (gentle check-ins, small gestures)'
+            },
+            {
+              type: 'prompt',
+              label: 'Track how preemptive care changes relationships',
+              content: 'Track how preemptive care changes relationships'
+            }
+          ],
+          freeItems: [
+            'Observation skills',
+            'Gentle communication',
+            'Small gestures of care',
+            'Empathy and patience'
+          ]
+        },
+        {
+          id: 'nurturer-3',
+          type: 'activity',
+          title: 'Healing Circle Facilitator',
+          description: 'Organize a monthly gathering where people share struggles and receive collective support. No advice-giving, only witnessing and holding space.',
+          quote: 'I create sacred spaces where hearts can heal in community.',
+          journalPrompt: 'How did facilitating a healing circle change your understanding of support? What did you learn about holding space?',
+          archetype: 'Sol Nurturer',
+          rarity: 'common',
+          icon: '🔄',
+          color: 'bg-green-100 border-green-300',
+          tags: ['healing', 'community', 'support'],
+          duration: '2 hours',
           difficulty: 'medium',
           timeOfDay: 'evening',
           actionableSteps: [
             {
               type: 'prompt',
-              label: 'Transformation Inventory',
-              content: 'Identify one area of your life that feels stuck. Write down: What it is now → What you want it to become → One small action you can take today.'
+              label: 'Invite 6-8 people who trust you',
+              content: 'Invite 6-8 people who trust you'
             },
             {
-              type: 'search',
-              label: 'Google Search: "Personal transformation techniques"',
-              content: 'personal transformation techniques change management self improvement',
-              url: 'https://www.google.com/search?q=personal+transformation+techniques+change+management'
+              type: 'prompt',
+              label: 'Create simple circle format',
+              content: 'Create simple circle format: opening, sharing, closing'
             },
             {
-              type: 'link',
-              label: 'Buy: "The Gifts of Imperfection" by Brené Brown',
-              content: 'Guide to transformation through vulnerability',
-              url: 'https://amazon.com/dp/159285849X?tag=yourtag-20',
+              type: 'prompt',
+              label: 'Facilitate with no advice - only witnessing',
+              content: 'Facilitate with no advice - only witnessing'
+            },
+            {
+              type: 'prompt',
+              label: 'Hold monthly gatherings and let group evolve organically',
+              content: 'Hold monthly gatherings and let group evolve organically'
+            }
+          ],
+          freeItems: [
+            'Safe space for gathering',
+            'Facilitation skills',
+            'Willingness to hold space',
+            'Trust in the healing process'
+          ]
+        },
+        // Rare Activities (25% probability)
+        {
+          id: 'nurturer-4',
+          type: 'activity',
+          title: 'Invisible Support Network',
+          description: 'Create anonymous support systems for people who struggle to ask for help. Coordinate with mutual friends to provide seamless care.',
+          archetype: 'Sol Nurturer',
+          rarity: 'rare',
+          icon: '🕸️',
+          color: 'bg-pink-100 border-pink-300',
+          tags: ['anonymous', 'support', 'network'],
+          duration: '1 month',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify people who need support but won\'t ask',
+              content: 'Identify people who need support but won\'t ask'
+            },
+            {
+              type: 'prompt',
+              label: 'Coordinate with mutual friends to provide invisible help',
+              content: 'Coordinate with mutual friends to provide invisible help'
+            },
+            {
+              type: 'prompt',
+              label: 'Create system for groceries, childcare, transportation without exposure',
+              content: 'Create system for groceries, childcare, transportation without exposure'
+            },
+            {
+              type: 'prompt',
+              label: 'Track how invisible support changes people\'s confidence',
+              content: 'Track how invisible support changes people\'s confidence'
+            },
+            {
+              type: 'product',
+              label: 'Handcrafted Postcard Set - 50 Beautiful Cards',
+              content: 'Personalized postcards that nurturers use to send anonymous care and support',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
               affiliate: {
                 program: 'Amazon Associates',
                 commission: 'Up to 10%',
                 tracking: '24 hours'
               },
-              productImage: '/api/placeholder/200/250',
-              price: '$15.99',
+              productImage: '/api/placeholder/200/200',
+              price: '$18',
+              category: 'tools'
+            },
+            {
+              type: 'product',
+              label: 'The Art of Gathering by Priya Parker',
+              content: 'Essential reading for nurturers creating meaningful connections and healing spaces',
+              url: 'https://amazon.com/dp/1594634920?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$17',
               category: 'books'
             }
+          ]
+        },
+        {
+          id: 'nurturer-5',
+          type: 'activity',
+          title: 'Intergenerational Nurturing Exchange',
+          description: 'Connect elders who need companionship with young families who need wisdom. Facilitate regular exchanges of caregiving and guidance.',
+          archetype: 'Sol Nurturer',
+          rarity: 'rare',
+          icon: '👥',
+          color: 'bg-pink-100 border-pink-300',
+          tags: ['generations', 'exchange', 'care'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Partner with senior centers and family resource centers',
+              content: 'Partner with senior centers and family resource centers'
+            },
+            {
+              type: 'prompt',
+              label: 'Match elders with young families based on interests',
+              content: 'Match elders with young families based on interests'
+            },
+            {
+              type: 'prompt',
+              label: 'Facilitate regular exchanges: meals, activities, wisdom sharing',
+              content: 'Facilitate regular exchanges: meals, activities, wisdom sharing'
+            },
+            {
+              type: 'prompt',
+              label: 'Create ongoing support system for both generations',
+              content: 'Create ongoing support system for both generations'
+            },
+            {
+              type: 'product',
+              label: 'Intergenerational Board Game Collection',
+              content: 'Games specifically designed to bridge age gaps and create connection',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$89',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'nurturer-6',
+          type: 'activity',
+          title: 'Grief Holding Space Sanctuary',
+          description: 'Organize quarterly gatherings for people experiencing different types of loss. Create space for grief to be witnessed and honored without rushing to healing.',
+          archetype: 'Sol Nurturer',
+          rarity: 'rare',
+          icon: '🕊️',
+          color: 'bg-pink-100 border-pink-300',
+          tags: ['grief', 'sanctuary', 'healing'],
+          duration: '3 hours',
+          difficulty: 'hard',
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Invite people experiencing loss (death, divorce, job loss, etc.)',
+              content: 'Invite people experiencing loss (death, divorce, job loss, etc.)'
+            },
+            {
+              type: 'prompt',
+              label: 'Create ritual space for sharing grief stories',
+              content: 'Create ritual space for sharing grief stories'
+            },
+            {
+              type: 'prompt',
+              label: 'Facilitate without trying to "fix" or rush healing',
+              content: 'Facilitate without trying to "fix" or rush healing'
+            },
+            {
+              type: 'prompt',
+              label: 'Let people witness each other\'s pain without judgment',
+              content: 'Let people witness each other\'s pain without judgment'
+            },
+            {
+              type: 'product',
+              label: 'Himalayan Salt Tears Holder',
+              content: 'Handcrafted vessel that grief counselors use to hold symbolic tears during mourning rituals',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$23',
+              category: 'tools'
+            }
+          ]
+        },
+        // Legendary Activities (5% probability)
+        {
+          id: 'nurturer-7',
+          type: 'activity',
+          title: 'Community Resilience Architecture',
+          description: 'Design and implement a neighborhood mutual aid network that activates automatically during crises and celebrates automatically during joys.',
+          archetype: 'Sol Nurturer',
+          rarity: 'legendary',
+          icon: '🏘️',
+          color: 'bg-pink-100 border-pink-300',
+          tags: ['community', 'resilience', 'network'],
+          duration: '6 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Map every household\'s needs and gifts',
+              content: 'Map every household\'s needs and gifts'
+            },
+            {
+              type: 'prompt',
+              label: 'Create communication systems for crisis response and celebration',
+              content: 'Create communication systems for crisis response and celebration'
+            },
+            {
+              type: 'prompt',
+              label: 'Design automatic triggers for community support',
+              content: 'Design automatic triggers for community support'
+            },
+            {
+              type: 'prompt',
+              label: 'Center gatherings around seasonal celebrations and natural rhythms',
+              content: 'Center gatherings around seasonal celebrations and natural rhythms'
+            },
+            {
+              type: 'product',
+              label: 'Neighborhood Communication Hub Kit',
+              content: 'Analog bulletin board system that resilient communities use for crisis coordination',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$199',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'nurturer-8',
+          type: 'activity',
+          title: 'Healing Institution Founder',
+          description: 'Establish a new institution focused on community healing - healing café, grief support center, intergenerational program, or wellness cooperative.',
+          archetype: 'Sol Nurturer',
+          rarity: 'legendary',
+          icon: '🏥',
+          color: 'bg-pink-100 border-pink-300',
+          tags: ['institution', 'healing', 'community'],
+          duration: '1 year',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify healing gap in your community',
+              content: 'Identify healing gap in your community'
+            },
+            {
+              type: 'prompt',
+              label: 'Design institution that serves multiple generations',
+              content: 'Design institution that serves multiple generations'
+            },
+            {
+              type: 'prompt',
+              label: 'Create sustainable funding and volunteer model',
+              content: 'Create sustainable funding and volunteer model'
+            },
+            {
+              type: 'prompt',
+              label: 'Launch with community celebration and ongoing programming',
+              content: 'Launch with community celebration and ongoing programming'
+            },
+            {
+              type: 'product',
+              label: 'Healing Institution Startup Guide',
+              content: 'Manual that successful healing centers use to create sustainable community wellness programs',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$78',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'nurturer-4',
+          type: 'activity',
+          title: 'Care Package Stealth Mission',
+          description: 'Create surprise care packages for people going through difficult times. Focus on those who struggle to ask for help directly.',
+          quote: 'I deliver love in unexpected packages to those who need it most.',
+          journalPrompt: 'What care packages did you create? How did surprising others with care change your relationships?',
+          archetype: 'Sol Nurturer',
+          rarity: 'common',
+          icon: '📦',
+          color: 'bg-green-100 border-green-300',
+          tags: ['care', 'surprise', 'support'],
+          duration: '1 hour',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify 3 people going through challenges',
+              content: 'Identify 3 people going through challenges'
+            },
+            {
+              type: 'prompt',
+              label: 'Create personalized care packages with meaningful items',
+              content: 'Create personalized care packages with meaningful items'
+            },
+            {
+              type: 'prompt',
+              label: 'Deliver anonymously or with simple "thinking of you" note',
+              content: 'Deliver anonymously or with simple "thinking of you" note'
+            },
+            {
+              type: 'prompt',
+              label: 'Observe how unexpected care creates ripple effects',
+              content: 'Observe how unexpected care creates ripple effects'
+            }
+          ],
+          freeItems: [
+            'Thoughtful items for care packages',
+            'Wrapping materials',
+            'Anonymous delivery method',
+            'Empathy and observation skills'
+          ]
+        },
+        {
+          id: 'nurturer-5',
+          type: 'activity',
+          title: 'Boundary Garden Tending',
+          description: 'Create healthy boundaries while maintaining compassion. Learn to say "no" with love and "yes" with intention.',
+          quote: 'I tend the garden of my boundaries with love and firmness.',
+          journalPrompt: 'What boundaries did you set? How did maintaining healthy boundaries change your relationships?',
+          archetype: 'Sol Nurturer',
+          rarity: 'common',
+          icon: '🌿',
+          color: 'bg-green-100 border-green-300',
+          tags: ['boundaries', 'self-care', 'compassion'],
+          duration: '2 weeks',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify areas where you need stronger boundaries',
+              content: 'Identify areas where you need stronger boundaries'
+            },
+            {
+              type: 'prompt',
+              label: 'Practice saying "no" with love and clarity',
+              content: 'Practice saying "no" with love and clarity'
+            },
+            {
+              type: 'prompt',
+              label: 'Learn to say "yes" only with full intention',
+              content: 'Learn to say "yes" only with full intention'
+            },
+            {
+              type: 'prompt',
+              label: 'Maintain compassion while holding firm boundaries',
+              content: 'Maintain compassion while holding firm boundaries'
+            }
+          ],
+          freeItems: [
+            'Self-reflection time',
+            'Communication skills',
+            'Self-compassion practices',
+            'Support from trusted friends'
+          ]
+        },
+        {
+          id: 'nurturer-6',
+          type: 'activity',
+          title: 'Compassionate Witness Training',
+          description: 'Practice being a compassionate witness to others\' suffering without trying to fix it. Learn to hold space for pain without taking it on.',
+          quote: 'I hold space for others\' pain without making it my own.',
+          journalPrompt: 'How did being a compassionate witness change your approach to helping others? What did you learn about holding space?',
+          archetype: 'Sol Nurturer',
+          rarity: 'rare',
+          icon: '👁️',
+          color: 'bg-green-100 border-green-300',
+          tags: ['compassion', 'witnessing', 'support'],
+          duration: '1 month',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Practice active listening without offering solutions',
+              content: 'Practice active listening without offering solutions'
+            },
+            {
+              type: 'prompt',
+              label: 'Learn to validate feelings without fixing problems',
+              content: 'Learn to validate feelings without fixing problems'
+            },
+            {
+              type: 'prompt',
+              label: 'Develop emotional boundaries while staying present',
+              content: 'Develop emotional boundaries while staying present'
+            },
+            {
+              type: 'prompt',
+              label: 'Practice self-care after witnessing difficult emotions',
+              content: 'Practice self-care after witnessing difficult emotions'
+            }
+          ],
+          freeItems: [
+            'Active listening skills',
+            'Emotional resilience',
+            'Self-care practices',
+            'Support network for yourself'
+          ]
+        },
+        {
+          id: 'nurturer-7',
+          type: 'activity',
+          title: 'Intergenerational Care Bridge',
+          description: 'Create connections between different generations through shared care activities. Bridge age gaps through mutual support and learning.',
+          quote: 'I build bridges of care that span the gaps between generations.',
+          journalPrompt: 'What intergenerational connections did you create? How did bridging age gaps through care change your community?',
+          archetype: 'Sol Nurturer',
+          rarity: 'rare',
+          icon: '🌉',
+          color: 'bg-green-100 border-green-300',
+          tags: ['generations', 'care', 'community'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Connect with senior centers and youth programs',
+              content: 'Connect with senior centers and youth programs'
+            },
+            {
+              type: 'prompt',
+              label: 'Design care activities that benefit both generations',
+              content: 'Design care activities that benefit both generations'
+            },
+            {
+              type: 'prompt',
+              label: 'Facilitate regular intergenerational gatherings',
+              content: 'Facilitate regular intergenerational gatherings'
+            },
+            {
+              type: 'prompt',
+              label: 'Document the mutual learning and support',
+              content: 'Document the mutual learning and support'
+            }
+          ],
+          freeItems: [
+            'Community connections',
+            'Facilitation skills',
+            'Care activities and materials',
+            'Patience for intergenerational learning'
+          ]
+        },
+        {
+          id: 'nurturer-8',
+          type: 'activity',
+          title: 'Cosmic Care Network',
+          description: 'Create a network of care that responds to cosmic events. Organize community support during lunar phases, solar cycles, or celestial alignments.',
+          quote: 'I orchestrate care that flows with the rhythms of the cosmos.',
+          journalPrompt: 'What cosmic care network did you create? How did aligning care with celestial cycles change your community?',
+          archetype: 'Sol Nurturer',
+          rarity: 'legendary',
+          icon: '🌟',
+          color: 'bg-green-100 border-green-300',
+          tags: ['cosmic', 'care', 'community'],
+          duration: '6 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose cosmic events to align care with',
+              content: 'Choose cosmic events to align care with (lunar phases, solar cycles, celestial alignments)'
+            },
+            {
+              type: 'prompt',
+              label: 'Design care activities for each cosmic phase',
+              content: 'Design care activities for each cosmic phase'
+            },
+            {
+              type: 'prompt',
+              label: 'Build community network to respond to cosmic cycles',
+              content: 'Build community network to respond to cosmic cycles'
+            },
+            {
+              type: 'prompt',
+              label: 'Document how cosmic alignment enhances care',
+              content: 'Document how cosmic alignment enhances care'
+            }
+          ],
+          freeItems: [
+            'Astronomical knowledge',
+            'Community network',
+            'Care activities and materials',
+            'Commitment to long-term care'
+          ]
+        }
+      ],
+      'Sol Alchemist': [
+        // Common Activities (70% probability)
+        {
+          id: 'alchemist-1',
+          type: 'activity',
+          title: 'Transformation Ritual Design',
+          description: 'Create a personal ritual that transforms one aspect of your life. Use symbolic elements, timing, and intention to catalyze change.',
+          quote: 'I craft rituals that transmute the lead of limitation into the gold of possibility.',
+          journalPrompt: 'What transformation ritual did you create? How did the ritual process change your relationship to change?',
+          archetype: 'Sol Alchemist',
+          rarity: 'common',
+          icon: '⚗️',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['transformation', 'ritual', 'change'],
+          duration: '1 hour',
+          difficulty: 'easy',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose one aspect of your life to transform',
+              content: 'Choose one aspect of your life to transform'
+            },
+            {
+              type: 'prompt',
+              label: 'Design a ritual with symbolic elements',
+              content: 'Design a ritual with symbolic elements'
+            },
+            {
+              type: 'prompt',
+              label: 'Set clear intention and timing',
+              content: 'Set clear intention and timing'
+            },
+            {
+              type: 'prompt',
+              label: 'Perform the ritual with full presence',
+              content: 'Perform the ritual with full presence'
+            }
+          ],
+          freeItems: [
+            'Symbolic elements for your ritual',
+            'Quiet space for performance',
+            'Clear intention and focus',
+            'Openness to transformation'
+          ]
+        },
+        {
+          id: 'alchemist-2',
+          type: 'activity',
+          title: 'Shadow Solar Eclipse Work',
+          description: 'During new moon or cloudy days, consciously work with a shadow aspect of yourself. Turn self-criticism into self-compassion through alchemical practice.',
+          quote: 'I embrace my shadows to find the hidden light within.',
+          journalPrompt: 'What shadow aspect did you work with? How did embracing your shadow change your self-compassion?',
+          archetype: 'Sol Alchemist',
+          rarity: 'common',
+          icon: '🌑',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['shadow', 'transformation', 'healing'],
+          duration: '30 minutes',
+          difficulty: 'medium',
+          timeOfDay: 'evening',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Check moon phases and choose new moon or overcast day',
+              content: 'Check moon phases and choose new moon or overcast day'
+            },
+            {
+              type: 'prompt',
+              label: 'Identify one shadow aspect you usually avoid',
+              content: 'Identify one shadow aspect you usually avoid'
+            },
+            {
+              type: 'prompt',
+              label: 'Spend 30 minutes dialoguing with it outdoors',
+              content: 'Spend 30 minutes dialoguing with it outdoors'
+            },
+            {
+              type: 'prompt',
+              label: 'Find the hidden gift within the shadow trait',
+              content: 'Find the hidden gift within the shadow trait'
+            }
+          ],
+          freeItems: [
+            'Moon phase calendar',
+            'Quiet outdoor space',
+            'Journal for shadow work',
+            'Self-compassion practices'
+          ]
+        },
+        {
+          id: 'alchemist-3',
+          type: 'activity',
+          title: 'Poison into Medicine Alchemy',
+          description: 'Identify your deepest wound and create something that helps others heal the same pain. Transform personal poison into collective medicine.',
+          quote: 'I transmute my deepest wounds into medicine for others.',
+          journalPrompt: 'What wound did you transform into medicine? How did helping others heal change your own healing?',
+          archetype: 'Sol Alchemist',
+          rarity: 'common',
+          icon: '⚗️',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['healing', 'transformation', 'medicine'],
+          duration: '2 hours',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify your most transformed wound or struggle',
+              content: 'Identify your most transformed wound or struggle'
+            },
+            {
+              type: 'prompt',
+              label: 'Create something that helps others with similar pain',
+              content: 'Create something that helps others with similar pain'
+            },
+            {
+              type: 'prompt',
+              label: 'Share your transformation story with someone who needs it',
+              content: 'Share your transformation story with someone who needs it'
+            },
+            {
+              type: 'prompt',
+              label: 'Document how your medicine helps others heal',
+              content: 'Document how your medicine helps others heal'
+            }
+          ],
+          freeItems: [
+            'Courage to face your wounds',
+            'Creative expression tools',
+            'Willingness to share your story',
+            'Empathy for others\' pain'
+          ]
+        },
+        // Rare Activities (25% probability)
+        {
+          id: 'alchemist-4',
+          type: 'activity',
+          title: 'Collective Trauma Alchemy',
+          description: 'Research collective trauma in your community and organize a healing ritual or restorative project that addresses it historically and spiritually.',
+          archetype: 'Sol Alchemist',
+          rarity: 'rare',
+          icon: '🏛️',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['collective', 'trauma', 'healing'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Research historical trauma in your community',
+              content: 'Research historical trauma in your community'
+            },
+            {
+              type: 'prompt',
+              label: 'Partner with affected communities for authentic healing',
+              content: 'Partner with affected communities for authentic healing'
+            },
+            {
+              type: 'prompt',
+              label: 'Design respectful ritual or restorative project',
+              content: 'Design respectful ritual or restorative project'
+            },
+            {
+              type: 'prompt',
+              label: 'Hold healing ceremony in location connected to original trauma',
+              content: 'Hold healing ceremony in location connected to original trauma'
+            },
+            {
+              type: 'product',
+              label: 'Sage Smudge Bundle Making Kit',
+              content: 'Traditional cleansing herbs that indigenous healers use for collective trauma work',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$34',
+              category: 'tools'
+            },
+            {
+              type: 'product',
+              label: 'The Body Keeps the Score by Bessel van der Kolk',
+              content: 'Essential reading for alchemists working with trauma and collective healing',
+              url: 'https://amazon.com/dp/0143127748?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$18',
+              category: 'books'
+            }
+          ]
+        },
+        {
+          id: 'alchemist-5',
+          type: 'activity',
+          title: 'Elements Transformation Workshop',
+          description: 'Design workshop that teaches 10+ people to transform suffering into wisdom using natural elements as metaphors and healing partners.',
+          archetype: 'Sol Alchemist',
+          rarity: 'rare',
+          icon: '🌊',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['workshop', 'elements', 'teaching'],
+          duration: '1 day',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Design curriculum using earth, water, fire, air as teachers',
+              content: 'Design curriculum using earth, water, fire, air as teachers'
+            },
+            {
+              type: 'prompt',
+              label: 'Recruit participants through healing communities',
+              content: 'Recruit participants through healing communities'
+            },
+            {
+              type: 'prompt',
+              label: 'Hold workshop entirely outdoors with natural elements',
+              content: 'Hold workshop entirely outdoors with natural elements'
+            },
+            {
+              type: 'prompt',
+              label: 'Create follow-up support for ongoing transformation',
+              content: 'Create follow-up support for ongoing transformation'
+            },
+            {
+              type: 'product',
+              label: 'Portable Copper Fire Bowl',
+              content: 'Sacred fire vessel that transformation workshops use for releasing old patterns',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$89',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'alchemist-6',
+          type: 'activity',
+          title: 'Relationship Alchemy Laboratory',
+          description: 'Heal a broken relationship through conscious alchemical work. Use conflict as raw material for deeper understanding and connection.',
+          archetype: 'Sol Alchemist',
+          rarity: 'rare',
+          icon: '💝',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['relationship', 'healing', 'connection'],
+          duration: '1 month',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose one relationship that needs healing',
+              content: 'Choose one relationship that needs healing'
+            },
+            {
+              type: 'prompt',
+              label: 'Take responsibility for your part without blaming',
+              content: 'Take responsibility for your part without blaming'
+            },
+            {
+              type: 'prompt',
+              label: 'Create ritual space for honest communication',
+              content: 'Create ritual space for honest communication'
+            },
+            {
+              type: 'prompt',
+              label: 'Transform conflict into deeper understanding',
+              content: 'Transform conflict into deeper understanding'
+            },
+            {
+              type: 'product',
+              label: 'Nonviolent Communication Card Deck',
+              content: 'Conversation tools that relationship alchemists use to transform conflict',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$24',
+              category: 'tools'
+            }
+          ]
+        },
+        // Legendary Activities (5% probability)
+        {
+          id: 'alchemist-7',
+          type: 'activity',
+          title: 'Generational Pattern Breaker',
+          description: 'Map destructive patterns across 3+ generations of your family/culture. Create comprehensive intervention that breaks the cycle permanently.',
+          archetype: 'Sol Alchemist',
+          rarity: 'legendary',
+          icon: '🔗',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['generations', 'patterns', 'healing'],
+          duration: '1 year',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Research family patterns across 3+ generations',
+              content: 'Research family patterns across 3+ generations'
+            },
+            {
+              type: 'prompt',
+              label: 'Map destructive cycles and their origins',
+              content: 'Map destructive cycles and their origins'
+            },
+            {
+              type: 'prompt',
+              label: 'Involve willing family members in healing work',
+              content: 'Involve willing family members in healing work'
+            },
+            {
+              type: 'prompt',
+              label: 'Create new traditions connected to natural cycles',
+              content: 'Create new traditions connected to natural cycles'
+            },
+            {
+              type: 'product',
+              label: 'Ancestral Healing Ritual Kit',
+              content: 'Traditional ceremony supplies that lineage healers use to break generational patterns',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$78',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'alchemist-8',
+          type: 'activity',
+          title: 'Community Shadow Integration',
+          description: 'Address and transform a collective shadow or wound in your community through organized healing work, truth-telling, and restorative practices.',
+          archetype: 'Sol Alchemist',
+          rarity: 'legendary',
+          icon: '🌙',
+          color: 'bg-indigo-100 border-indigo-300',
+          tags: ['community', 'shadow', 'integration'],
+          duration: '6 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify community shadow that needs integration',
+              content: 'Identify community shadow that needs integration'
+            },
+            {
+              type: 'prompt',
+              label: 'Create safe space for truth-telling and acknowledgment',
+              content: 'Create safe space for truth-telling and acknowledgment'
+            },
+            {
+              type: 'prompt',
+              label: 'Design restorative practices that honor all affected',
+              content: 'Design restorative practices that honor all affected'
+            },
+            {
+              type: 'prompt',
+              label: 'Establish ongoing healing practices for community',
+              content: 'Establish ongoing healing practices for community'
+            },
+            {
+              type: 'product',
+              label: 'Community Truth and Reconciliation Toolkit',
+              content: 'Structured process that healing communities use to address collective shadows',
+              url: 'https://amazon.com/dp/B00B1ZJ8YQ?tag=solara02-20',
+              affiliate: {
+                program: 'Amazon Associates',
+                commission: 'Up to 10%',
+                tracking: '24 hours'
+              },
+              productImage: '/api/placeholder/200/200',
+              price: '$156',
+              category: 'tools'
+            }
+          ]
+        },
+        {
+          id: 'alchemist-4',
+          type: 'activity',
+          title: 'Emotional Transmutation Lab',
+          description: 'Take a challenging emotion you\'re experiencing and consciously alchemize it into something constructive. Use emotional energy as raw material for creation.',
+          quote: 'I transform emotional chaos into creative order.',
+          journalPrompt: 'What emotion did you transmute? How did using emotional energy as fuel change your creative process?',
+          archetype: 'Sol Alchemist',
+          rarity: 'common',
+          icon: '🔬',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['emotion', 'transformation', 'creation'],
+          duration: '1 hour',
+          difficulty: 'medium',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Name the difficult emotion you\'re currently experiencing',
+              content: 'Name the difficult emotion you\'re currently experiencing'
+            },
+            {
+              type: 'prompt',
+              label: 'Feel it fully without trying to change it',
+              content: 'Feel it fully without trying to change it'
+            },
+            {
+              type: 'prompt',
+              label: 'Channel that energy into productive action',
+              content: 'Channel that energy into productive action'
+            },
+            {
+              type: 'prompt',
+              label: 'Create something meaningful from the emotional fuel',
+              content: 'Create something meaningful from the emotional fuel'
+            }
+          ],
+          freeItems: [
+            'Emotional awareness',
+            'Creative expression tools',
+            'Willingness to feel difficult emotions',
+            'Focus on constructive action'
+          ]
+        },
+        {
+          id: 'alchemist-5',
+          type: 'activity',
+          title: 'Limitation Liberation Ritual',
+          description: 'Identify one limitation you\'ve accepted and create a ritual to break free from it. Use symbolic actions to transform self-imposed boundaries.',
+          quote: 'I dissolve the chains of limitation through the power of ritual transformation.',
+          journalPrompt: 'What limitation did you break free from? How did the liberation ritual change your sense of possibility?',
+          archetype: 'Sol Alchemist',
+          rarity: 'rare',
+          icon: '🔓',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['liberation', 'ritual', 'transformation'],
+          duration: '2 hours',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify one limitation you\'ve accepted',
+              content: 'Identify one limitation you\'ve accepted'
+            },
+            {
+              type: 'prompt',
+              label: 'Design a ritual to break free from it',
+              content: 'Design a ritual to break free from it'
+            },
+            {
+              type: 'prompt',
+              label: 'Perform the ritual with full intention',
+              content: 'Perform the ritual with full intention'
+            },
+            {
+              type: 'prompt',
+              label: 'Document the transformation and new possibilities',
+              content: 'Document the transformation and new possibilities'
+            }
+          ],
+          freeItems: [
+            'Symbolic elements for your ritual',
+            'Courage to face limitations',
+            'Clear intention and focus',
+            'Willingness to change'
+          ]
+        },
+        {
+          id: 'alchemist-6',
+          type: 'activity',
+          title: 'Collective Trauma Alchemy',
+          description: 'Work with a collective trauma or wound that affects your community. Create healing practices that transform shared pain into collective wisdom.',
+          quote: 'I transmute collective wounds into shared wisdom and strength.',
+          journalPrompt: 'What collective trauma did you work with? How did transforming shared pain change your community?',
+          archetype: 'Sol Alchemist',
+          rarity: 'rare',
+          icon: '🌍',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['collective', 'trauma', 'healing'],
+          duration: '3 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify a collective trauma affecting your community',
+              content: 'Identify a collective trauma affecting your community'
+            },
+            {
+              type: 'prompt',
+              label: 'Create healing practices for the community',
+              content: 'Create healing practices for the community'
+            },
+            {
+              type: 'prompt',
+              label: 'Facilitate collective healing sessions',
+              content: 'Facilitate collective healing sessions'
+            },
+            {
+              type: 'prompt',
+              label: 'Document the transformation of shared pain',
+              content: 'Document the transformation of shared pain'
+            }
+          ],
+          freeItems: [
+            'Community connections',
+            'Healing facilitation skills',
+            'Safe spaces for collective work',
+            'Patience for long-term transformation'
+          ]
+        },
+        {
+          id: 'alchemist-7',
+          type: 'activity',
+          title: 'Cosmic Transformation Portal',
+          description: 'Create a transformation ritual that aligns with cosmic events. Use celestial timing to amplify your alchemical work.',
+          quote: 'I open portals of transformation that align with the rhythms of the cosmos.',
+          journalPrompt: 'What cosmic transformation portal did you create? How did aligning with celestial timing enhance your alchemical work?',
+          archetype: 'Sol Alchemist',
+          rarity: 'legendary',
+          icon: '🌌',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['cosmic', 'transformation', 'ritual'],
+          duration: '1 month',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Choose a cosmic event to align with',
+              content: 'Choose a cosmic event to align with (lunar phases, solar cycles, celestial alignments)'
+            },
+            {
+              type: 'prompt',
+              label: 'Design transformation ritual for that timing',
+              content: 'Design transformation ritual for that timing'
+            },
+            {
+              type: 'prompt',
+              label: 'Perform the ritual during the cosmic event',
+              content: 'Perform the ritual during the cosmic event'
+            },
+            {
+              type: 'prompt',
+              label: 'Document how cosmic alignment enhanced transformation',
+              content: 'Document how cosmic alignment enhanced transformation'
+            }
+          ],
+          freeItems: [
+            'Astronomical knowledge',
+            'Ritual space and materials',
+            'Clear intention and focus',
+            'Patience for cosmic timing'
+          ]
+        },
+        {
+          id: 'alchemist-8',
+          type: 'activity',
+          title: 'Intergenerational Alchemy Bridge',
+          description: 'Create transformation practices that bridge generational divides. Use alchemical principles to heal intergenerational wounds.',
+          quote: 'I transmute the wounds of time into bridges of understanding.',
+          journalPrompt: 'What intergenerational alchemy did you create? How did bridging generational divides change your community?',
+          archetype: 'Sol Alchemist',
+          rarity: 'legendary',
+          icon: '🌉',
+          color: 'bg-orange-100 border-orange-300',
+          tags: ['generations', 'alchemy', 'healing'],
+          duration: '6 months',
+          difficulty: 'hard',
+          timeOfDay: 'anytime',
+          actionableSteps: [
+            {
+              type: 'prompt',
+              label: 'Identify intergenerational wounds in your community',
+              content: 'Identify intergenerational wounds in your community'
+            },
+            {
+              type: 'prompt',
+              label: 'Create alchemical practices for healing',
+              content: 'Create alchemical practices for healing'
+            },
+            {
+              type: 'prompt',
+              label: 'Facilitate intergenerational healing sessions',
+              content: 'Facilitate intergenerational healing sessions'
+            },
+            {
+              type: 'prompt',
+              label: 'Document the transformation of generational wounds',
+              content: 'Document the transformation of generational wounds'
+            }
+          ],
+          freeItems: [
+            'Community connections',
+            'Alchemical knowledge',
+            'Safe spaces for healing',
+            'Patience for deep transformation'
           ]
         }
       ]

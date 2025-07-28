@@ -10,7 +10,7 @@ export interface SolarEarnings {
     amount: number;
     reason: string;
     streak: number;
-    bonusType?: 'roll' | 'weekly' | 'monthly' | 'referral' | 'achievement' | 'event';
+    bonusType?: 'roll' | 'weekly' | 'monthly' | 'referral' | 'achievement' | 'event' | 'oracle' | 'guidance';
   }[];
   achievements: {
     firstRoll: boolean;
@@ -234,9 +234,18 @@ export class SolarEarningsManager {
     const rollEarnings = this.calculateRollEarnings(rarity);
     const today = new Date().toDateString();
 
-    // Don't award if already rolled today (this check should be handled upstream)
-    if (earnings.lastRollDate === today) {
-      return rollEarnings;
+    // NEW: Only award SOLAR once per day for oracle rolls
+    const todayOracleRolls = earnings.earningsHistory.filter(h => h.date === today && h.bonusType === 'roll');
+    if (todayOracleRolls.length > 0) {
+      // Already awarded today, return zero earnings but maintain streak info
+      return {
+        ...rollEarnings,
+        totalEarned: 0,
+        achievements: { unlocked: [], bonusEarned: 0 },
+        bonuses: { weeklyBonus: 0, monthlyBonus: 0 },
+        eventMultiplier: 1.0,
+        totalBonusEarned: 0
+      };
     }
 
     // Check for special event multipliers
@@ -317,6 +326,65 @@ export class SolarEarningsManager {
       eventMultiplier,
       totalBonusEarned
     };
+  }
+
+  // NEW: Award SOLAR for guidance completion based on rarity
+  awardGuidanceCompletion(rarity: string, rollTitle: string): RollEarnings {
+    const earnings = this.getEarnings();
+    const today = new Date().toDateString();
+
+    // Calculate guidance completion reward based on rarity
+    let baseAmount = 0;
+    switch (rarity) {
+      case 'common':
+        baseAmount = 5;
+        break;
+      case 'rare':
+        baseAmount = 15;
+        break;
+      case 'legendary':
+        baseAmount = 50;
+        break;
+      default:
+        baseAmount = 5;
+    }
+
+    const totalEarned = baseAmount;
+
+    // Update earnings
+    const updatedEarnings = this.getEarnings();
+    updatedEarnings.totalEarned += totalEarned;
+
+    // Add to history
+    updatedEarnings.earningsHistory.push({
+      date: today,
+      amount: totalEarned,
+      reason: `Guidance completion: "${rollTitle}" (${rarity})`,
+      streak: earnings.dailyStreak,
+      bonusType: 'guidance'
+    });
+
+    localStorage.setItem(this.storageKey, JSON.stringify(updatedEarnings));
+
+    return {
+      baseAmount,
+      streakMultiplier: 1.0,
+      totalEarned,
+      newStreak: earnings.dailyStreak,
+      streakBroken: false,
+      achievements: { unlocked: [], bonusEarned: 0 },
+      bonuses: { weeklyBonus: 0, monthlyBonus: 0 },
+      eventMultiplier: 1.0,
+      totalBonusEarned: 0
+    };
+  }
+
+  // NEW: Check if user has already received daily oracle SOLAR
+  hasReceivedDailyOracleSolar(): boolean {
+    const earnings = this.getEarnings();
+    const today = new Date().toDateString();
+    const todayHistory = earnings.earningsHistory.filter(h => h.date === today && h.bonusType === 'oracle');
+    return todayHistory.length > 0;
   }
 
   // Get streak info for display

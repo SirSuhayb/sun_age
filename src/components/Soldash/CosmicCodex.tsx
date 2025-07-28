@@ -27,7 +27,7 @@ export default function CosmicCodex() {
       >
         <div className="px-6 pt-10 pb-10">
           {/* Title */}
-          <div className="text-3xl font-serif text-black text-center mb-4 font-normal" style={{ letterSpacing: '-0.04em' }}>
+          <div className="text-2xl font-serif text-black text-center mb-4 font-normal" style={{ letterSpacing: '-0.04em' }}>
             Unlock your Cosmic Codex
           </div>
           {/* Subtitle */}

@@ -139,7 +139,7 @@ export default function SolCycle() {
             <Image src="/journey/starspike.svg" alt="Starspike" width={44} height={44} style={{ width: 44, height: 44 }} />
           </div>
           {/* Title */}
-          <div className="text-3xl font-serif text-black text-center" style={{ letterSpacing: '-0.04em', marginBottom: 20 }}>
+          <div className="text-2xl font-serif text-black text-center" style={{ letterSpacing: '-0.04em', marginBottom: 20 }}>
             Previous Sol Cycles
           </div>
           {/* Arc with dots (SVG) and Day label */}

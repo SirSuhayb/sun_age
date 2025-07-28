@@ -1,0 +1,50 @@
+# =============================================================================
+# SOLAR TOKEN DISTRIBUTION SYSTEM - ENVIRONMENT VARIABLES
+# =============================================================================
+
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+
+# =============================================================================
+# FARCASTER CONFIGURATION
+# =============================================================================
+NEXT_PUBLIC_FARCASTER_HUB_URL=https://hub.farcaster.xyz
+NEXT_PUBLIC_FARCASTER_NETWORK=mainnet
+
+# =============================================================================
+# CONTRACT ADDRESSES
+# =============================================================================
+NEXT_PUBLIC_SOLAR_PLEDGE_ADDRESS=0x746042147240304098C837563aAEc0F671881B07
+NEXT_PUBLIC_USDC_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+NEXT_PUBLIC_SOLAR_TOKEN_ADDRESS=0x746042147240304098C837563aAEc0F671881B07
+NEXT_PUBLIC_SOLAR_UTILITY_ADDRESS=0x746042147240304098C837563aAEc0F671881B07
+NEXT_PUBLIC_MORPHO_ADDRESS=0x746042147240304098C837563aAEc0F671881B07
+NEXT_PUBLIC_TREASURY_ADDRESS=0x9EeF19328828d918693Befe278dD052799B6A7AF
+
+# =============================================================================
+# BLOCKCHAIN CONFIGURATION
+# =============================================================================
+NEXT_PUBLIC_RPC_URL=https://mainnet.base.org
+
+# =============================================================================
+# PAYMENT PROCESSING
+# =============================================================================
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+
+# =============================================================================
+# APP CONFIGURATION
+# =============================================================================
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# =============================================================================
+# ADMIN WALLET FOR SOLAR TOKEN DISTRIBUTION
+# =============================================================================
+ADMIN_WALLET_ADDRESS=0x9EeF19328828d918693Befe278dD052799B6A7AF
+ADMIN_WALLET_PRIVATE_KEY=0x9f82806c65b2518811e903adcf28a3744dfd07f462ace8d5c50fdb30535a168f
+
+# ⚠️  IMPORTANT: Keep your private key secure and never commit it to version control! 

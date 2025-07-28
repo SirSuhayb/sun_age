@@ -89,8 +89,7 @@ export default function SoldashLayout({
             {/* Title */}
             <div className="text-lg font-serif font-bold text-black">SOL DASH</div>
 
-            {/* Placeholder for balance */}
-            <div className="w-16"></div>
+
           </div>
         </div>
       </div>

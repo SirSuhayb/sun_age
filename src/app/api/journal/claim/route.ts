@@ -1,18 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '~/utils/supabase/server';
-import { ethers } from 'ethers';
-
-// SOLAR token contract details
-const SOLAR_TOKEN_ADDRESS = '0x746042147240304098C837563aAEc0F671881B07';
-const SOLAR_TOKEN_ABI = [
-  'function transfer(address to, uint256 amount) returns (bool)',
-  'function balanceOf(address account) view returns (uint256)',
-  'function decimals() view returns (uint8)'
-];
-
-// Admin wallet configuration
-const ADMIN_PRIVATE_KEY = process.env.ADMIN_WALLET_PRIVATE_KEY;
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'https://mainnet.base.org';
+import { tokenDistributor } from '~/lib/tokenDistributor';
 
 export async function POST(req: NextRequest) {
   const { userFid, entryId, shareId, walletAddress } = await req.json();
@@ -21,7 +9,11 @@ export async function POST(req: NextRequest) {
   // Accept both checksummed and lowercase addresses
   let normalizedAddress;
   try {
-    normalizedAddress = ethers.getAddress(walletAddress.toLowerCase());
+    // Simple address validation - you can use ethers.getAddress if ethers is imported
+    if (!walletAddress || !walletAddress.startsWith('0x') || walletAddress.length !== 42) {
+      throw new Error('Invalid wallet address format');
+    }
+    normalizedAddress = walletAddress.toLowerCase();
   } catch (error) {
     return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
   }
@@ -60,40 +52,22 @@ export async function POST(req: NextRequest) {
   let status: string;
 
   try {
-    if (!ADMIN_PRIVATE_KEY) {
-      // Fallback: simulate transaction for development
-      console.log('No admin wallet configured, simulating transaction...');
-      txHash = '0x' + Math.random().toString(16).slice(2).padEnd(64, '0');
-      status = 'pending';
+    // Use the token distributor for real token distribution
+    const distributionResult = await tokenDistributor.distributeJournalClaim(
+      userFid,
+      normalizedAddress,
+      entryId,
+      shareId
+    );
+
+    if (distributionResult.success) {
+      txHash = distributionResult.transactionHash || '0x' + Math.random().toString(16).slice(2).padEnd(64, '0');
+      status = 'confirmed';
+      console.log(`Successfully distributed ${distributionResult.amount} SOLAR tokens to ${normalizedAddress}`);
     } else {
-      // Real token transfer
-      console.log('Processing real token transfer...');
-      
-      // Setup provider and wallet
-      const provider = new ethers.JsonRpcProvider(RPC_URL);
-      const adminWallet = new ethers.Wallet(ADMIN_PRIVATE_KEY, provider);
-      
-      // Connect to SOLAR token contract
-      const solarToken = new ethers.Contract(SOLAR_TOKEN_ADDRESS, SOLAR_TOKEN_ABI, adminWallet);
-      
-      // Check admin wallet balance
-      const adminBalance = await solarToken.balanceOf(adminWallet.address);
-      const claimAmount = ethers.parseUnits('10000', 18); // 10,000 SOLAR tokens
-      
-      if (adminBalance < claimAmount) {
-        return NextResponse.json({ 
-          error: 'Insufficient tokens in admin wallet' 
-        }, { status: 500 });
-      }
-      
-      // Transfer tokens
-      const tx = await solarToken.transfer(normalizedAddress, claimAmount);
-      await tx.wait(); // Wait for confirmation
-      
-      txHash = tx.hash;
-      status = 'pending';
-      
-      console.log(`Successfully transferred 10,000 SOLAR tokens to ${normalizedAddress}`);
+      return NextResponse.json({ 
+        error: distributionResult.error || 'Token distribution failed' 
+      }, { status: 500 });
     }
 
     // Record claim in database
