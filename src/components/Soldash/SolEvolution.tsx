@@ -130,6 +130,67 @@ function getKeyThemeInsight(archetype: string, foundation: string, depth: string
   return insight;
 }
 
+// Generate contextual call-to-action for Oracle based on current phase
+function getOracleCallToAction(phaseName?: string, archetype?: string, agePhase?: string): string {
+  if (!phaseName || !archetype) {
+    return "Your current evolution calls for personalized daily guidance. Consult the Sol Oracle for cosmic wisdom tailored to your unique journey.";
+  }
+
+  const oracleMessages: Record<string, Record<string, string>> = {
+    'Sol Innovator': {
+      'Curious Experimenter': 'Your experimental phase thrives on daily cosmic insights. Let the Oracle guide your breakthrough discoveries.',
+      'System Questioner': 'Your questioning mind needs daily wisdom to challenge the right paradigms. Seek Oracle guidance for focused inquiry.',
+      'Innovation Architect': 'Your crystallizing vision requires daily cosmic alignment. The Oracle can illuminate your blueprint\'s next steps.',
+      'Connected Revolutionary': 'Your transformative work needs daily cosmic support. Let the Oracle guide your revolutionary impact.',
+      'Wisdom Transmitter': 'Your teaching role calls for daily divine inspiration. The Oracle channels cosmic wisdom through your guidance.',
+      'System Transformer': 'Your paradigm-shifting presence needs daily cosmic attunement. Seek Oracle wisdom for maximum transformational impact.'
+    },
+    'Sol Nurturer': {
+      'Natural Caregiver': 'Your caring nature flourishes with daily cosmic nourishment. Let the Oracle guide your nurturing gifts.',
+      'Community Builder': 'Your community work needs daily cosmic wisdom for sustainable growth. Seek Oracle guidance for collective healing.',
+      'Support System Creator': 'Your structural nurturing requires daily cosmic insight. The Oracle illuminates pathways for lasting support.',
+      'Growth Facilitator': 'Your facilitation gifts need daily cosmic alignment. Let the Oracle guide your role in others\' evolution.',
+      'Wisdom Keeper': 'Your sacred knowledge calls for daily cosmic renewal. The Oracle channels ancient wisdom through your keeping.',
+      'Sacred Guardian': 'Your protective presence needs daily cosmic strengthening. Seek Oracle wisdom for generational healing.'
+    },
+    'Sol Alchemist': {
+      'Sensitive Explorer': 'Your heightened sensitivity needs daily cosmic protection and guidance. The Oracle shields and directs your awareness.',
+      'Shadow Walker': 'Your journey through darkness requires daily cosmic light. Let the Oracle illuminate your transformational path.',
+      'Transformation Student': 'Your alchemical studies need daily cosmic teaching. Seek Oracle wisdom for mastering sacred change.',
+      'Wisdom Alchemist': 'Your mastery requires daily cosmic attunement for perfect transmutation. The Oracle guides your golden work.',
+      'Mystical Teacher': 'Your transformational guidance needs daily cosmic inspiration. Let the Oracle flow through your teaching.',
+      'Sacred Oracle': 'Your oracular gifts require daily cosmic communion. Seek divine wisdom to enhance your mystical insights.'
+    },
+    'Sol Sage': {
+      'Wonder Seeker': 'Your curious spirit needs daily cosmic mysteries to explore. The Oracle reveals new dimensions of understanding.',
+      'Truth Hunter': 'Your discernment requires daily cosmic sharpening. Let the Oracle guide your pursuit of authentic wisdom.',
+      'Experience Collector': 'Your knowledge gathering needs daily cosmic context. Seek Oracle wisdom to integrate your experiences.',
+      'Wisdom Teacher': 'Your teaching gift requires daily cosmic inspiration. The Oracle channels universal knowledge through your sharing.',
+      'Universal Connector': 'Your pattern recognition needs daily cosmic revelation. Let the Oracle show you deeper interconnections.',
+      'Cosmic Philosopher': 'Your philosophical insights require daily cosmic communion. Seek Oracle wisdom for transcendent understanding.'
+    },
+    'Sol Builder': {
+      'Foundation Layer': 'Your foundational work needs daily cosmic timing for maximum impact. The Oracle guides your patient building.',
+      'Skill Forger': 'Your skill development requires daily cosmic enhancement. Let the Oracle amplify your mastery journey.',
+      'Structure Creator': 'Your manifestation work needs daily cosmic alignment. Seek Oracle guidance for perfect timing and form.',
+      'Master Builder': 'Your systemic creations require daily cosmic wisdom for collective service. The Oracle guides your legacy work.',
+      'Architect of Legacy': 'Your generational building needs daily cosmic vision. Let the Oracle illuminate your lasting impact.',
+      'Eternal Foundation': 'Your foundational presence requires daily cosmic renewal. Seek Oracle wisdom for timeless strength.'
+    },
+    'Sol Artist': {
+      'Beauty Discoverer': 'Your artistic awakening needs daily cosmic inspiration. The Oracle reveals beauty in unexpected places.',
+      'Creative Rebel': 'Your authentic expression requires daily cosmic courage. Let the Oracle guide your artistic revolution.',
+      'Harmony Weaver': 'Your unifying creations need daily cosmic balance. Seek Oracle wisdom for perfect artistic synthesis.',
+      'Beauty Ambassador': 'Your healing art requires daily cosmic empowerment. The Oracle amplifies your transformational creativity.',
+      'Harmony Master': 'Your mastery needs daily cosmic attunement to universal beauty. Let the Oracle guide your artistic service.',
+      'Pure Beauty': 'Your embodied art requires daily cosmic communion. Seek Oracle wisdom for living as divine expression.'
+    }
+  };
+
+  const message = oracleMessages[archetype]?.[phaseName];
+  return message || `Your ${agePhase?.toLowerCase()} evolution calls for daily cosmic guidance. Consult the Sol Oracle for wisdom aligned with your current phase.`;
+}
+
 const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
   // Generate complete solar profile from birth date
   const solarProfile = bookmark?.birthDate ? getCompleteSolarProfile(bookmark.birthDate) : null;
@@ -268,11 +329,34 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
         </div>
       </div>
       {/* Upcoming Milestone */}
-      <div className="flex gap-3 items-start">
+      <div className="flex gap-3 items-start mb-2">
         <Image src="/you/little_nova.svg" alt="Upcoming Milestone Icon" width={32} height={32} className="w-8 h-8 mt-1" />
         <div>
           <div className="font-mono text-[#E67803] text-lg font-medium uppercase tracking-tight mb-1">{milestoneLabel}</div>
           <div className="font-serif text-lg text-black leading-snug">{milestoneDescription}</div>
+        </div>
+      </div>
+      {/* Daily Guidance CTA */}
+      <div className="flex gap-3 items-start">
+        <div className="w-8 h-8 mt-1 flex items-center justify-center text-xl">🔮</div>
+        <div>
+          <div className="font-mono text-[#E67803] text-lg font-medium uppercase tracking-tight mb-1">SEEK DAILY GUIDANCE</div>
+          <div className="font-serif text-lg text-black leading-snug mb-3">
+            {getOracleCallToAction(phaseInfo?.name, solArchetype, agePhase)}
+          </div>
+          <button
+            onClick={() => {
+              const birthDate = bookmark.birthDate;
+              if (birthDate) {
+                window.location.href = `/surprise-me?birthDate=${birthDate}`;
+              } else {
+                window.location.href = '/surprise-me';
+              }
+            }}
+            className="text-sm font-mono text-[#E67803] underline underline-offset-2 tracking-widest uppercase hover:text-[#C05B00] transition-colors"
+          >
+            Consult the Sol Oracle
+          </button>
         </div>
       </div>
     </div>
