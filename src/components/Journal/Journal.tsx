@@ -120,13 +120,18 @@ export function Journal({ solAge }: JournalProps) {
     setEditingEntry({ ...entry });
   };
 
-  const handleSave = async (entryToSave: { id?: string, content: string }) => {
+  const handleSave = async (entryToSave: { id?: string, content: string, parent_entry_id?: string, parent_share_id?: string }) => {
     if (editingEntry && editingEntry.id) {
       // Update existing entry
       await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid);
     } else {
       // Create a new entry and immediately update the editor state
-      const newEntry = await createEntry({ content: entryToSave.content, sol_day: solAge }, userFid);
+      const newEntry = await createEntry({ 
+        content: entryToSave.content, 
+        sol_day: solAge,
+        parent_entry_id: entryToSave.parent_entry_id,
+        parent_share_id: entryToSave.parent_share_id
+      }, userFid);
       // Update the editing entry state so future auto-saves update this entry, not create new ones
       setEditingEntry(newEntry);
     }

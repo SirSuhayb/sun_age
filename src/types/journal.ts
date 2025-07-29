@@ -48,6 +48,8 @@ export interface WisdomSuggestion {
 export interface CreateJournalEntryRequest {
   content: string;
   sol_day: number;
+  parent_entry_id?: string;
+  parent_share_id?: string;
 }
 
 export interface UpdateJournalEntryRequest {

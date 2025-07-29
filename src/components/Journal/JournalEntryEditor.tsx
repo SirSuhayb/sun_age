@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 
 interface JournalEntryEditorProps {
   entry: JournalEntry;
-  onSave: (entryToSave: { id?: string, content: string }) => Promise<void>;
+  onSave: (entryToSave: { id?: string, content: string, parent_entry_id?: string, parent_share_id?: string }) => Promise<void>;
   onAutoSave: (entryToSave: { id?: string, content: string }) => Promise<void>;
   onFinish: () => void;
   onEdit?: () => void;

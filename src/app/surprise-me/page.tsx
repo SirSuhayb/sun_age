@@ -656,7 +656,7 @@ export default function SurpriseMePage() {
                 angle.set(planetAngles[angleKey]);
               }
               return () => controls && controls.stop();
-            }, [isRolling, planetAngles, angleKey]);
+            }, [angle, angleKey]);
             const left = useTransform(angle, a => `${cx + radius * Math.cos((a * Math.PI) / 180)}px`);
             const top = useTransform(angle, a => `${cy + radius * Math.sin((a * Math.PI) / 180)}px`);
             return (

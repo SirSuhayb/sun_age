@@ -158,7 +158,7 @@ async function getRootEntriesForUser(
     if (!entries) return [];
     
     // Filter to only root nodes (no parent relationships)
-    const rootEntries = [];
+    const rootEntries: WisdomTreeNode[] = [];
     for (const entry of entries) {
       const { data: parentRel } = await supabase
         .from('journal_entry_relationships')

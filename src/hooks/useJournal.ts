@@ -73,7 +73,9 @@ export function useJournal() {
           const requestBody = {
             content: entry.content,
             sol_day: entry.sol_day,
-            userFid: userFid
+            userFid: userFid,
+            parent_entry_id: entry.parent_entry_id,
+            parent_share_id: entry.parent_share_id
           };
           
           console.log('[useJournal] Sending migration request:', {
@@ -149,7 +151,9 @@ export function useJournal() {
         content: data.content,
         word_count: data.content.trim().split(/\s+/).length,
         preservation_status: 'local',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        parent_entry_id: data.parent_entry_id,
+        parent_share_id: data.parent_share_id
       };
 
       setEntries(prev => {
