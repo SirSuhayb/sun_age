@@ -23,7 +23,8 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
 
   useEffect(() => {
     // Load roll data from localStorage
-    const storedRolls = localStorage.getItem('dailyRolls');
+    const today = new Date().toDateString();
+    const storedRolls = localStorage.getItem(`dailyRolls_${today}`);
     if (storedRolls) {
       const parsed = JSON.parse(storedRolls);
       const currentRoll = parsed.history?.find((roll: DailyRoll) => roll.id === id);
