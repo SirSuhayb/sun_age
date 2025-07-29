@@ -82,6 +82,9 @@ export default function SurpriseMePage() {
   const [showGameExplanation, setShowGameExplanation] = useState(false);
   const [hasSeenExplanation, setHasSeenExplanation] = useState(false);
   
+  // Wallet tooltip state
+  const [walletTooltipDismissed, setWalletTooltipDismissed] = useState(false);
+  
   // Token distribution state
   const [isDistributingTokens, setIsDistributingTokens] = useState(false);
   const [tokenDistributionResult, setTokenDistributionResult] = useState<any>(null);
@@ -138,6 +141,10 @@ export default function SurpriseMePage() {
       const seenExplanation = localStorage.getItem('surpriseMeExplanationSeen');
       setHasSeenExplanation(!!seenExplanation);
       
+      // Check if wallet tooltip has been dismissed
+      const tooltipDismissed = localStorage.getItem('walletTooltipDismissed');
+      setWalletTooltipDismissed(!!tooltipDismissed);
+      
       // Initialize SOLAR earnings
       const earnings = solarEarningsManager.getEarningsSummary();
       setSolarEarnings(earnings);
@@ -156,6 +163,14 @@ export default function SurpriseMePage() {
       setAvailableRolls(3); // default if not found
     }
   }, []);
+
+  // Reset wallet tooltip dismissed state when user connects wallet
+  useEffect(() => {
+    if (isConnected && walletTooltipDismissed) {
+      setWalletTooltipDismissed(false);
+      localStorage.removeItem('walletTooltipDismissed');
+    }
+  }, [isConnected, walletTooltipDismissed]);
 
 
 
@@ -531,9 +546,9 @@ export default function SurpriseMePage() {
         </div>
       )}
 
-      {/* Wallet Connection Prompt */}
-      {!isConnected && (
-        <div className="fixed bottom-4 left-4 right-4 z-50 bg-blue-100 border border-blue-300 p-4 rounded-none shadow-lg">
+      {/* Wallet Connection Prompt - only show for web users who haven't dismissed it */}
+      {!isConnected && !isInFrame && !walletTooltipDismissed && (
+        <div className="fixed bottom-4 left-4 right-4 z-[60] bg-blue-100 border border-blue-300 p-4 rounded-none shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="text-blue-600">🔗</div>
@@ -541,12 +556,24 @@ export default function SurpriseMePage() {
                 CONNECT WALLET TO RECEIVE SOLAR TOKENS
               </div>
             </div>
-            <button
-              onClick={() => connect({ connector: connectors[0] })}
-              className="px-4 py-2 bg-blue-600 text-white font-mono text-xs hover:bg-blue-700 transition-colors"
-            >
-              CONNECT
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => connect({ connector: connectors[0] })}
+                className="px-4 py-2 bg-blue-600 text-white font-mono text-xs hover:bg-blue-700 transition-colors"
+              >
+                CONNECT
+              </button>
+              <button
+                onClick={() => {
+                  setWalletTooltipDismissed(true);
+                  localStorage.setItem('walletTooltipDismissed', 'true');
+                }}
+                className="px-2 py-2 text-blue-600 hover:text-blue-800 font-mono text-xs transition-colors"
+                aria-label="Dismiss wallet connection prompt"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         </div>
       )}
