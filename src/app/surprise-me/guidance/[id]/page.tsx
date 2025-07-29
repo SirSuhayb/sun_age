@@ -12,7 +12,7 @@ import { solarEarningsManager } from '~/lib/solarEarnings';
 import ProductImage from '@/components/ProductImage';
 import { PulsingStarSpinner } from '~/components/ui/PulsingStarSpinner';
 import { surpriseMeFramework } from '~/lib/surpriseMe';
-import { getSolarArchetype } from '~/lib/astrology';
+import { getSolarArchetype } from '~/lib/solarIdentity';
 
 export default function GuidancePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
