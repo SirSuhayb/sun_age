@@ -105,7 +105,7 @@ export function getNextMilestone(days: number, birthDate: Date): Milestone | nul
     cycles: nextInterval,
     label: 'Numerical Milestone',
     emoji: '🔢',
-    description: 'A significant numerical milestone.',
+    description: 'A significant numerical milestone',
     daysToMilestone: toNextInterval,
     milestoneDate: dInterval.toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\//g, "."),
     type: 'interval'
@@ -123,7 +123,7 @@ export function getNextMilestone(days: number, birthDate: Date): Milestone | nul
     cycles: cyclesAtBirthday,
     label: 'Solar Return',
     emoji: '🌞',
-    description: 'Your annual solar return.',
+    description: 'Your annual solar return',
     daysToMilestone: daysToBirthday,
     milestoneDate: nextBirthday.toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\//g, "."),
     type: 'cosmic'
@@ -141,7 +141,7 @@ export function getNextMilestone(days: number, birthDate: Date): Milestone | nul
     cycles: nextPalindrome,
     label: 'Palindrome Day',
     emoji: '🔄',
-    description: 'A rare palindrome day count!',
+    description: 'A rare palindrome day count',
     daysToMilestone: toNextPalindrome,
     milestoneDate: dPalindrome.toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\//g, "."),
     type: 'palindrome'
@@ -159,7 +159,7 @@ export function getNextMilestone(days: number, birthDate: Date): Milestone | nul
     cycles: nextInteresting,
     label: 'Interesting Number',
     emoji: '✨',
-    description: 'A mathematically interesting number!',
+    description: 'A mathematically interesting number',
     daysToMilestone: toNextInteresting,
     milestoneDate: dInteresting.toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\//g, "."),
     type: 'interesting'

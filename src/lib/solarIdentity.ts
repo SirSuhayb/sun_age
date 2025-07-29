@@ -29,21 +29,21 @@ export const LIFE_PHASES: LifePhase[] = [
 
 // Foundation types based on primary life focus/energy
 export const FOUNDATION_TYPES = {
-  'Seeker Foundation': 'Driven by curiosity and the need to understand',
-  'Builder Foundation': 'Focused on creating lasting structures and systems',
-  'Nurturer Foundation': 'Centered on growth, care, and supporting others',
-  'Innovator Foundation': 'Motivated by change, creativity, and breakthrough thinking',
-  'Wisdom Foundation': 'Grounded in experience and sharing knowledge',
+  'Seeker Foundation': 'Driven by curiosity and understanding',
+  'Builder Foundation': 'Focused on creating lasting structures',
+  'Nurturer Foundation': 'Centered on growth and supporting others',
+  'Innovator Foundation': 'Motivated by change and breakthrough thinking',
+  'Wisdom Foundation': 'Grounded in experience and knowledge sharing',
   'Harmonic Foundation': 'Balanced integration of all energies'
 };
 
 // Depth types based on inner processing style
 export const DEPTH_TYPES = {
-  'Explorer Depth': 'Surface-level curiosity with broad interests',
-  'Artisan Depth': 'Skilled crafting with attention to beauty and form',
-  'Alchemist Depth': 'Deep transformation through understanding hidden patterns',
-  'Sage Depth': 'Profound wisdom integration across multiple domains',
-  'Mystic Depth': 'Transcendent understanding beyond conventional knowledge'
+  'Explorer Depth': 'Surface curiosity with broad interests',
+  'Artisan Depth': 'Skilled crafting with attention to beauty',
+  'Alchemist Depth': 'Deep transformation through pattern recognition',
+  'Sage Depth': 'Profound wisdom across multiple domains',
+  'Mystic Depth': 'Transcendent understanding beyond convention'
 };
 
 // Matrix: [Archetype][Age Phase] -> Foundation
@@ -244,23 +244,23 @@ export function getDepth(archetype: string, agePhase: string): string {
 
 // Updated core quotes that incorporate foundation/depth awareness
 export const solarArchetypeCoreQuotes: Record<string, string> = {
-  'Sol Innovator': "I channel tomorrow's dreams into today's reality through systematic transformation",
-  'Sol Nurturer': "I create sacred spaces where souls can grow and foundations can flourish",
-  'Sol Alchemist': "I transform darkness into golden wisdom through deep pattern recognition",
-  'Sol Sage': "I expand consciousness through adventurous wisdom-seeking and systematic understanding",
-  'Sol Builder': "I construct lasting foundations that support collective achievement and growth",
-  'Sol Artist': "I weave beauty and harmony into systematic structures that inspire human connection",
+  'Sol Innovator': "I build tomorrow through conscious transformation",
+  'Sol Nurturer': "I create sacred spaces where souls flourish",
+  'Sol Alchemist': "I transform shadows into golden wisdom",
+  'Sol Sage': "I expand consciousness through fearless exploration",
+  'Sol Builder': "I craft lasting foundations for collective growth",
+  'Sol Artist': "I weave beauty into structures that inspire connection",
   'Sol Traveler': "You are a child of the cosmos, building your unique path through space and time",
 };
 
 export const solarArchetypeRadiatesWith: Record<string, string> = {
-  'Sol Innovator': 'Their inner Sol radiates with electric creativity, systematic thinking, and transformative humanitarian vision.',
-  'Sol Nurturer': 'Their inner Sol radiates with nurturing care, structural wisdom, and the power to help others build lasting growth.',
-  'Sol Alchemist': 'Their inner Sol radiates with deep transformative wisdom, systematic pattern recognition, and the courage to build light from darkness.',
-  'Sol Sage': 'Their inner Sol radiates with adventurous wisdom, systematic knowledge integration, and consciousness expansion through structured exploration.',
-  'Sol Builder': 'Their inner Sol radiates with steadfast dedication, transformative insight, and the ability to create foundations that evolve and adapt.',
-  'Sol Artist': 'Their inner Sol radiates with beauty, systematic harmony, and the gift of inspiring human connection through structured creativity.',
-  'Sol Traveler': 'Their inner Sol radiates with curiosity, systematic wonder, and the deep building of cosmic understanding.'
+  'Sol Innovator': 'Their inner Sol radiates with electric creativity, breakthrough thinking, and humanitarian vision.',
+  'Sol Nurturer': 'Their inner Sol radiates with nurturing care, patient wisdom, and power to cultivate growth.',
+  'Sol Alchemist': 'Their inner Sol radiates with transformative insight, pattern recognition, and courage to transmute darkness.',
+  'Sol Sage': 'Their inner Sol radiates with adventurous wisdom, knowledge integration, and consciousness expansion.',
+  'Sol Builder': 'Their inner Sol radiates with steadfast dedication, structural insight, and ability to create lasting foundations.',
+  'Sol Artist': 'Their inner Sol radiates with beauty, harmony, and gift for inspiring human connection.',
+  'Sol Traveler': 'Their inner Sol radiates with curiosity, wonder, and deep cosmic understanding.'
 };
 
 /**
@@ -377,32 +377,49 @@ export function generateSolarIdentityDescription(
   const archetypeDescriptors: Record<string, string> = {
     'Sol Innovator': 'visionary architect of the future',
     'Sol Nurturer': 'sacred gardener of human potential',
-    'Sol Alchemist': 'mystical transformer of darkness into light',
+    'Sol Alchemist': 'mystical transformer of shadows',
     'Sol Sage': 'philosophical explorer of consciousness',
     'Sol Builder': 'cosmic architect of lasting foundations',
     'Sol Artist': 'divine weaver of beauty and harmony',
   };
 
   const sunSignTraits: Record<string, string> = {
-    'Aries': 'pioneering fire with unstoppable momentum',
-    'Taurus': 'grounding earth energy with unshakeable determination',
-    'Gemini': 'quicksilver communication with endless curiosity',
-    'Cancer': 'protective waters with deep emotional wisdom',
-    'Leo': 'radiant solar power with magnetic leadership',
-    'Virgo': 'precision earth magic with perfectionist drive',
-    'Libra': 'harmonizing air with diplomatic grace',
-    'Scorpio': 'transformational intensity with penetrating insight',
-    'Sagittarius': 'expansive fire with philosophical wisdom',
-    'Capricorn': 'mountainous authority with strategic mastery',
-    'Aquarius': 'revolutionary innovation with humanitarian vision',
-    'Pisces': 'flowing intuition with mystical connection',
+    'Aries': 'pioneering fire and unstoppable momentum',
+    'Taurus': 'grounding earth energy and unshakeable determination',
+    'Gemini': 'quicksilver communication and endless curiosity',
+    'Cancer': 'protective waters and deep emotional wisdom',
+    'Leo': 'radiant solar power and magnetic leadership',
+    'Virgo': 'precision earth magic and perfectionist drive',
+    'Libra': 'harmonizing air and diplomatic grace',
+    'Scorpio': 'transformational intensity and penetrating insight',
+    'Sagittarius': 'expansive fire and philosophical wisdom',
+    'Capricorn': 'mountainous authority and strategic mastery',
+    'Aquarius': 'revolutionary innovation and humanitarian vision',
+    'Pisces': 'flowing intuition and mystical connection',
+  };
+
+  const foundationIntegrations: Record<string, string> = {
+    'Seeker Foundation': 'through curious exploration',
+    'Builder Foundation': 'through structured creation',
+    'Nurturer Foundation': 'through patient cultivation',
+    'Innovator Foundation': 'through breakthrough thinking',
+    'Wisdom Foundation': 'through experienced guidance',
+    'Harmonic Foundation': 'through balanced integration',
+  };
+
+  const depthExpressions: Record<string, string> = {
+    'Explorer Depth': 'with broad curiosity',
+    'Artisan Depth': 'with skilled craftsmanship',
+    'Alchemist Depth': 'with transformative insight',
+    'Sage Depth': 'with profound wisdom',
+    'Mystic Depth': 'with transcendent understanding',
   };
 
   const archetypeDescriptor = archetypeDescriptors[solArchetype] || '';
   const sunSignTrait = sunSignTraits[sunSign] || '';
-  const foundationDescription = getFoundationDescription(foundation);
-  const depthDescription = getDepthDescription(depth);
+  const foundationIntegration = foundationIntegrations[foundation] || '';
+  const depthExpression = depthExpressions[depth] || '';
   const phaseContext = agePhase ? ` In your ${agePhase}, you are` : ' You are';
 
-  return `${phaseContext} a ${archetypeDescriptor}, combining ${sunSignTrait} with deep transformational wisdom. Your ${foundation.replace(' Foundation', '')} foundation makes you ${foundationDescription.toLowerCase()}, while your ${depth.replace(' Depth', '')} depth gives you ${depthDescription.toLowerCase()} that serves humanity's evolution.`;
+  return `${phaseContext} a ${archetypeDescriptor}, expressing ${sunSignTrait} ${foundationIntegration} and ${depthExpression}.`;
 }
