@@ -747,17 +747,29 @@ export function Journal({ solAge }: JournalProps) {
                       </p>
                       <div className="flex justify-between items-center text-xs font-mono uppercase tracking-widest">
                         <div className="flex gap-4">
-                          {entry.preservation_status === 'local' && (
+                          {(entry.preservation_status === 'local' || entry.preservation_status === 'synced') && (
                             <button
                               onClick={() => handleEdit(entry)}
                               className="text-gray-500 hover:text-black underline underline-offset-2"
                             >EDIT</button>
+                          )}
+                          {(entry.preservation_status === 'local' || entry.preservation_status === 'synced') && (
+                            <button
+                              onClick={() => setEntryToDelete(entry.id)}
+                              className="text-red-500 hover:text-red-700 underline underline-offset-2"
+                            >DELETE</button>
                           )}
                           {entry.preservation_status === 'local' && (
                             <button
                               onClick={() => {/* preserve logic here */}}
                               className="text-[#BFA12A] hover:text-[#8c7a2a] underline underline-offset-2"
                             >PRESERVE</button>
+                          )}
+                          {entry.preservation_status === 'synced' && (
+                            <button
+                              onClick={() => handleShare(entry)}
+                              className="text-blue-600 hover:text-blue-800 underline underline-offset-2"
+                            >SHARE</button>
                           )}
                           {entry.preservation_status === 'preserved' && (
                             <button
