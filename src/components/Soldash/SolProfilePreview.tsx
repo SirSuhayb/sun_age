@@ -79,16 +79,11 @@ const SolProfilePreview: React.FC<SolProfilePreviewProps> = ({ bookmark }) => {
         <Image src={radiantSunSvg} alt="Radiant Sun" width={56} height={56} className="w-14 h-14 object-contain" style={{ borderRadius: 0 }} />
       </div>
 
-      {/* Subheader: Foundation & Depth with Age Phase Context */}
+      {/* Subheader: Foundation & Depth */}
       <div className="text-center">
         <div className="text-base font-mono tracking-tight leading-tightest text-[#888] uppercase">
           {foundation.toUpperCase()} & {depth.toUpperCase()}
         </div>
-        {agePhase && (
-          <div className="text-sm font-mono text-[#999] mt-1 uppercase tracking-wide">
-            {agePhase} Expression
-          </div>
-        )}
       </div>
 
       {/* Power Phrase */}
