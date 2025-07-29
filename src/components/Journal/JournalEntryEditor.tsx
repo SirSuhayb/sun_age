@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 
 interface JournalEntryEditorProps {
   entry: JournalEntry;
-  onSave: (entryToSave: { id?: string, content: string }) => Promise<void>;
+  onSave: (entryToSave: { id?: string, content: string, parent_entry_id?: string, parent_share_id?: string }) => Promise<void>;
   onAutoSave: (entryToSave: { id?: string, content: string }) => Promise<void>;
   onFinish: () => void;
   onEdit?: () => void;
@@ -91,7 +91,12 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
     try {
       // Add a small delay to show the spinner animation
       await new Promise(resolve => setTimeout(resolve, 800));
-      await onSave({ id: entry.id, content });
+      await onSave({ 
+        id: entry.id, 
+        content,
+        parent_entry_id: entry.parent_entry_id,
+        parent_share_id: entry.parent_share_id
+      });
       setLastSaved(new Date());
     } catch (e: any) {
       setError(e.message || "Failed to save entry");

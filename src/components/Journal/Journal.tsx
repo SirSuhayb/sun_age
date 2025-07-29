@@ -120,13 +120,18 @@ export function Journal({ solAge }: JournalProps) {
     setEditingEntry({ ...entry });
   };
 
-  const handleSave = async (entryToSave: { id?: string, content: string }) => {
+  const handleSave = async (entryToSave: { id?: string, content: string, parent_entry_id?: string, parent_share_id?: string }) => {
     if (editingEntry && editingEntry.id) {
       // Update existing entry
       await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid);
     } else {
       // Create a new entry and immediately update the editor state
-      const newEntry = await createEntry({ content: entryToSave.content, sol_day: solAge }, userFid);
+      const newEntry = await createEntry({ 
+        content: entryToSave.content, 
+        sol_day: solAge,
+        parent_entry_id: entryToSave.parent_entry_id,
+        parent_share_id: entryToSave.parent_share_id
+      }, userFid);
       // Update the editing entry state so future auto-saves update this entry, not create new ones
       setEditingEntry(newEntry);
     }
@@ -341,7 +346,7 @@ export function Journal({ solAge }: JournalProps) {
   };
 
   // Handler for "Add a reflection" CTA
-  const handleAddReflection = () => {
+  const handleAddReflection = (parentEntryId?: string, parentShareId?: string) => {
     setPreviewEntry(null);
     setEditingEntry({
       id: '',
@@ -350,7 +355,10 @@ export function Journal({ solAge }: JournalProps) {
       content: '',
       preservation_status: 'local',
       word_count: 0,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      // Track the parent entry that inspired this reflection
+      parent_entry_id: parentEntryId,
+      parent_share_id: parentShareId
     });
   };
 

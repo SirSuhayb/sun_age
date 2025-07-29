@@ -31,6 +31,7 @@ export async function GET(
       .single();
 
     return new Response(JSON.stringify({
+      id: share.id,
       entry: share.journal_entries,
       authorFid: share.user_fid,
       authorUsername: profile?.username || null,
