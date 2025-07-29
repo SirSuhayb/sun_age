@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { getSunSign, getSolPhase, getSolarArchetype, dayRangeToAgeRange } from '../../lib/solarIdentity';
+import { getSunSign, getSolPhase, getSolarArchetype, dayRangeToAgeRange, getCompleteSolarProfile, getFoundationDescription, getDepthDescription } from '../../lib/solarIdentity';
 import { getNextMilestone } from '../../lib/milestones';
 
 interface Bookmark {
@@ -9,6 +9,7 @@ interface Bookmark {
   solArchetype?: string;
   foundation?: string;
   depth?: string;
+  agePhase?: string;
 }
 
 interface SolEvolutionProps {
@@ -16,10 +17,14 @@ interface SolEvolutionProps {
 }
 
 const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
-  const sunSign = bookmark?.birthDate ? getSunSign(bookmark.birthDate) : '';
-  const solArchetype = bookmark?.solArchetype || (bookmark.birthDate ? getSolarArchetype(bookmark.birthDate) : '');
-  const foundation = bookmark.foundation || 'Builder Foundation';
-  const depth = bookmark.depth || 'Alchemist Depth';
+  // Generate complete solar profile from birth date
+  const solarProfile = bookmark?.birthDate ? getCompleteSolarProfile(bookmark.birthDate) : null;
+  
+  const sunSign = solarProfile?.sunSign || (bookmark?.birthDate ? getSunSign(bookmark.birthDate) : '');
+  const solArchetype = solarProfile?.archetype || bookmark?.solArchetype || '';
+  const foundation = solarProfile?.foundation || bookmark?.foundation || 'Seeker Foundation';
+  const depth = solarProfile?.depth || bookmark?.depth || 'Explorer Depth';
+  const agePhase = solarProfile?.agePhase || bookmark?.agePhase || '';
 
   // Use solAge from bookmark if present, otherwise calculate from birthDate
   const solAge =
@@ -34,13 +39,16 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
   console.log('SolEvolution debug:', {
     solArchetype,
     solAge,
+    foundation,
+    depth,
+    agePhase,
     phaseInfo: solArchetype && solAge !== undefined ? getSolPhase(solArchetype, solAge) : null,
     bookmark
   });
 
   const phaseInfo = solArchetype && solAge !== undefined ? getSolPhase(solArchetype, solAge) : null;
 
-  // Current Phase: name, age range, description
+  // Current Phase: name, age range, description with enhanced foundation/depth context
   let phaseLabel = '';
   let phaseDescription = '';
   if (phaseInfo && solArchetype) {
@@ -97,14 +105,20 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
     const phaseRange = phaseRanges[solArchetype][phaseInfo.phase - 1];
     const ageRange = dayRangeToAgeRange(phaseRange.min, phaseRange.max === Infinity ? phaseRange.min + 3652 : phaseRange.max);
     phaseLabel = `CURRENT PHASE (${ageRange})`;
-    phaseDescription = `The ${phaseInfo.name} — You're in a key period for your ${solArchetype.replace('Sol ', '')} journey, where your ${foundation.replace(' Foundation', '')} skills meet ${depth.replace(' Depth', '')} wisdom.`;
+    
+    // Enhanced description with foundation/depth context
+    const foundationDesc = getFoundationDescription(foundation).toLowerCase();
+    const depthDesc = getDepthDescription(depth).toLowerCase();
+    phaseDescription = `The ${phaseInfo.name} — You're in a ${agePhase.toLowerCase()} period where you are ${foundationDesc}, using ${depthDesc} to create meaningful impact in your ${solArchetype.replace('Sol ', '')} journey.`;
   } else {
     phaseLabel = 'CURRENT PHASE';
     phaseDescription = 'Your current phase information will appear here.';
   }
 
-  // Key Themes: template-based
-  const keyTheme = `Balancing your ${foundation.replace(' Foundation', '').toLowerCase()} skills with your ${depth.replace(' Depth', '').toLowerCase()} wisdom. This year, your ${solArchetype.replace('Sol ', '') || 'solar'} energy is ready to reach wider audiences.`;
+  // Enhanced Key Themes with age-appropriate foundation/depth integration
+  const foundationContext = getFoundationDescription(foundation).toLowerCase();
+  const depthContext = getDepthDescription(depth).toLowerCase(); 
+  const keyTheme = `In your ${agePhase || 'current phase'}, you are ${foundationContext} while developing ${depthContext}. This creates a unique ${solArchetype.replace('Sol ', '') || 'solar'} expression ready to reach and impact wider communities.`;
 
   // Upcoming Milestone
   let milestoneLabel = '';
