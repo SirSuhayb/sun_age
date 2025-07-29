@@ -12,6 +12,7 @@ import { solarEarningsManager } from '~/lib/solarEarnings';
 import ProductImage from '@/components/ProductImage';
 import { PulsingStarSpinner } from '~/components/ui/PulsingStarSpinner';
 import { surpriseMeFramework } from '~/lib/surpriseMe';
+import { getSolarArchetype } from '~/lib/solarIdentity';
 
 export default function GuidancePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -23,7 +24,8 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
 
   useEffect(() => {
     // Load roll data from localStorage
-    const storedRolls = localStorage.getItem('dailyRolls');
+    const today = new Date().toDateString();
+    const storedRolls = localStorage.getItem(`dailyRolls_${today}`);
     if (storedRolls) {
       const parsed = JSON.parse(storedRolls);
       const currentRoll = parsed.history?.find((roll: DailyRoll) => roll.id === id);
@@ -36,7 +38,22 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
 
     // DEV ONLY: If no roll found in localStorage, try to create one from the framework
     if (!rollData && process.env.NODE_ENV === 'development') {
-      surpriseMeFramework.getArchetypeActivities('Sol Innovator').then(allActivities => {
+      // Try to get user's archetype from stored data
+      const bookmark = localStorage.getItem('sunCycleBookmark');
+      let userArchetype = 'Sol Innovator'; // Default fallback
+      
+      if (bookmark) {
+        try {
+          const parsed = JSON.parse(bookmark);
+          if (parsed.birthDate) {
+            userArchetype = getSolarArchetype(parsed.birthDate);
+          }
+        } catch (error) {
+          console.error('Error getting user archetype:', error);
+        }
+      }
+      
+      surpriseMeFramework.getArchetypeActivities(userArchetype).then(allActivities => {
         const devRoll = allActivities.find(activity => activity.id === id);
         if (devRoll) {
           setRollData(devRoll);
