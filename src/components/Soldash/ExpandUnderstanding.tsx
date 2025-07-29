@@ -34,10 +34,10 @@ const ExpandUnderstanding: React.FC = () => {
         </ul>
       </div>
       <button
-        className="w-full py-4 bg-[#E6B13A] text-black font-mono text-lg tracking-widest uppercase border-none rounded-none mt-2 cursor-not-allowed"
-        disabled
+        className="w-full py-4 bg-[#E6B13A] text-black font-mono text-lg tracking-widest uppercase border-none rounded-none mt-2 hover:bg-[#D4A02A] transition-colors"
+        onClick={() => window.location.href = '/soldash/you/expand'}
       >
-        Coming Soon
+        Unlock Your Chart
       </button>
     </div>
   );
