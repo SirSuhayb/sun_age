@@ -185,10 +185,10 @@ export default function CeremonyStepper() {
       autoBookmark(); // <-- Automatically bookmark after successful pledge
       next(); // Move to next step on success
       
-      // Show screenshot prompt after successful pledge
-      setTimeout(() => {
-        showScreenshotPrompt();
-      }, 1000);
+      // Show screenshot prompt after successful pledge - DISABLED due to false triggers
+      // setTimeout(() => {
+      //   showScreenshotPrompt();
+      // }, 1000);
     } catch (err) {
       console.error('Pledge error:', err);
       setUiError(err instanceof Error ? err.message : "Failed to process transaction");
