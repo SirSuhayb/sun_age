@@ -20,8 +20,8 @@ export async function getArchetypeActivities(archetype: string): Promise<DailyRo
   }
 
   try {
-    const module = await import(`./${fileName}`);
-    return module.activities;
+    const activityModule = await import(`./${fileName}`);
+    return activityModule.activities;
   } catch (error) {
     console.error(`Failed to load activities for ${archetype}:`, error);
     // Fallback to Sol Traveler
