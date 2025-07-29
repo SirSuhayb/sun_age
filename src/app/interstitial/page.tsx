@@ -184,7 +184,7 @@ export default function InterstitialPage() {
               style={{ backgroundColor: '#FFF7B0' }}
               onClick={() => {
                 handleBookmark();
-                router.push('/soldash?tab=sol%20sign');
+                router.push('/soldash/you');
               }}
             >
               <Image src="/tabIcons/radiance.svg" alt="Radiance" width={80} height={80} className="object-contain" />
@@ -214,7 +214,7 @@ export default function InterstitialPage() {
               style={{ backgroundColor: '#C7E6FF' }}
               onClick={() => {
                 handleBookmark();
-                router.push('/soldash?tab=journal');
+                router.push('/soldash/journal');
               }}
             >
               <Image src="/tabIcons/galaxy.svg" alt="Galaxy" width={80} height={80} className="object-contain" />
