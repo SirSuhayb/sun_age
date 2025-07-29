@@ -57,6 +57,11 @@ export function Journal({ solAge }: JournalProps) {
   const { sdk, isInFrame, context, connectManually, refreshContext, loading: frameLoading } = useFrameSDK();
   const [previewEntry, setPreviewEntry] = useState<JournalEntry | null>(null);
   
+  // Non-Farcaster user support
+  const [userAccountId, setUserAccountId] = useState<string | null>(null);
+  const [showAccountCreation, setShowAccountCreation] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  
   // Get userFid from Farcaster context or dev override
   const isDev = process.env.NODE_ENV === 'development';
   const farcasterUserFid = context?.user?.fid;
@@ -123,7 +128,7 @@ export function Journal({ solAge }: JournalProps) {
   const handleSave = async (entryToSave: { id?: string, content: string, parent_entry_id?: string, parent_share_id?: string }) => {
     if (editingEntry && editingEntry.id) {
       // Update existing entry
-      await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid);
+      await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid, userAccountId);
     } else {
       // Create a new entry and immediately update the editor state
       const newEntry = await createEntry({ 
@@ -131,7 +136,7 @@ export function Journal({ solAge }: JournalProps) {
         sol_day: solAge,
         parent_entry_id: entryToSave.parent_entry_id,
         parent_share_id: entryToSave.parent_share_id
-      }, userFid);
+      }, userFid, userAccountId);
       // Update the editing entry state so future auto-saves update this entry, not create new ones
       setEditingEntry(newEntry);
     }
@@ -154,6 +159,49 @@ export function Journal({ solAge }: JournalProps) {
     if (entryToDelete) {
       deleteEntry(entryToDelete, userFid);
       setEntryToDelete(null);
+    }
+  };
+
+  // Create user account for non-Farcaster users
+  const handleCreateUserAccount = async () => {
+    if (!userEmail) {
+      setMigrationError('Email is required to create an account');
+      return;
+    }
+    
+    setIsMigrating(true);
+    setMigrationError(null);
+    
+    try {
+      console.log('[Journal] Creating user account for email:', userEmail);
+      
+      const response = await fetch('/api/user-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userEmail,
+          platform: 'web'
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create account');
+      }
+      
+      const { account } = await response.json();
+      console.log('[Journal] User account created:', account);
+      
+      setUserAccountId(account.id);
+      setShowAccountCreation(false);
+      
+      // Now try migration again
+      await handleMigrateLocalEntries();
+    } catch (err: any) {
+      console.error('[Journal] Account creation failed:', err);
+      setMigrationError(err.message || 'Failed to create account');
+    } finally {
+      setIsMigrating(false);
     }
   };
 
@@ -186,22 +234,30 @@ export function Journal({ solAge }: JournalProps) {
         }
       }
 
-      // Use dev toggle or real context
-      if (!userFid) {
+      // Check if we have either Farcaster user or user account
+      if (!userFid && !userAccountId) {
+        // For non-Farcaster users, show account creation option
+        if (!isInFrame) {
+          console.log('[Journal] No user identification available, showing account creation option');
+          setShowAccountCreation(true);
+          return;
+        }
+        
         const errorDetails = {
           farcasterUserFid,
           devUserFid,
+          userAccountId,
           hasContext: !!context,
           hasUser: !!context?.user,
           isInFrame,
           isDev,
           devFarcaster
         };
-        console.error('[Journal] Migration failed - no userFid available:', errorDetails);
-        throw new Error(`You must be connected via Farcaster to migrate entries. Connection state: ${JSON.stringify(errorDetails)}`);
+        console.error('[Journal] Migration failed - no user identification available:', errorDetails);
+        throw new Error(`You must be connected via Farcaster or create an account to migrate entries. Connection state: ${JSON.stringify(errorDetails)}`);
       }
       console.log('[Journal] Attempting to migrate local entries:', localEntries);
-      console.log('[Journal] Migration userFid:', userFid, 'type:', typeof userFid);
+      console.log('[Journal] Migration userFid:', userFid, 'userAccountId:', userAccountId);
       console.log('[Journal] Local entries count:', localEntries.length);
       
       // Log details of each local entry
@@ -229,7 +285,8 @@ export function Journal({ solAge }: JournalProps) {
         const testRequestBody = {
           content: 'Test entry for API validation',
           sol_day: 1,
-          userFid: userFid
+          userFid: userFid,
+          userAccountId: userAccountId
         };
         
         console.log('[Journal] Test request body:', testRequestBody);
@@ -266,7 +323,7 @@ export function Journal({ solAge }: JournalProps) {
         return;
       }
       
-      const result = await migrateLocalEntries(userFid);
+      const result = await migrateLocalEntries(userFid, userAccountId);
       console.log('[Journal] Migration result:', result);
       if (result.errors.length > 0) {
         setMigrationError(result.errors.map(e => (typeof e === 'string' ? e : e.message || JSON.stringify(e))).join('\n'));
@@ -280,7 +337,7 @@ export function Journal({ solAge }: JournalProps) {
         // Add a small delay to ensure database transaction is committed
         await new Promise(resolve => setTimeout(resolve, 1000));
         // Refresh entries from the database after migration
-        await loadEntries(undefined, userFid);
+        await loadEntries(undefined, userFid, userAccountId);
       }
     } catch (err: any) {
       setMigrationError(err.message || 'Migration failed.');
@@ -304,10 +361,10 @@ export function Journal({ solAge }: JournalProps) {
       devFarcaster
     });
 
-    // Load entries with userFid (API will handle authentication)
-    loadEntries(undefined, userFid);
+    // Load entries with user identification (API will handle authentication)
+    loadEntries(undefined, userFid, userAccountId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userFid]);
+  }, [userFid, userAccountId]);
 
   // Handler to trigger direct share flow for a synced entry
   const handleShare = async (entry: JournalEntry) => {
@@ -656,7 +713,7 @@ export function Journal({ solAge }: JournalProps) {
       )}
 
       {/* Migration notice for local entries */}
-      {localEntries.length > 0 && userFid && (
+      {localEntries.length > 0 && (userFid || userAccountId) && (
         <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200">
           {migrationError && (
             <div className="mb-2 p-2 bg-red-100 border border-red-300 text-red-700 font-mono text-xs whitespace-pre-line">
@@ -688,7 +745,7 @@ export function Journal({ solAge }: JournalProps) {
           </div>
         </div>
       )}
-      {localEntries.length > 0 && !userFid && (
+      {localEntries.length > 0 && !userFid && !userAccountId && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200">
           <div className="text-center">
             <h4 className="font-mono text-sm text-blue-800 mb-1">
@@ -696,24 +753,79 @@ export function Journal({ solAge }: JournalProps) {
             </h4>
             <p className="text-xs text-blue-700 mb-3">
               You have {localEntries.length} {localEntries.length === 1 ? 'entry' : 'entries'} stored locally. 
-              Connect via Farcaster to migrate them to the database and enable sharing.
+              Connect via Farcaster or create an account to migrate them to the database and enable sharing.
             </p>
-            {isInFrame && (
-              <button
-                onClick={async () => {
-                  try {
-                    await connectManually();
-                  } catch (err: any) {
-                    console.error('Manual connection failed:', err);
-                    alert(`Connection failed: ${err.message}`);
-                  }
-                }}
-                disabled={frameLoading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-mono text-xs tracking-widest py-2 px-3 border border-blue-700"
-              >
-                {frameLoading ? 'CONNECTING...' : 'CONNECT FARCASTER'}
-              </button>
-            )}
+            <div className="flex flex-col gap-2">
+              {isInFrame && (
+                <button
+                  onClick={async () => {
+                    try {
+                      await connectManually();
+                    } catch (err: any) {
+                      console.error('Manual connection failed:', err);
+                      alert(`Connection failed: ${err.message}`);
+                    }
+                  }}
+                  disabled={frameLoading}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-mono text-xs tracking-widest py-2 px-3 border border-blue-700"
+                >
+                  {frameLoading ? 'CONNECTING...' : 'CONNECT FARCASTER'}
+                </button>
+              )}
+              {!isInFrame && (
+                <button
+                  onClick={() => setShowAccountCreation(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white font-mono text-xs tracking-widest py-2 px-3 border border-green-700"
+                >
+                  CREATE ACCOUNT
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Account Creation Modal */}
+      {showAccountCreation && (
+        <div className="mb-4 p-4 bg-green-50 border border-green-200">
+          <div className="text-center">
+            <h4 className="font-mono text-sm text-green-800 mb-1">
+              CREATE ACCOUNT TO MIGRATE ENTRIES
+            </h4>
+            <p className="text-xs text-green-700 mb-3">
+              Enter your email to create an account and migrate your {localEntries.length} local {localEntries.length === 1 ? 'entry' : 'entries'}.
+            </p>
+            <div className="flex flex-col gap-2 max-w-sm mx-auto">
+              <input
+                type="email"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="px-3 py-2 border border-green-300 text-sm font-mono focus:outline-none focus:border-green-500"
+                disabled={isMigrating}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCreateUserAccount}
+                  disabled={isMigrating || !userEmail}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-mono text-xs tracking-widest py-2 px-3 border border-green-700"
+                >
+                  {isMigrating ? (
+                    <div className="flex items-center justify-center">
+                      <PulsingStarSpinner />
+                      CREATING...
+                    </div>
+                  ) : 'CREATE & MIGRATE'}
+                </button>
+                <button
+                  onClick={() => setShowAccountCreation(false)}
+                  disabled={isMigrating}
+                  className="px-3 py-2 border border-green-300 text-green-700 font-mono text-xs tracking-widest hover:bg-green-100 disabled:opacity-50"
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

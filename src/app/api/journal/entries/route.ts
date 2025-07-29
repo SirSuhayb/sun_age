@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceRoleClient } from '~/utils/supabase/server';
 
+// Helper function to get unified user ID for database queries
+async function getUnifiedUserIdForQuery(supabase: any, userFid?: number, userAccountId?: string): Promise<{ userFid: number, unifiedUserId?: string }> {
+  if (userFid) {
+    // For Farcaster users, try to get unified ID but fallback to userFid for backward compatibility
+    const { data: unifiedId } = await supabase
+      .rpc('get_unified_user_id_from_fid', { farcaster_fid: userFid });
+    return { userFid, unifiedUserId: unifiedId };
+  } else if (userAccountId) {
+    // For non-Farcaster users, get unified ID and use 0 as userFid
+    const { data: unifiedId } = await supabase
+      .rpc('get_unified_user_id_from_account', { account_id: userAccountId });
+    return { userFid: 0, unifiedUserId: unifiedId };
+  }
+  throw new Error('No user identification provided');
+}
+
 export async function GET(req: NextRequest) {
   console.log('[API] GET /api/journal/entries called');
   console.log('[API] Request URL:', req.url);
@@ -10,27 +26,36 @@ export async function GET(req: NextRequest) {
   const supabase = createServiceRoleClient();
   console.log('[API] Service role client created');
   
-  // Get userFid from query params (for now, we'll need to pass this from the client)
+  // Get user identification from query params
   const userFidParam = req.nextUrl.searchParams.get('userFid');
-  console.log('[API] UserFid from params:', userFidParam);
+  const userAccountIdParam = req.nextUrl.searchParams.get('userAccountId');
+  console.log('[API] UserFid from params:', userFidParam, 'UserAccountId from params:', userAccountIdParam);
   
-  if (!userFidParam) {
-    console.log('[API] No userFid provided, returning 400');
-    return NextResponse.json({ error: 'userFid parameter required' }, { status: 400 });
+  let userFid: number | null = null;
+  let userAccountId: string | null = null;
+  
+  if (userFidParam) {
+    userFid = parseInt(userFidParam, 10);
+    if (isNaN(userFid)) {
+      console.log('[API] Invalid userFid:', userFidParam);
+      return NextResponse.json({ error: 'Invalid userFid' }, { status: 400 });
+    }
+    console.log('[API] Using user FID:', userFid);
+  } else if (userAccountIdParam) {
+    userAccountId = userAccountIdParam;
+    console.log('[API] Using user account ID:', userAccountId);
+  } else {
+    console.log('[API] No user identification provided, returning 400');
+    return NextResponse.json({ error: 'userFid or userAccountId parameter required' }, { status: 400 });
   }
-  
-  const userFid = parseInt(userFidParam, 10);
-  if (isNaN(userFid)) {
-    console.log('[API] Invalid userFid:', userFidParam);
-    return NextResponse.json({ error: 'Invalid userFid' }, { status: 400 });
-  }
-  
-  console.log('[API] Using user FID:', userFid);
 
+  // Get user identification for query
+  const userQuery = await getUnifiedUserIdForQuery(supabase, userFid, userAccountId);
+  
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
-    .eq('user_fid', userFid)
+    .eq('user_fid', userQuery.userFid)
     .order('created_at', { ascending: false });
 
   console.log('[API] Database query result:', { 
@@ -76,13 +101,14 @@ export async function POST(req: NextRequest) {
         console.log('[API] Request body type:', typeof body);
         console.log('[API] Request body keys:', Object.keys(body));
         
-        const { content, sol_day, userFid, parent_entry_id, parent_share_id } = body;
+        const { content, sol_day, userFid, userAccountId, parent_entry_id, parent_share_id } = body;
 
         console.log('[API] Extracted fields:', { 
             content: !!content, 
             contentLength: content?.length,
             sol_day, 
             userFid, 
+            userAccountId,
             userFidType: typeof userFid 
         });
 
@@ -101,11 +127,12 @@ export async function POST(req: NextRequest) {
         console.log('[API] Using service role client');
         const supabase = createServiceRoleClient();
         
-        // Get userFid from request body or use authenticated user if available
+        // Get user identification from request body
         let finalUserFid: number;
+        let finalUserAccountId: string | undefined;
         
         if (userFid) {
-          // Use provided userFid for migration
+          // Use provided userFid for Farcaster users
           const parsedUserFid = typeof userFid === 'string' ? parseInt(userFid, 10) : userFid;
           if (isNaN(parsedUserFid)) {
             console.error('[API] Invalid userFid:', userFid);
@@ -113,12 +140,17 @@ export async function POST(req: NextRequest) {
           }
           finalUserFid = parsedUserFid;
           console.log('[API] Using provided userFid:', finalUserFid);
+        } else if (userAccountId) {
+          // Use provided userAccountId for non-Farcaster users
+          finalUserAccountId = userAccountId;
+          finalUserFid = 0; // Use 0 for non-Farcaster users
+          console.log('[API] Using provided userAccountId:', finalUserAccountId);
         } else {
           // Try to get from authenticated user (fallback)
           const { data: { user } } = await supabase.auth.getUser();
           if (!user) {
-            console.error('[API] No userFid provided and no authenticated user found');
-            return NextResponse.json({ error: 'userFid required or user must be authenticated' }, { status: 400 });
+            console.error('[API] No user identification provided and no authenticated user found');
+            return NextResponse.json({ error: 'userFid or userAccountId required, or user must be authenticated' }, { status: 400 });
           }
           finalUserFid = parseInt(user.id);
           console.log('[API] Using authenticated user FID:', finalUserFid);
@@ -129,7 +161,7 @@ export async function POST(req: NextRequest) {
             content,
             sol_day,
             word_count: content.trim().split(/\s+/).length,
-            preservation_status: userFid ? 'synced' : 'local',
+            preservation_status: (userFid || userAccountId) ? 'synced' : 'local',
         };
 
         console.log('[API] Creating new entry:', newEntry);
