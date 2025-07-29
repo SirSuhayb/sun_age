@@ -107,18 +107,14 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
     phaseLabel = `CURRENT PHASE (${ageRange})`;
     
     // Enhanced description with foundation/depth context
-    const foundationDesc = getFoundationDescription(foundation).toLowerCase();
-    const depthDesc = getDepthDescription(depth).toLowerCase();
-    phaseDescription = `The ${phaseInfo.name} — You're in a ${agePhase.toLowerCase()} period where you are ${foundationDesc}, using ${depthDesc} to create meaningful impact in your ${solArchetype.replace('Sol ', '')} journey.`;
+    phaseDescription = `The ${phaseInfo.name} — Your ${agePhase.toLowerCase()} period of ${solArchetype.replace('Sol ', '').toLowerCase()} evolution.`;
   } else {
     phaseLabel = 'CURRENT PHASE';
     phaseDescription = 'Your current phase information will appear here.';
   }
 
   // Enhanced Key Themes with age-appropriate foundation/depth integration
-  const foundationContext = getFoundationDescription(foundation).toLowerCase();
-  const depthContext = getDepthDescription(depth).toLowerCase(); 
-  const keyTheme = `In your ${agePhase || 'current phase'}, you are ${foundationContext} while developing ${depthContext}. This creates a unique ${solArchetype.replace('Sol ', '') || 'solar'} expression ready to reach and impact wider communities.`;
+  const keyTheme = `Your ${foundation.replace(' Foundation', '').toLowerCase()} foundation and ${depth.replace(' Depth', '').toLowerCase()} depth are creating a unique ${solArchetype.replace('Sol ', '').toLowerCase() || 'solar'} expression ready to reach wider communities.`;
 
   // Upcoming Milestone
   let milestoneLabel = '';
@@ -127,7 +123,7 @@ const SolEvolution: React.FC<SolEvolutionProps> = ({ bookmark }) => {
     const milestone = getNextMilestone(solAge, new Date(bookmark.birthDate));
     if (milestone) {
       milestoneLabel = `UPCOMING MILESTONE (DAY ${milestone.cycles.toLocaleString()})`;
-      milestoneDescription = `${milestone.description} Awaits in ${milestone.daysToMilestone} days.`;
+      milestoneDescription = `${milestone.description} — ${milestone.daysToMilestone} days away.`;
     } else {
       milestoneLabel = 'UPCOMING MILESTONE';
       milestoneDescription = 'Your next milestone will appear here.';
