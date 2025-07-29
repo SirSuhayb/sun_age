@@ -38,6 +38,7 @@ export interface CreateUserAccountRequest {
   sol_age?: number;
   archetype?: string;
   farcaster_fid?: number;
+  anon_id?: string;
 }
 
 export interface WisdomExtract {

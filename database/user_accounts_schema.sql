@@ -141,3 +141,13 @@ BEGIN
   RETURN unified_id;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Add columns to user_notification_details for linking anon_id to user accounts
+ALTER TABLE user_notification_details 
+ADD COLUMN IF NOT EXISTS anon_id TEXT,
+ADD COLUMN IF NOT EXISTS user_account_id UUID REFERENCES user_accounts(id),
+ADD COLUMN IF NOT EXISTS linked_at TIMESTAMP;
+
+-- Add indexes for the new columns
+CREATE INDEX IF NOT EXISTS idx_user_notification_details_anon_id ON user_notification_details(anon_id);
+CREATE INDEX IF NOT EXISTS idx_user_notification_details_user_account_id ON user_notification_details(user_account_id);

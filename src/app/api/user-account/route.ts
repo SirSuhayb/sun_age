@@ -6,10 +6,10 @@ export async function POST(req: NextRequest) {
   try {
     console.log('[API] POST /api/user-account called');
     
-    const body: CreateUserAccountRequest = await req.json();
+    const body = await req.json();
     console.log('[API] Request body:', body);
     
-    const { email, platform, sol_age, archetype, farcaster_fid } = body;
+    const { email, platform, sol_age, archetype, farcaster_fid, anon_id } = body;
     
     // Validate required fields
     if (!email || !platform) {
@@ -86,10 +86,35 @@ export async function POST(req: NextRequest) {
       );
     }
     
+    // Link anon_id if provided (for existing Sol Age data)
+    if (anon_id && newAccount.id) {
+      try {
+        console.log('[API] Linking anon_id to account:', { anon_id, accountId: newAccount.id });
+        
+        // Update user_notification_details to link anon_id to account
+        const { error: linkError } = await supabase
+          .from('user_notification_details')
+          .update({ 
+            user_account_id: newAccount.id,
+            linked_at: new Date().toISOString() 
+          })
+          .eq('anon_id', anon_id);
+          
+        if (linkError) {
+          console.warn('[API] Failed to link anon_id to account:', linkError);
+        } else {
+          console.log('[API] Successfully linked anon_id to account');
+        }
+      } catch (linkErr) {
+        console.warn('[API] Error linking anon_id:', linkErr);
+      }
+    }
+
     console.log('[API] User account created successfully:', {
       accountId: newAccount.id,
       email: newAccount.email,
-      unifiedUserId
+      unifiedUserId,
+      linkedAnonId: anon_id
     });
     
     return NextResponse.json({

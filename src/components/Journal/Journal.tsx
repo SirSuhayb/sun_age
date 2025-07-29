@@ -11,6 +11,7 @@ import Image from 'next/image';
 import React from 'react';
 import { PulsingStarSpinner } from "~/components/ui/PulsingStarSpinner";
 import { useFrameSDK } from '~/hooks/useFrameSDK';
+import { useWebUserIdentity } from '~/hooks/useWebUserIdentity';
 import { composeAndShareEntry } from '~/lib/journal';
 import EntryPreviewModalClient from './EntryPreviewModalClient';
 import { format } from 'date-fns';
@@ -57,8 +58,8 @@ export function Journal({ solAge }: JournalProps) {
   const { sdk, isInFrame, context, connectManually, refreshContext, loading: frameLoading } = useFrameSDK();
   const [previewEntry, setPreviewEntry] = useState<JournalEntry | null>(null);
   
-  // Non-Farcaster user support
-  const [userAccountId, setUserAccountId] = useState<string | null>(null);
+  // Web user identity management
+  const webIdentity = useWebUserIdentity();
   const [showAccountCreation, setShowAccountCreation] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   
@@ -67,6 +68,9 @@ export function Journal({ solAge }: JournalProps) {
   const farcasterUserFid = context?.user?.fid;
   const devUserFid = isDev && devFarcaster ? 5543 : undefined;
   const userFid = farcasterUserFid || devUserFid;
+  
+  // Get user account ID from web identity
+  const userAccountId = webIdentity.userAccountId;
   
   const {
     entries,
@@ -175,24 +179,10 @@ export function Journal({ solAge }: JournalProps) {
     try {
       console.log('[Journal] Creating user account for email:', userEmail);
       
-      const response = await fetch('/api/user-account', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: userEmail,
-          platform: 'web'
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create account');
-      }
-      
-      const { account } = await response.json();
+      // Use the web identity hook to create account with Sol Age linking
+      const account = await webIdentity.createUserAccount(userEmail);
       console.log('[Journal] User account created:', account);
       
-      setUserAccountId(account.id);
       setShowAccountCreation(false);
       
       // Now try migration again
@@ -247,6 +237,12 @@ export function Journal({ solAge }: JournalProps) {
           farcasterUserFid,
           devUserFid,
           userAccountId,
+          webIdentity: {
+            userAccountId: webIdentity.userAccountId,
+            anonId: webIdentity.anonId,
+            isWebUser: webIdentity.isWebUser,
+            isLoading: webIdentity.isLoading
+          },
           hasContext: !!context,
           hasUser: !!context?.user,
           isInFrame,
@@ -745,7 +741,7 @@ export function Journal({ solAge }: JournalProps) {
           </div>
         </div>
       )}
-      {localEntries.length > 0 && !userFid && !userAccountId && (
+      {localEntries.length > 0 && !userFid && !userAccountId && !webIdentity.isLoading && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200">
           <div className="text-center">
             <h4 className="font-mono text-sm text-blue-800 mb-1">
