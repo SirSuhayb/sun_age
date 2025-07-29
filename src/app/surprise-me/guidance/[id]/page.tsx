@@ -36,11 +36,12 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
 
     // DEV ONLY: If no roll found in localStorage, try to create one from the framework
     if (!rollData && process.env.NODE_ENV === 'development') {
-      const allActivities = surpriseMeFramework.getArchetypeActivities('Sol Innovator');
-      const devRoll = allActivities.find(activity => activity.id === id);
-      if (devRoll) {
-        setRollData(devRoll);
-      }
+      surpriseMeFramework.getArchetypeActivities('Sol Innovator').then(allActivities => {
+        const devRoll = allActivities.find(activity => activity.id === id);
+        if (devRoll) {
+          setRollData(devRoll);
+        }
+      });
     }
 
     // Check if guidance has already been completed today
