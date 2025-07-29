@@ -12,8 +12,9 @@ export default function GuidanceDevPage() {
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      const innovatorActivities = surpriseMeFramework.getArchetypeActivities('Sol Innovator');
-      setActivities(innovatorActivities);
+      surpriseMeFramework.getArchetypeActivities('Sol Innovator').then(innovatorActivities => {
+        setActivities(innovatorActivities);
+      });
     }
   }, []);
 
