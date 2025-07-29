@@ -67,6 +67,15 @@ export class SurpriseMeFramework {
     return await getCachedArchetypeActivities(archetype);
   }
 
+  getUserProfile(birthDate: string): UserProfile {
+    const archetype = getSolarArchetype(birthDate);
+    return {
+      birthDate,
+      archetype,
+      history: []
+    };
+  }
+
   async generatePersonalizedRoll(userProfile: UserProfile): Promise<DailyRoll> {
     const archetypeActivities = await this.getArchetypeActivities(userProfile.archetype);
     const availableActivities = archetypeActivities.filter(activity => 
@@ -119,4 +128,5 @@ export class SurpriseMeFramework {
   }
 }
 
+export { SurpriseMeFramework };
 export const surpriseMeFramework = SurpriseMeFramework.getInstance();

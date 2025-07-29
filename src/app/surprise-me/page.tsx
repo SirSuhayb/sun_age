@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAccount, useConnect } from 'wagmi';
 import { useFrameSDK } from '~/hooks/useFrameSDK';
-import { SurpriseMeFramework } from '~/lib/surpriseMe';
+
 import { SolarEarningsManager } from '~/lib/solarEarnings';
 import { ConfirmationModal, SimpleModal } from '~/components/ui/ConfirmationModal';
 import Image from 'next/image';
@@ -217,7 +217,7 @@ export default function SurpriseMePage() {
       // Add current history to profile
       userProfile.history = rollHistory;
       
-      const roll = surpriseMeFramework.generatePersonalizedRoll(userProfile);
+      const roll = await surpriseMeFramework.generatePersonalizedRoll(userProfile);
       
       // Award SOLAR tokens for this roll with all bonuses (only once per day)
       const rollEarnings = solarEarningsManager.awardSolar(roll.rarity, roll.title);
