@@ -128,5 +128,4 @@ export class SurpriseMeFramework {
   }
 }
 
-export { SurpriseMeFramework };
 export const surpriseMeFramework = SurpriseMeFramework.getInstance();
