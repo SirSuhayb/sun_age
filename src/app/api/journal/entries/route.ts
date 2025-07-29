@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         console.log('[API] Request body type:', typeof body);
         console.log('[API] Request body keys:', Object.keys(body));
         
-        const { content, sol_day, userFid } = body;
+        const { content, sol_day, userFid, parent_entry_id, parent_share_id } = body;
 
         console.log('[API] Extracted fields:', { 
             content: !!content, 
@@ -146,6 +146,48 @@ export async function POST(req: NextRequest) {
         }
 
         console.log('[API] Entry created successfully:', entry);
+        
+        // Create parent-child relationship if this was inspired by another entry
+        if (parent_entry_id && entry) {
+            console.log('[API] Creating parent-child relationship:', { parent_entry_id, child_entry_id: entry.id, parent_share_id });
+            
+            const { error: relationshipError } = await supabase
+                .from('journal_entry_relationships')
+                .insert({
+                    parent_entry_id,
+                    child_entry_id: entry.id,
+                    parent_share_id,
+                    relationship_type: 'inspired_by',
+                    interaction_source: 'shared_entry_cta',
+                    time_to_reflection_minutes: 0 // Could calculate this if we track view time
+                });
+                
+            if (relationshipError) {
+                console.error('[API] Error creating relationship:', relationshipError);
+                // Don't fail the whole request, just log the error
+            } else {
+                console.log('[API] Parent-child relationship created successfully');
+                
+                // Update the view session if we have a parent_share_id
+                if (parent_share_id) {
+                    const { error: sessionUpdateError } = await supabase
+                        .from('journal_entry_view_sessions')
+                        .update({ 
+                            resulting_entry_id: entry.id,
+                            resulted_in_reflection: true
+                        })
+                        .eq('viewer_fid', finalUserFid)
+                        .eq('entry_id', parent_entry_id)
+                        .order('session_start', { ascending: false })
+                        .limit(1);
+                        
+                    if (sessionUpdateError) {
+                        console.error('[API] Error updating view session:', sessionUpdateError);
+                    }
+                }
+            }
+        }
+        
         return NextResponse.json({ entry });
 
     } catch (error) {

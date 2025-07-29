@@ -341,7 +341,7 @@ export function Journal({ solAge }: JournalProps) {
   };
 
   // Handler for "Add a reflection" CTA
-  const handleAddReflection = () => {
+  const handleAddReflection = (parentEntryId?: string, parentShareId?: string) => {
     setPreviewEntry(null);
     setEditingEntry({
       id: '',
@@ -350,7 +350,10 @@ export function Journal({ solAge }: JournalProps) {
       content: '',
       preservation_status: 'local',
       word_count: 0,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      // Track the parent entry that inspired this reflection
+      parent_entry_id: parentEntryId,
+      parent_share_id: parentShareId
     });
   };
 

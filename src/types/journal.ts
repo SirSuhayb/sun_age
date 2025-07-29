@@ -8,6 +8,9 @@ export interface JournalEntry {
   word_count: number;
   created_at: string;
   preserved_at?: string;
+  // Wisdom tree tracking
+  parent_entry_id?: string;
+  parent_share_id?: string;
 }
 
 export interface WisdomExtract {
@@ -76,4 +79,60 @@ export type JournalTabState = 'timeline' | 'create' | 'edit' | 'view';
 export interface JournalFilters {
   preservation_status?: 'all' | 'local' | 'preserved';
   search?: string;
+}
+
+// Wisdom Tree Types
+export interface JournalEntryRelationship {
+  id: string;
+  parent_entry_id: string;
+  child_entry_id: string;
+  parent_share_id?: string;
+  relationship_type: 'inspired_by' | 'response_to' | 'continuation_of';
+  interaction_source: 'shared_entry_cta' | 'direct_link' | 'discovery_feed';
+  time_to_reflection_minutes?: number;
+  parent_view_count?: number;
+  created_at: string;
+}
+
+export interface JournalEntryInfluenceMetrics {
+  entry_id: string;
+  direct_children_count: number;
+  total_descendants_count: number;
+  share_count: number;
+  view_count: number;
+  reflection_conversion_rate: number;
+  tree_depth: number;
+  tree_breadth: number;
+  influence_score: number;
+  first_child_created_at?: string;
+  last_child_created_at?: string;
+  updated_at: string;
+}
+
+export interface WisdomTreeNode {
+  entry: JournalEntry;
+  author?: {
+    fid: number;
+    username?: string;
+    display_name?: string;
+  };
+  metrics?: JournalEntryInfluenceMetrics;
+  children: WisdomTreeNode[];
+  depth: number;
+  path: string[];
+}
+
+export interface JournalViewSession {
+  id: string;
+  entry_id: string;
+  viewer_fid: number;
+  share_id?: string;
+  session_start: string;
+  session_end?: string;
+  interaction_type?: 'viewed' | 'clicked_add_reflection' | 'shared' | 'bookmarked';
+  resulted_in_reflection: boolean;
+  resulting_entry_id?: string;
+  referrer_source?: string;
+  device_type?: string;
+  created_at: string;
 } 
