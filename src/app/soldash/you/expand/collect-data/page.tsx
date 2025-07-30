@@ -65,11 +65,33 @@ export default function CollectDataPage() {
     setIsSubmitting(true);
     
     try {
-      // TODO: Save birth data and generate chart
-      console.log('Submitting birth data:', formData);
+      // TODO: Geocode the location to get coordinates
+      // For now, use mock coordinates
+      const mockCoordinates = {
+        latitude: 37.7749,
+        longitude: -122.4194,
+        timezone: 'America/Los_Angeles'
+      };
+
+      const birthData = {
+        date: formData.birthDate,
+        time: formData.birthTime,
+        location: {
+          city: formData.birthLocation.split(',')[0]?.trim() || formData.birthLocation,
+          country: formData.birthLocation.split(',').pop()?.trim() || 'Unknown',
+          latitude: mockCoordinates.latitude,
+          longitude: mockCoordinates.longitude,
+          timezone: mockCoordinates.timezone
+        }
+      };
+
+      // Save to localStorage for now
+      localStorage.setItem('birthData', JSON.stringify(birthData));
+      
+      console.log('Birth data saved:', birthData);
       
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Redirect to chart generation page
       window.location.href = '/soldash/you/expand/chart';

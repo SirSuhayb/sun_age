@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronDown, ChevronUp, Calendar, Target, Zap, TrendingUp, Heart, Star } from 'lucide-react';
 import Link from 'next/link';
@@ -19,73 +19,83 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-// Mock detailed analysis data
-const detailedAnalysis = {
-  lifeFocus: {
-    title: "Life Focus & Purpose",
-    icon: Target,
-    content: "Your Aquarius Sun combined with Pisces Moon creates a unique blend of innovation and intuition. You're drawn to humanitarian causes and have a natural ability to envision a better future for humanity. Your life purpose centers around bringing visionary ideas into reality through compassionate action.",
-    keyPoints: [
-      "Natural humanitarian instincts",
-      "Visionary thinking and future-focused mindset", 
-      "Bridge between logic and intuition",
-      "Called to serve collective evolution"
-    ]
-  },
-  energyRhythms: {
-    title: "Energy Rhythms & Cycles",
-    icon: Zap,
-    content: "Your energy operates in distinct cycles influenced by your Gemini Rising. You have periods of intense creative output followed by necessary recharge phases. Understanding these rhythms helps you optimize productivity and maintain emotional balance.",
-    keyPoints: [
-      "28-day emotional cycles (Pisces Moon influence)",
-      "Weekly intellectual peaks (Gemini Rising)",
-      "Seasonal shifts affect innovation capacity",
-      "Daily energy best from 2-6 PM"
-    ]
-  },
-  naturalStrengths: {
-    title: "Natural Strengths & Talents",
-    icon: Star,
-    content: "Your chart reveals exceptional abilities in communication, innovation, and emotional intelligence. You possess rare combination of analytical thinking and intuitive insight, making you excellent at problem-solving and understanding complex human dynamics.",
-    keyPoints: [
-      "Exceptional communication skills",
-      "Innovative problem-solving approach",
-      "High emotional and social intelligence",
-      "Natural counseling and healing abilities"
-    ]
-  },
-  annualResets: {
-    title: "Annual Reset Periods",
-    icon: Calendar,
-    content: "Your personal new year begins around your birthday in February, but you experience additional reset periods during summer solstice and autumn equinox. These are optimal times for major life changes and new project launches.",
-    periods: [
-      { name: "Primary Reset", date: "February 15-28", description: "Major life planning and goal setting" },
-      { name: "Mid-Year Recalibration", date: "June 20-July 5", description: "Course correction and creative breakthrough" },
-      { name: "Autumn Integration", date: "September 21-October 5", description: "Harvesting insights and preparing for next phase" }
-    ]
-  },
-  growthPhases: {
-    title: "Life Growth Phases",
-    icon: TrendingUp,
-    content: "Your chart indicates distinct 7-year cycles of development, with major transitions occurring at ages 21, 28, 35, 42, and 49. Each phase brings specific lessons and opportunities for expansion.",
-    phases: [
-      { age: "21-28", title: "Foundation Building", description: "Establishing identity and core beliefs" },
-      { age: "28-35", title: "Creative Expression", description: "Manifesting unique gifts and talents" },
-      { age: "35-42", title: "Leadership Emergence", description: "Taking on greater responsibilities and influence" },
-      { age: "42-49", title: "Mastery Integration", description: "Combining all skills for maximum impact" }
-    ]
-  },
-  relationships: {
-    title: "Relationship Patterns",
-    icon: Heart,
-    content: "Your relationship style is characterized by deep emotional connection (Pisces Moon) combined with intellectual stimulation needs (Gemini Rising). You attract partners who appreciate both your innovative thinking and emotional depth.",
-    keyPoints: [
-      "Seeks partners who share humanitarian values",
-      "Needs both intellectual and emotional connection",
-      "Tendency to be the counselor in relationships",
-      "Attracts creative and spiritually-minded individuals"
-    ]
-  }
+// Generate detailed analysis based on chart and Sol data
+const generateDetailedAnalysis = (chartData: any, solData: any) => {
+  const sunSign = chartData?.sun?.sign || 'Aquarius';
+  const moonSign = chartData?.moon?.sign || 'Pisces';
+  const risingSign = chartData?.rising?.sign || 'Gemini';
+  const archetype = solData?.archetype || 'Sol Innovator';
+  const foundation = solData?.foundation || 'Builder Foundation';
+  const depth = solData?.depth || 'Alchemist Depth';
+  const phase = solData?.phase || 'Current Phase (Ages 28–35)';
+
+  return {
+    lifeFocus: {
+      title: "Life Focus & Purpose",
+      icon: Target,
+      content: `Your ${sunSign} Sun combined with ${moonSign} Moon creates a unique blend that aligns with your ${archetype} identity. Your ${foundation} provides the practical framework for manifesting your vision, while your ${depth} adds transformational wisdom. This cosmic signature points to a life purpose centered around bridging innovation with intuitive understanding.`,
+      keyPoints: [
+        `${archetype} energy drives your core mission`,
+        `${foundation} provides practical manifestation skills`,
+        `${depth} offers transformational insights`,
+        `${sunSign}-${moonSign} combination enhances spiritual innovation`
+      ]
+    },
+    energyRhythms: {
+      title: "Energy Rhythms & Cycles",
+      icon: Zap,
+      content: `Your energy operates in distinct cycles influenced by your ${risingSign} Rising and ${phase}. The interplay between your ${archetype} nature and current life phase creates unique rhythms that optimize when you take action versus when you integrate insights.`,
+      keyPoints: [
+        `${moonSign} Moon creates emotional cycles every 28 days`,
+        `${risingSign} Rising influences daily energy patterns`,
+        `${phase} brings specific developmental focus`,
+        `${archetype} energy peaks during innovation periods`
+      ]
+    },
+    naturalStrengths: {
+      title: "Natural Strengths & Talents",
+      icon: Star,
+      content: `Your ${archetype} nature combined with ${depth} reveals exceptional abilities that are enhanced by your ${sunSign}-${moonSign}-${risingSign} configuration. Your ${foundation} provides the practical skills to ground your visionary insights into reality.`,
+      keyPoints: [
+        `${archetype} brings innovative leadership abilities`,
+        `${foundation} provides practical manifestation skills`,
+        `${depth} offers transformational healing gifts`,
+        `${risingSign} enhances communication and adaptability`
+      ]
+    },
+    annualResets: {
+      title: "Annual Reset Periods",
+      icon: Calendar,
+      content: `Your ${archetype} nature experiences powerful reset periods that align with both astrological transits and your personal Sol cycle. These periods are optimal for major life changes and breakthrough innovations.`,
+      periods: [
+        { name: "Sol Birthday Reset", date: "Personal Birthday", description: `${archetype} renewal and vision setting` },
+        { name: "Mid-Year Recalibration", date: "6 months after birthday", description: "Course correction and manifestation check-in" },
+        { name: "Seasonal Alignment", date: "Solstices & Equinoxes", description: "Natural rhythm synchronization" }
+      ]
+    },
+    growthPhases: {
+      title: "Life Growth Phases",
+      icon: TrendingUp,
+      content: `Your ${phase} is part of a larger developmental cycle that integrates your ${archetype} evolution with traditional astrological timing. Each phase builds upon your ${foundation} while deepening your ${depth}.`,
+      phases: [
+        { age: "21-28", title: "Foundation Activation", description: `Establishing ${foundation} in the world` },
+        { age: "28-35", title: `${archetype} Emergence`, description: "Manifesting unique gifts and innovations" },
+        { age: "35-42", title: `${depth} Integration`, description: "Deepening transformational abilities" },
+        { age: "42-49", title: "Master Synthesis", description: "Combining all elements for maximum impact" }
+      ]
+    },
+    relationships: {
+      title: "Relationship Patterns",
+      icon: Heart,
+      content: `Your relationship style reflects both your ${moonSign} Moon emotional needs and your ${archetype} mission. You attract partners who can support your ${foundation} work while appreciating your ${depth} insights.`,
+      keyPoints: [
+        `${archetype} attracts fellow innovators and visionaries`,
+        `${moonSign} Moon needs emotional depth and understanding`,
+        `${risingSign} Rising creates adaptable communication style`,
+        `${depth} draws those seeking transformation`
+      ]
+    }
+  };
 };
 
 const ExpandableSection = ({ section, isExpanded, onToggle }: any) => {
@@ -170,6 +180,22 @@ export default function DetailsPage() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     lifeFocus: true // Start with first section expanded
   });
+  const [chartData, setChartData] = useState<any>(null);
+  const [solData, setSolData] = useState<any>(null);
+
+  useEffect(() => {
+    // Get chart data and Sol profile data
+    const savedChartData = localStorage.getItem('chartData');
+    const savedSolData = localStorage.getItem('sunCycleBookmark');
+    
+    if (savedChartData) {
+      setChartData(JSON.parse(savedChartData));
+    }
+    
+    if (savedSolData) {
+      setSolData(JSON.parse(savedSolData));
+    }
+  }, []);
 
   const toggleSection = (sectionKey: string) => {
     setExpandedSections(prev => ({
@@ -212,14 +238,21 @@ export default function DetailsPage() {
 
         {/* Expandable Sections */}
         <div className="space-y-0">
-          {Object.entries(detailedAnalysis).map(([key, section]) => (
-            <ExpandableSection
-              key={key}
-              section={section}
-              isExpanded={expandedSections[key]}
-              onToggle={() => toggleSection(key)}
-            />
-          ))}
+          {chartData || solData ? (
+            Object.entries(generateDetailedAnalysis(chartData, solData)).map(([key, section]) => (
+              <ExpandableSection
+                key={key}
+                section={section}
+                isExpanded={expandedSections[key]}
+                onToggle={() => toggleSection(key)}
+              />
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <div className="text-lg font-serif text-[#444] mb-2">Loading your personalized analysis...</div>
+              <div className="text-sm text-[#666]">Integrating your chart data with Sol profile</div>
+            </div>
+          )}
         </div>
 
         {/* Summary & Next Steps */}

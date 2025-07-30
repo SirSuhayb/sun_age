@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Download, Share2, Eye, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import NatalChartGenerator from '~/components/Soldash/NatalChartGenerator';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -40,15 +41,41 @@ const mockChartData = {
 export default function ChartPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showChart, setShowChart] = useState(false);
+  const [chartData, setChartData] = useState<any>(null);
+  const [birthData, setBirthData] = useState<any>(null);
 
   useEffect(() => {
-    // Simulate chart generation
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      setShowChart(true);
-    }, 3000);
+    // Get birth data from localStorage or URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    // TODO: If sessionId exists, verify Stripe payment
+    if (sessionId) {
+      console.log('Payment session:', sessionId);
+    }
 
-    return () => clearTimeout(timer);
+    // For now, simulate getting birth data from localStorage
+    const savedBirthData = localStorage.getItem('birthData');
+    if (savedBirthData) {
+      const data = JSON.parse(savedBirthData);
+      setBirthData(data);
+      setIsLoading(false);
+    } else {
+      // Mock birth data for development
+      const mockData = {
+        date: '1990-02-15',
+        time: '14:30',
+        location: {
+          city: 'San Francisco',
+          country: 'USA',
+          latitude: 37.7749,
+          longitude: -122.4194,
+          timezone: 'America/Los_Angeles'
+        }
+      };
+      setBirthData(mockData);
+      setIsLoading(false);
+    }
   }, []);
 
   const handleViewAdvancedDetails = () => {
@@ -63,6 +90,11 @@ export default function ChartPage() {
   const handleShareChart = () => {
     // TODO: Implement chart sharing functionality
     console.log('Sharing chart...');
+  };
+
+  const handleChartGenerated = (generatedChartData: any) => {
+    setChartData(generatedChartData);
+    setShowChart(true);
   };
 
   if (isLoading) {
@@ -155,17 +187,19 @@ export default function ChartPage() {
         </motion.div>
 
         {/* Success Message */}
-        <motion.div 
-          className="bg-[#E8F5E8] border border-[#A8D8A8] p-4 mb-8 text-center"
-          variants={itemVariants}
-        >
-          <div className="text-lg font-serif font-semibold text-[#2D5A2D] mb-1">
-            🎉 Your Sol Chart is Ready!
-          </div>
-          <div className="text-sm text-[#3D6A3D]">
-            Generated for {mockChartData.birthInfo.date} at {mockChartData.birthInfo.time} in {mockChartData.birthInfo.location}
-          </div>
-        </motion.div>
+        {showChart && (
+          <motion.div 
+            className="bg-[#E8F5E8] border border-[#A8D8A8] p-4 mb-8 text-center"
+            variants={itemVariants}
+          >
+            <div className="text-lg font-serif font-semibold text-[#2D5A2D] mb-1">
+              🎉 Your Sol Chart is Ready!
+            </div>
+            <div className="text-sm text-[#3D6A3D]">
+              Generated for {birthData?.date} at {birthData?.time} in {birthData?.location.city}, {birthData?.location.country}
+            </div>
+          </motion.div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Chart Visualization */}
@@ -175,48 +209,41 @@ export default function ChartPage() {
           >
             <h2 className="text-xl font-serif font-semibold mb-6 text-center">Your Natal Chart</h2>
             
-            {/* Mock Chart - This would be replaced with actual chart rendering */}
-            <div className="relative w-full aspect-square max-w-lg mx-auto bg-[#FCF6E5] border border-[#E5E1D8] p-8">
-              <div className="absolute inset-8 border border-[#D7D7D7] rounded-full">
-                <div className="absolute inset-4 border border-[#E5E1D8] rounded-full">
-                  <div className="absolute inset-8 border border-[#F0F0F0] rounded-full flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-3xl mb-2">♒</div>
-                      <div className="text-sm font-mono text-[#666]">Aquarius Sun</div>
-                      <div className="text-xs text-[#888] mt-1">21° 26'</div>
-                    </div>
-                  </div>
+            {birthData ? (
+              <NatalChartGenerator 
+                birthData={birthData}
+                onChartGenerated={handleChartGenerated}
+                className="w-full max-w-lg mx-auto"
+              />
+            ) : (
+              <div className="w-full max-w-lg mx-auto bg-[#FCF6E5] border border-[#E5E1D8] p-8 text-center">
+                <div className="text-6xl mb-4">⏳</div>
+                <div className="text-sm text-[#888] font-mono">Loading birth data...</div>
+              </div>
+            )}
+
+            {chartData && (
+              <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+                <div className="p-3 bg-[#FCF6E5] border border-[#E5E1D8]">
+                  <div className="text-2xl mb-1">☉</div>
+                  <div className="text-sm font-semibold">Sun Sign</div>
+                  <div className="text-xs text-[#666]">{chartData.sun.sign}</div>
+                  <div className="text-xs text-[#888]">{Math.round(chartData.sun.degree)}°</div>
+                </div>
+                <div className="p-3 bg-[#FCF6E5] border border-[#E5E1D8]">
+                  <div className="text-2xl mb-1">☽</div>
+                  <div className="text-sm font-semibold">Moon Sign</div>
+                  <div className="text-xs text-[#666]">{chartData.moon.sign}</div>
+                  <div className="text-xs text-[#888]">{Math.round(chartData.moon.degree)}°</div>
+                </div>
+                <div className="p-3 bg-[#FCF6E5] border border-[#E5E1D8]">
+                  <div className="text-2xl mb-1">↗</div>
+                  <div className="text-sm font-semibold">Rising Sign</div>
+                  <div className="text-xs text-[#666]">{chartData.rising.sign}</div>
+                  <div className="text-xs text-[#888]">{Math.round(chartData.rising.degree)}°</div>
                 </div>
               </div>
-              
-              {/* Zodiac signs around the circle */}
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-lg">♈</div>
-              <div className="absolute top-8 right-2 text-lg">♉</div>
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-lg">♊</div>
-              <div className="absolute right-8 bottom-2 text-lg">♋</div>
-              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-lg">♌</div>
-              <div className="absolute bottom-8 left-2 text-lg">♍</div>
-              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-lg">♎</div>
-              <div className="absolute top-8 left-2 text-lg">♏</div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 bg-[#FCF6E5] border border-[#E5E1D8]">
-                <div className="text-2xl mb-1">♒</div>
-                <div className="text-sm font-semibold">Sun Sign</div>
-                <div className="text-xs text-[#666]">Aquarius</div>
-              </div>
-              <div className="p-3 bg-[#FCF6E5] border border-[#E5E1D8]">
-                <div className="text-2xl mb-1">♓</div>
-                <div className="text-sm font-semibold">Moon Sign</div>
-                <div className="text-xs text-[#666]">Pisces</div>
-              </div>
-              <div className="p-3 bg-[#FCF6E5] border border-[#E5E1D8]">
-                <div className="text-2xl mb-1">♊</div>
-                <div className="text-sm font-semibold">Rising Sign</div>
-                <div className="text-xs text-[#666]">Gemini</div>
-              </div>
-            </div>
+            )}
           </motion.div>
 
           {/* Key Insights */}
