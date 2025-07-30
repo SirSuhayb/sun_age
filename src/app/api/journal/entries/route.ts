@@ -31,8 +31,8 @@ export async function GET(req: NextRequest) {
   const userAccountIdParam = req.nextUrl.searchParams.get('userAccountId');
   console.log('[API] UserFid from params:', userFidParam, 'UserAccountId from params:', userAccountIdParam);
   
-  let userFid: number | null = null;
-  let userAccountId: string | null = null;
+  let userFid: number | undefined;
+  let userAccountId: string | undefined;
   
   if (userFidParam) {
     userFid = parseInt(userFidParam, 10);
@@ -50,7 +50,11 @@ export async function GET(req: NextRequest) {
   }
 
   // Get user identification for query
-  const userQuery = await getUnifiedUserIdForQuery(supabase, userFid, userAccountId);
+  const userQuery = await getUnifiedUserIdForQuery(
+    supabase, 
+    userFid || undefined, 
+    userAccountId || undefined
+  );
   
   const { data: entries, error } = await supabase
     .from('journal_entries')
