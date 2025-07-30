@@ -15,7 +15,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['movement', 'morning', 'solar', 'universal'],
     duration: '15 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -43,7 +43,9 @@ export const universalActivities: DailyRoll[] = [
     ],
     nicheItems: [
       {
+        type: 'product',
         label: 'Cork Yoga Blocks Set',
+        content: 'Sustainable blocks that solar yoga practitioners use for earth connection',
         price: '$34',
         url: 'https://example.com/yoga-blocks',
         productImage: '/products/yoga-blocks.jpg'
@@ -64,7 +66,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['gratitude', 'writing', 'mindfulness', 'universal'],
     duration: '10 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -148,7 +150,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['compassion', 'social', 'gratitude', 'universal'],
     duration: '10 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -190,7 +192,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['elements', 'mindfulness', 'balance', 'universal'],
     duration: '12 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -232,7 +234,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['writing', 'reflection', 'future', 'universal'],
     duration: '5 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -274,7 +276,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['adventure', 'walking', 'exploration', 'universal'],
     duration: '15 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -316,7 +318,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['mindfulness', 'space', 'emotions', 'universal'],
     duration: '10 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -358,7 +360,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['kindness', 'social', 'appreciation', 'universal'],
     duration: 'Throughout day',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -400,7 +402,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['mindfulness', 'consumption', 'awareness', 'universal'],
     duration: 'Throughout day',
     difficulty: 'medium',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -442,7 +444,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['wisdom', 'social', 'intergenerational', 'universal'],
     duration: '15 minutes',
     difficulty: 'medium',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -484,7 +486,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['mindfulness', 'ritual', 'daily life', 'universal'],
     duration: '10 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -526,7 +528,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['perspective', 'stress relief', 'cosmic', 'universal'],
     duration: '5 minutes',
     difficulty: 'easy',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
@@ -568,7 +570,7 @@ export const universalActivities: DailyRoll[] = [
     tags: ['kindness', 'service', 'anonymous', 'universal'],
     duration: '10 minutes',
     difficulty: 'medium',
-    timeOfDay: 'any',
+    timeOfDay: 'anytime',
     actionableSteps: [
       {
         type: 'prompt',
