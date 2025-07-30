@@ -8,6 +8,7 @@ import React from 'react';
 import { PulsingStarSpinner } from "~/components/ui/PulsingStarSpinner";
 import { shareJournalEntry, composeAndShareEntry } from '~/lib/journal';
 import { createPortal } from 'react-dom';
+import { useUnifiedShare } from '~/components/UnifiedShareFlow';
 
 interface JournalEntryEditorProps {
   entry: JournalEntry;
@@ -64,6 +65,7 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
   const [showDailyPrompt, setShowDailyPrompt] = useState(true);
   const { sdk, isInFrame } = useFrameSDK();
   const { content: dailyContent, isLoading: dailyContentLoading } = useDailyContent();
+  const { triggerShare, ShareFlowComponent } = useUnifiedShare();
 
   // Auto-save functionality
   const debouncedAutoSave = useMemo(
@@ -109,9 +111,31 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
     setIsSharing(true);
     setError(null);
     try {
-      await composeAndShareEntry(entry, sdk, isInFrame, entry.user_fid);
-      // Optional: Show success feedback
-      console.log('Entry shared successfully');
+      // For Farcaster users, use the existing share flow
+      if (isInFrame) {
+        await composeAndShareEntry(entry, sdk, isInFrame, entry.user_fid);
+        console.log('Entry shared successfully via Farcaster');
+      } else {
+        // For non-Farcaster users, use the unified share flow
+        const preview = content.slice(0, 200);
+        const shareUrl = window.location.origin + `/journal/shared?preview=${encodeURIComponent(preview)}`;
+        
+        triggerShare({
+          content: {
+            type: 'journal_entry',
+            title: 'My Cosmic Reflection',
+            description: 'A moment of inner wisdom from my solar journey',
+            data: {
+              preview,
+              shareUrl,
+              entryId: entry.id
+            }
+          },
+          onShareComplete: (platform, shareId) => {
+            console.log(`Journal entry shared on ${platform} with ID: ${shareId}`);
+          }
+        });
+      }
     } catch (e: any) {
       setError(e.message || "Failed to share entry");
     } finally {
@@ -347,6 +371,9 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
               {error && <div className="text-red-500 mt-2 text-center">{error}</div>}
           </div>
       </div>
+      
+      {/* Unified Share Flow Component */}
+      <ShareFlowComponent />
     </div>,
     document.body
   );
