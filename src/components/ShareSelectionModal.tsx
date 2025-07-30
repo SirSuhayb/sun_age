@@ -240,7 +240,7 @@ export function ShareSelectionModal({
               {content?.title || 'Share Your Sol Age'}
             </h2>
             <p className="text-gray-600 text-xs font-mono tracking-widest uppercase text-center max-w-xs mx-auto" style={{ letterSpacing: '0.15em' }}>
-              {content?.description || 'Choose where you\'d like to share your cosmic journey and earn $SOLAR tokens'}
+              {content?.description || 'Choose where you&apos;d like to share your cosmic journey and earn $SOLAR tokens'}
             </p>
           </div>
 

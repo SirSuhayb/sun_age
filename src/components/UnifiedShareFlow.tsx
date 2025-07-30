@@ -45,6 +45,7 @@ export function UnifiedShareFlow({
   }
 
   const getContentIcon = () => {
+    if (!content) return '🌞';
     switch (content.type) {
       case 'sol_age': return '☀️';
       case 'journal_entry': return '📓';
@@ -55,6 +56,7 @@ export function UnifiedShareFlow({
   };
 
   const getContentEmoji = () => {
+    if (!content) return 'Your cosmic journey is ready!';
     switch (content.type) {
       case 'sol_age': return 'Your cosmic age calculation is ready!';
       case 'journal_entry': return 'Your reflection is complete!';
@@ -64,7 +66,7 @@ export function UnifiedShareFlow({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !content) return null;
 
   return (
     <>
@@ -100,11 +102,11 @@ export function UnifiedShareFlow({
                   </div>
                 )}
                 
-                {content.type === 'journal_entry' && (
-                  <div className="text-gray-600 italic">
-                    "{content.data.preview?.slice(0, 80)}..."
-                  </div>
-                )}
+                                 {content.type === 'journal_entry' && (
+                   <div className="text-gray-600 italic">
+                     &ldquo;{content.data.preview?.slice(0, 80)}...&rdquo;
+                   </div>
+                 )}
                 
                 {content.type === 'roll' && (
                   <div className="flex items-center justify-center gap-2">
@@ -113,11 +115,11 @@ export function UnifiedShareFlow({
                   </div>
                 )}
                 
-                {content.type === 'pledge' && (
-                  <div className="text-gray-600 italic">
-                    "{content.data.signatureMsg?.slice(0, 80)}..."
-                  </div>
-                )}
+                                 {content.type === 'pledge' && (
+                   <div className="text-gray-600 italic">
+                     &ldquo;{content.data.signatureMsg?.slice(0, 80)}...&rdquo;
+                   </div>
+                 )}
               </div>
             </div>
 
@@ -203,7 +205,12 @@ export function UnifiedShareFlow({
 export function useUnifiedShare() {
   const [shareState, setShareState] = useState<{
     isOpen: boolean;
-    content: any;
+    content: {
+      type: 'sol_age' | 'journal_entry' | 'roll' | 'pledge';
+      title: string;
+      description: string;
+      data: any;
+    } | null;
     userName?: string;
     profilePicUrl?: string;
     onShareComplete?: (platform: string, shareId: string) => void;
