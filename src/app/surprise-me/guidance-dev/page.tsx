@@ -47,6 +47,13 @@ export default function GuidanceDevPage() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-serif font-bold text-black mb-4">Sol Innovator Activities</h1>
           <p className="text-gray-600 font-mono text-sm">Dev-only page for testing guidance pages</p>
+          {activities.length > 0 && (
+            <div className="mt-4 text-sm text-gray-500 font-mono">
+              <div>Total activities: {activities.length}</div>
+              <div>Universal activities: {activities.filter(a => a.archetype === 'Universal').length}</div>
+              <div>Archetype-specific: {activities.filter(a => a.archetype !== 'Universal').length}</div>
+            </div>
+          )}
         </div>
 
         <div className="grid gap-6">
@@ -60,7 +67,7 @@ export default function GuidanceDevPage() {
                       {activity.title}
                     </div>
                     <div className="font-mono text-xs uppercase tracking-widest text-gray-500 mb-2">
-                      {activity.rarity} • {activity.duration}
+                      {activity.rarity} • {activity.duration} • {activity.archetype}
                     </div>
                     <div className="text-gray-600 text-sm mb-3">
                       {activity.description}
@@ -84,9 +91,14 @@ export default function GuidanceDevPage() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500 font-mono">
-            Total activities: {activities.length}
-          </p>
+          <div className="text-sm text-gray-500 font-mono space-y-1">
+            <p>Total activities: {activities.length}</p>
+            <p>Universal (archetype-agnostic): {activities.filter(a => a.archetype === 'Universal').length}</p>
+            <p>Sol Innovator specific: {activities.filter(a => a.archetype === 'Sol Innovator').length}</p>
+            {activities.filter(a => a.archetype === 'Universal').length === 15 && (
+              <p className="text-green-600 font-bold">✅ All 15 universal activities loaded!</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

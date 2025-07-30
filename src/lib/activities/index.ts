@@ -1,4 +1,5 @@
 import type { DailyRoll } from '../surpriseMe';
+import { universalActivities } from './universal-activities';
 
 // Function to dynamically load activities by archetype
 export async function getArchetypeActivities(archetype: string): Promise<DailyRoll[]> {
@@ -13,21 +14,26 @@ export async function getArchetypeActivities(archetype: string): Promise<DailyRo
   };
 
   const fileName = archetypeToFile[archetype];
+  let archetypeSpecificActivities: DailyRoll[] = [];
+
   if (!fileName) {
     // Fallback to Sol Traveler if archetype not found
     const { activities } = await import('./sol-traveler');
-    return activities;
+    archetypeSpecificActivities = activities;
+  } else {
+    try {
+      const activityModule = await import(`./${fileName}`);
+      archetypeSpecificActivities = activityModule.activities;
+    } catch (error) {
+      console.error(`Failed to load activities for ${archetype}:`, error);
+      // Fallback to Sol Traveler
+      const { activities } = await import('./sol-traveler');
+      archetypeSpecificActivities = activities;
+    }
   }
 
-  try {
-    const activityModule = await import(`./${fileName}`);
-    return activityModule.activities;
-  } catch (error) {
-    console.error(`Failed to load activities for ${archetype}:`, error);
-    // Fallback to Sol Traveler
-    const { activities } = await import('./sol-traveler');
-    return activities;
-  }
+  // Combine archetype-specific activities with universal activities
+  return [...archetypeSpecificActivities, ...universalActivities];
 }
 
 // Cache for loaded activities to avoid re-importing
