@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     });
     
     // Get Sol Age data from linked notification details if available
-    let solAgeData = null;
+    let solAgeData: { hasBookmark: boolean; linkedAt: any } | null = null;
     if (updated && updated.length > 0) {
       const linkedData = updated[0];
       
