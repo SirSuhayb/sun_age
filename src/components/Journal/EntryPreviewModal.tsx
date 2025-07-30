@@ -77,11 +77,10 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
     } else {
       // Default behavior - navigate to journal with parent info in URL
       const params = new URLSearchParams({
-        tab: 'journal',
         inspired_by: entry.id,
         ...(shareId && { share_id: shareId }),
       });
-      window.location.href = `/soldash?${params.toString()}`;
+      window.location.href = `/soldash/journal?${params.toString()}`;
     }
   };
   const handleViewJourney = () => {
