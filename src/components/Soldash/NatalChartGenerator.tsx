@@ -245,7 +245,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     if (birthData && chartRef.current) {
       generateChart();
     }
-  }, [birthData]);
+  }, [birthData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isGenerating) {
     return (

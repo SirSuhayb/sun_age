@@ -134,7 +134,7 @@ export default function ExpandPaymentPage() {
 
           {/* Features Grid */}
           <div className="mb-8">
-            <h3 className="text-xl font-serif font-semibold mb-6 text-center">What You'll Discover</h3>
+            <h3 className="text-xl font-serif font-semibold mb-6 text-center">What You&apos;ll Discover</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {features.map((feature, index) => (
                 <motion.div 

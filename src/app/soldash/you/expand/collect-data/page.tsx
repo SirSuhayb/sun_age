@@ -207,7 +207,7 @@ export default function CollectDataPage() {
                 <p className="text-red-500 text-sm mt-1">{errors.birthLocation}</p>
               )}
               <p className="text-xs text-[#888] mt-1">
-                Include the city and country where you were born. This determines your chart's geographical coordinates.
+                Include the city and country where you were born. This determines your chart&apos;s geographical coordinates.
               </p>
             </motion.div>
 

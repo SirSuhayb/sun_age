@@ -230,7 +230,7 @@ export default function DetailsPage() {
         >
           <h2 className="text-xl font-serif font-semibold text-[#444] mb-3">Your Complete Cosmic Profile</h2>
           <p className="text-[#666] leading-relaxed">
-            This detailed analysis combines your birth chart data with Sol Dash's advanced algorithms to provide 
+            This detailed analysis combines your birth chart data with Sol Dash&apos;s advanced algorithms to provide 
             personalized insights into your life patterns, optimal timing, and evolutionary path. Each section 
             reveals different aspects of your cosmic signature and how to work with your natural rhythms.
           </p>

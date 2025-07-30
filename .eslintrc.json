@@ -9,7 +9,8 @@
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/no-implicit-any": "off",
     "prefer-const": "off",
-    "@typescript-eslint/no-import-type-side-effects": "off"
+    "@typescript-eslint/no-import-type-side-effects": "off",
+    "react-hooks/exhaustive-deps": "warn"
   },
   "overrides": [
     {
