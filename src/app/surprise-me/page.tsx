@@ -17,6 +17,7 @@ import { surpriseMeFramework, DailyRoll } from '~/lib/surpriseMe';
 import { solarEarningsManager } from '~/lib/solarEarnings';
 import Link from 'next/link';
 import OracleStatusBar from '~/components/ui/OracleStatusBar';
+import { useUnifiedShare } from '~/components/UnifiedShareFlow';
 
 export default function SurpriseMePage() {
   const router = useRouter();
@@ -73,6 +74,7 @@ export default function SurpriseMePage() {
   const { context, isInFrame, sdk } = useFrameSDK();
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
+  const { triggerShare, ShareFlowComponent } = useUnifiedShare();
   const [dailyRolls, setDailyRolls] = useState<number>(3);
   const [hasRolledToday, setHasRolledToday] = useState(false);
   const [isRolling, setIsRolling] = useState(false);
@@ -352,29 +354,56 @@ export default function SurpriseMePage() {
     const streak = solarEarnings.streakDays;
     
     try {
-      const { shareRoll } = await import('~/lib/sharing');
-      await shareRoll(
-        {
-          title: currentRoll.title,
-          description: currentRoll.description,
-          archetype: currentRoll.archetype,
-          rarity: currentRoll.rarity,
-          icon: currentRoll.icon,
-          type: currentRoll.type,
-        },
-        userName,
-        solarEarned,
-        streak,
-        sdk,
-        isInFrame
-      );
-      
-      // Award social sharing achievement bonus
-      solarEarningsManager.markSocialShare();
-      
-      // Update earnings display
-      const updatedEarnings = solarEarningsManager.getEarningsSummary();
-      setSolarEarnings(updatedEarnings);
+      // For Farcaster users, use the existing share flow
+      if (isInFrame) {
+        const { shareRoll } = await import('~/lib/sharing');
+        await shareRoll(
+          {
+            title: currentRoll.title,
+            description: currentRoll.description,
+            archetype: currentRoll.archetype,
+            rarity: currentRoll.rarity,
+            icon: currentRoll.icon,
+            type: currentRoll.type,
+          },
+          userName,
+          solarEarned,
+          streak,
+          sdk,
+          isInFrame
+        );
+      } else {
+        // For non-Farcaster users, use the unified share flow
+        const rarityEmoji = currentRoll.rarity === 'legendary' ? '🌟' : currentRoll.rarity === 'rare' ? '💎' : '✨';
+        triggerShare({
+          content: {
+            type: 'roll',
+            title: 'My Cosmic Guidance',
+            description: `The cosmos has guided me to ${currentRoll.title}`,
+            data: {
+              title: currentRoll.title,
+              description: currentRoll.description,
+              archetype: currentRoll.archetype,
+              rarity: currentRoll.rarity,
+              icon: currentRoll.icon,
+              type: currentRoll.type,
+              solarEarned,
+              streak
+            }
+          },
+          userName,
+          onShareComplete: (platform, shareId) => {
+            console.log(`Roll shared on ${platform} with ID: ${shareId}`);
+            
+            // Award social sharing achievement bonus
+            solarEarningsManager.markSocialShare();
+            
+            // Update earnings display
+            const updatedEarnings = solarEarningsManager.getEarningsSummary();
+            setSolarEarnings(updatedEarnings);
+          }
+        });
+      }
       
     } catch (err) {
       console.error('Error sharing roll:', err);
@@ -835,6 +864,9 @@ export default function SurpriseMePage() {
           </div>
         )}
       </SimpleModal>
+      
+      {/* Unified Share Flow Component */}
+      <ShareFlowComponent />
     </div>
   );
 }

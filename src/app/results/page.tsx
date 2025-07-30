@@ -10,6 +10,7 @@ import { SpinnerButton } from "~/components/ui/SpinnerButton";
 // import { showScreenshotPrompt } from '~/lib/screenshot';
 import Link from 'next/link';
 import { getSolarArchetype, solarArchetypeCoreQuotes, solarArchetypeRadiatesWith } from '~/lib/solarIdentity';
+import { useUnifiedShare } from '~/components/UnifiedShareFlow';
 
 export default function ResultsPage() {
   console.log("DEBUG: ResultsPage rendered");
@@ -33,6 +34,9 @@ export default function ResultsPage() {
 
   // Add state for bookmark modal
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+
+  // Unified share flow
+  const { triggerShare, ShareFlowComponent } = useUnifiedShare();
 
   // Get data from URL parameters with null checks
   const daysParam = searchParams?.get('days');
@@ -59,25 +63,49 @@ export default function ResultsPage() {
     setShared(true);
   };
 
-  // Separate handler for just sharing (no bookmark)
+  // Separate handler for just sharing (no bookmark) - now uses unified share flow
   const handleShareInternal = async () => {
     if (!days || !birthDate || !approxYears) return;
     const userName = context?.user?.displayName || 'TRAVELLER';
     const profilePicUrl = context?.user?.pfp?.url;
     
     try {
-      const { shareSolAge } = await import('~/lib/sharing');
-      await shareSolAge(
-        days,
-        approxYears,
-        birthDate,
-        userName,
-        profilePicUrl,
-        solarIdentity || undefined,
-        solarQuote || undefined,
-        sdk,
-        isInFrame
-      );
+      // For Farcaster users, use the existing share flow
+      if (isInFrame) {
+        const { shareSolAge } = await import('~/lib/sharing');
+        await shareSolAge(
+          days,
+          approxYears,
+          birthDate,
+          userName,
+          profilePicUrl,
+          solarIdentity || undefined,
+          solarQuote || undefined,
+          sdk,
+          isInFrame
+        );
+      } else {
+        // For non-Farcaster users, use the unified share flow
+        triggerShare({
+          content: {
+            type: 'sol_age',
+            title: 'Your Solar Age',
+            description: `You are a ${solarIdentity || 'Solar Being'} powered by ${days.toLocaleString()} days of pure sunlight`,
+            data: {
+              solAge: days,
+              archetype: solarIdentity,
+              quote: solarQuote,
+              approxYears
+            }
+          },
+          userName,
+          profilePicUrl,
+          onShareComplete: (platform, shareId) => {
+            console.log(`Sol Age shared on ${platform} with ID: ${shareId}`);
+            setShared(true);
+          }
+        });
+      }
     } catch (err) {
       console.error(err);
     }
@@ -416,6 +444,9 @@ export default function ResultsPage() {
           </div>
         </div>
       </footer>
+      
+      {/* Unified Share Flow Component */}
+      <ShareFlowComponent />
     </>
   );
 } 
