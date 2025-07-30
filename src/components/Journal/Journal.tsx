@@ -70,7 +70,7 @@ export function Journal({ solAge }: JournalProps) {
   const userFid = farcasterUserFid || devUserFid;
   
   // Get user account ID from web identity
-  const userAccountId = webIdentity.userAccountId;
+  const userAccountId = webIdentity.userAccountId || undefined;
   
   const {
     entries,
