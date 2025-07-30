@@ -13,6 +13,34 @@ export interface JournalEntry {
   parent_share_id?: string;
 }
 
+// User identification types for unified user system
+export interface UserIdentifier {
+  type: 'farcaster_fid' | 'account_id';
+  value: string | number;
+}
+
+export interface UserAccount {
+  id: string;
+  email: string;
+  user_type: 'farcaster' | 'non_farcaster';
+  farcaster_fid?: number;
+  platform: string;
+  sol_age?: number;
+  archetype?: string;
+  wallet_address?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateUserAccountRequest {
+  email: string;
+  platform: string;
+  sol_age?: number;
+  archetype?: string;
+  farcaster_fid?: number;
+  anon_id?: string;
+}
+
 export interface WisdomExtract {
   id: string;
   journal_entry_id: string;
@@ -50,6 +78,10 @@ export interface CreateJournalEntryRequest {
   sol_day: number;
   parent_entry_id?: string;
   parent_share_id?: string;
+  // User identification - can be either Farcaster FID or account ID
+  userFid?: number; // For backward compatibility with Farcaster users
+  userAccountId?: string; // For non-Farcaster users
+  userIdentifier?: UserIdentifier; // Unified approach
 }
 
 export interface UpdateJournalEntryRequest {

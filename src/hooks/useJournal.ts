@@ -49,14 +49,14 @@ export function useJournal() {
   }, []);
 
   // Migrate local entries to database
-  const migrateLocalEntries = useCallback(async (userFid: number) => {
+  const migrateLocalEntries = useCallback(async (userFid?: number, userAccountId?: string) => {
     setLoading(true);
     setError(null);
     
     try {
-      // Validate userFid
-      if (!userFid || typeof userFid !== 'number' || isNaN(userFid)) {
-        throw new Error(`Invalid userFid: ${userFid} (type: ${typeof userFid})`);
+      // Validate user identification - need either userFid or userAccountId
+      if ((!userFid || typeof userFid !== 'number' || isNaN(userFid)) && (!userAccountId || typeof userAccountId !== 'string')) {
+        throw new Error(`Invalid user identification. Provide either userFid (${userFid}) or userAccountId (${userAccountId})`);
       }
 
       const localEntries = entries.filter(e => e.preservation_status === 'local');
@@ -65,7 +65,7 @@ export function useJournal() {
         return { migrated: 0, errors: [] };
       }
 
-      console.log('[useJournal] Starting migration with userFid:', userFid, 'type:', typeof userFid);
+      console.log('[useJournal] Starting migration with userFid:', userFid, 'userAccountId:', userAccountId);
       console.log('[useJournal] Local entries to migrate:', localEntries);
 
       const results = await Promise.allSettled(
@@ -74,6 +74,7 @@ export function useJournal() {
             content: entry.content,
             sol_day: entry.sol_day,
             userFid: userFid,
+            userAccountId: userAccountId,
             parent_entry_id: entry.parent_entry_id,
             parent_share_id: entry.parent_share_id
           };
@@ -82,7 +83,7 @@ export function useJournal() {
             entryId: entry.id,
             requestBody,
             userFid: userFid,
-            userFidType: typeof userFid
+            userAccountId: userAccountId
           });
 
           const response = await fetch('/api/journal/entries', {
@@ -140,13 +141,13 @@ export function useJournal() {
   }, [entries, saveToLocalStorage]);
 
   // Create a new journal entry locally
-  const createEntry = useCallback(async (data: CreateJournalEntryRequest, userFid?: number): Promise<JournalEntry> => {
+  const createEntry = useCallback(async (data: CreateJournalEntryRequest, userFid?: number, userAccountId?: string): Promise<JournalEntry> => {
     setLoading(true);
     setError(null);
     try {
       const newEntry: JournalEntry = {
         id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        user_fid: userFid || 0, // Use provided userFid or default to 0
+        user_fid: userFid || 0, // Use provided userFid or default to 0 for non-Farcaster users
         sol_day: data.sol_day,
         content: data.content,
         word_count: data.content.trim().split(/\s+/).length,
@@ -173,11 +174,11 @@ export function useJournal() {
   }, [saveToLocalStorage]);
 
   // Load entries from API (for authenticated users)
-  const loadEntries = useCallback(async (filters?: JournalFilters, userFid?: number) => {
+  const loadEntries = useCallback(async (filters?: JournalFilters, userFid?: number, userAccountId?: string) => {
     setLoading(true);
     setError(null);
     try {
-      console.log('[useJournal] loadEntries called with filters:', filters, 'userFid:', userFid);
+      console.log('[useJournal] loadEntries called with filters:', filters, 'userFid:', userFid, 'userAccountId:', userAccountId);
       
       // Always load local entries from storage first
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -196,11 +197,13 @@ export function useJournal() {
         params.append('search', filters.search);
       }
       
-      // Add userFid parameter (required for service role client)
+      // Add user identification parameters (required for service role client)
       if (userFid) {
         params.append('userFid', String(userFid));
+      } else if (userAccountId) {
+        params.append('userAccountId', userAccountId);
       } else {
-        console.log('[useJournal] No userFid provided, skipping API call');
+        console.log('[useJournal] No user identification provided, skipping API call');
         setEntries(localEntries);
         return;
       }
@@ -253,7 +256,7 @@ export function useJournal() {
   }, [saveToLocalStorage]);
 
   // Update a journal entry locally or in the database
-  const updateEntry = useCallback(async (id: string, data: UpdateJournalEntryRequest, userFid?: number): Promise<JournalEntry> => {
+  const updateEntry = useCallback(async (id: string, data: UpdateJournalEntryRequest, userFid?: number, userAccountId?: string): Promise<JournalEntry> => {
     setLoading(true);
     setError(null);
     try {
@@ -279,8 +282,10 @@ export function useJournal() {
         const params = new URLSearchParams();
         if (userFid) {
           params.append('userFid', String(userFid));
+        } else if (userAccountId) {
+          params.append('userAccountId', userAccountId);
         } else {
-          throw new Error('userFid required for synced entry updates');
+          throw new Error('User identification (userFid or userAccountId) required for synced entry updates');
         }
         const response = await fetch(`/api/journal/entries/${id}?${params.toString()}`, {
           method: 'PUT',
@@ -293,7 +298,7 @@ export function useJournal() {
         }
         const { entry: updatedEntry } = await response.json();
         // Refresh entries from the database
-        await loadEntries(undefined, userFid);
+        await loadEntries(undefined, userFid, userAccountId);
         return updatedEntry;
       } else {
         throw new Error('Cannot update preserved entries');
@@ -308,7 +313,7 @@ export function useJournal() {
   }, [entries, saveToLocalStorage, loadEntries]);
 
   // Delete a journal entry locally or in the database
-  const deleteEntry = useCallback(async (id: string, userFid?: number): Promise<void> => {
+  const deleteEntry = useCallback(async (id: string, userFid?: number, userAccountId?: string): Promise<void> => {
     setLoading(true);
     setError(null);
     try {
@@ -327,8 +332,10 @@ export function useJournal() {
         const params = new URLSearchParams();
         if (userFid) {
           params.append('userFid', String(userFid));
+        } else if (userAccountId) {
+          params.append('userAccountId', userAccountId);
         } else {
-          throw new Error('userFid required for synced entry deletion');
+          throw new Error('User identification (userFid or userAccountId) required for synced entry deletion');
         }
         const response = await fetch(`/api/journal/entries/${id}?${params.toString()}`, {
           method: 'DELETE',
@@ -338,7 +345,7 @@ export function useJournal() {
           throw new Error(errorBody.error || 'Failed to delete entry');
         }
         // Refresh entries from the database
-        await loadEntries(undefined, userFid);
+        await loadEntries(undefined, userFid, userAccountId);
       } else {
         throw new Error('Cannot delete preserved entries');
       }
