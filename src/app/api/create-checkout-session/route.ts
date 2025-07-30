@@ -26,8 +26,8 @@ export async function POST(req: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Sol Chart Pro',
-              description: 'Complete natal chart analysis with advanced insights',
+              name: 'Sol Codex',
+              description: 'Expand your understanding with complete natal chart analysis',
               images: [
                 `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/you/solChart.svg`
               ],

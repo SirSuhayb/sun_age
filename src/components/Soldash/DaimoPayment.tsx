@@ -37,7 +37,7 @@ export const DaimoPayment: React.FC<DaimoPaymentProps> = ({
       const paymentRequest = await daimoPay.createPayment({
         amount: amount, // Amount in USD
         currency: 'USD',
-        description: `Sol Chart Pro - ${plan} subscription`,
+        description: `Sol Codex - ${plan} subscription`,
         metadata: {
           plan: plan,
           feature: 'sol-chart-pro',

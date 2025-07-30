@@ -118,9 +118,9 @@ export default function ExpandPaymentPage() {
         >
           {/* Header Section */}
           <div className="text-center mb-8">
-            <div className="text-3xl font-serif font-semibold mb-2">Your Complete Sol Chart</div>
+            <div className="text-3xl font-serif font-semibold mb-2">Sol Codex</div>
             <div className="text-lg text-[#666] font-mono uppercase tracking-wide">
-              Unlock the full depth of your cosmic signature
+              Expand your understanding
             </div>
           </div>
 
@@ -229,8 +229,8 @@ export default function ExpandPaymentPage() {
                 'Life phase timing and energy patterns',
                 'Annual milestone predictions and breakthrough timing',
                 'Advanced cosmic signature breakdown',
-                'Monthly chart updates and insights',
-                'Access to premium Sol content and features'
+                'Monthly codex updates and insights',
+                'Access to premium Sol Codex features'
               ].map((item, index) => (
                 <div key={index} className="flex items-center">
                   <Check className="w-5 h-5 text-[#E6B13A] mr-3 flex-shrink-0" />

@@ -33,12 +33,12 @@ const ExpandUnderstanding: React.FC = () => {
           ))}
         </ul>
       </div>
-      <button
-        className="w-full py-4 bg-[#E6B13A] text-black font-mono text-lg tracking-widest uppercase border-none rounded-none mt-2 hover:bg-[#D4A02A] transition-colors"
-        onClick={() => window.location.href = '/soldash/you/expand'}
-      >
-        Unlock Your Chart
-      </button>
+              <button
+          className="w-full py-4 bg-[#E6B13A] text-black font-mono text-lg tracking-widest uppercase border-none rounded-none mt-2 hover:bg-[#D4A02A] transition-colors"
+          onClick={() => window.location.href = '/soldash/you/expand'}
+        >
+          Unlock Sol Codex
+        </button>
     </div>
   );
 };

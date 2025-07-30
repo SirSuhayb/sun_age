@@ -115,7 +115,7 @@ export default function CollectDataPage() {
           <Link href="/soldash/you/expand" className="mr-4">
             <ArrowLeft className="w-6 h-6 text-[#888]" />
           </Link>
-          <h1 className="text-2xl font-serif font-semibold">Complete Your Sol Chart</h1>
+          <h1 className="text-2xl font-serif font-semibold">Complete Your Sol Codex</h1>
         </motion.div>
 
         {/* Progress Indicator */}
@@ -144,10 +144,10 @@ export default function CollectDataPage() {
           variants={itemVariants}
         >
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-serif font-semibold mb-2">Birth Information</h2>
-            <p className="text-[#666] font-mono text-sm">
-              Your exact birth details create the foundation for your complete Sol Chart
-            </p>
+                          <h2 className="text-2xl font-serif font-semibold mb-2">Birth Information</h2>
+              <p className="text-[#666] font-mono text-sm">
+                Your exact birth details create the foundation for your Sol Codex
+              </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -216,11 +216,11 @@ export default function CollectDataPage() {
               className="bg-[#FCF6E5] border border-[#E5E1D8] p-4 rounded-none"
               variants={itemVariants}
             >
-              <h4 className="font-serif font-semibold text-sm text-[#444] mb-2">Privacy & Security</h4>
-              <p className="text-xs text-[#666]">
-                Your birth information is encrypted and used solely to generate your personalized Sol Chart. 
-                We never share your personal data with third parties.
-              </p>
+                                <h4 className="font-serif font-semibold text-sm text-[#444] mb-2">Privacy & Security</h4>
+                  <p className="text-xs text-[#666]">
+                    Your birth information is encrypted and used solely to generate your personalized Sol Codex. 
+                    We never share your personal data with third parties.
+                  </p>
             </motion.div>
 
             {/* Submit Button */}
@@ -229,10 +229,10 @@ export default function CollectDataPage() {
               disabled={isSubmitting}
               className={`w-full py-4 ${isSubmitting ? 'bg-[#D7D7D7] cursor-not-allowed' : 'bg-[#E6B13A] hover:bg-[#D4A02A]'} text-black font-mono text-lg tracking-widest uppercase border-none transition-colors`}
               variants={itemVariants}
-              whileHover={!isSubmitting ? { scale: 1.02 } : {}}
-              whileTap={!isSubmitting ? { scale: 0.98 } : {}}
-            >
-              {isSubmitting ? 'Generating Your Chart...' : 'Generate My Sol Chart'}
+                                whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+                  whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+                >
+                  {isSubmitting ? 'Generating Your Codex...' : 'Generate My Sol Codex'}
             </motion.button>
           </form>
         </motion.div>

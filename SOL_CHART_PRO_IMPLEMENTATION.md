@@ -1,8 +1,8 @@
-# Sol Chart Pro - Complete Implementation Guide
+# Sol Codex - Complete Implementation Guide
 
 ## Overview
 
-Sol Chart Pro is a premium subscription service that expands the basic Sol Dash "YOU" tab experience with full natal chart generation, advanced astrological analysis, and personalized insights that integrate with the user's existing Sol archetype, foundation, depth, and phase data.
+Sol Codex is a premium subscription service that expands the basic Sol Dash "YOU" tab experience with full natal chart generation, advanced astrological analysis, and personalized insights that integrate with the user's existing Sol archetype, foundation, depth, and phase data. The Sol Codex helps users "expand their understanding" through deep cosmic insights.
 
 ## 🚀 Current Implementation
 
@@ -16,8 +16,8 @@ Sol Chart Pro is a premium subscription service that expands the basic Sol Dash 
 
 ### Chart Generation
 - **Libraries Used**:
-  - `astrochart`: "^0.0.1" - For chart visualization
-  - `circular-natal-horoscope-js`: "^1.1.0" - For astrological calculations
+  - `circular-natal-horoscope-js`: "^1.1.0" - For astrological calculations ([CircularNatalHoroscopeJS](https://github.com/0xStarcat/CircularNatalHoroscopeJS))
+  - `astrochart`: "^0.0.1" - For chart visualization ([AstroChart](https://github.com/AstroDraw/AstroChart))
 - **Chart Styling**: Matches the existing `solChart.svg` aesthetic
 - **Data Integration**: Combines astrological data with Sol profile context
 
@@ -120,7 +120,7 @@ const session = await stripe.checkout.sessions.create({
 const paymentRequest = await daimoPay.createPayment({
   amount: 7.77,
   currency: 'USD',
-  description: 'Sol Chart Pro - Monthly'
+  description: 'Sol Codex - Monthly'
 });
 ```
 
@@ -302,4 +302,4 @@ const analyzeCompatibility = (user1Chart, user1Sol, user2Chart, user2Sol) => {
 - [ ] Email templates for subscription management
 - [ ] Backup and recovery procedures
 
-This implementation provides a solid foundation for Sol Chart Pro while maintaining flexibility for future enhancements and the broader Solara ecosystem integration.
+This implementation provides a solid foundation for Sol Codex while maintaining flexibility for future enhancements and the broader Solara ecosystem integration.

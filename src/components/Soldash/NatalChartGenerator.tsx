@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 // Import astrology libraries
+// Using CircularNatalHoroscopeJS for calculations: https://github.com/0xStarcat/CircularNatalHoroscopeJS
+// Using AstroChart for rendering: https://github.com/AstroDraw/AstroChart
 // Note: These need to be imported dynamically due to potential client-side only requirements
 interface BirthData {
   date: string;
@@ -65,6 +67,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       const birthDateTime = new Date(`${birthData.date}T${birthData.time}`);
       
       // Dynamic import to avoid SSR issues
+      // CircularNatalHoroscopeJS - https://github.com/0xStarcat/CircularNatalHoroscopeJS
       const { default: CircularNatalHoroscope } = await import('circular-natal-horoscope-js');
       
       // Configure chart data for CircularNatalHoroscope

@@ -165,10 +165,10 @@ export default function ChartPage() {
         {/* Header */}
         <motion.div className="flex items-center justify-between mb-8" variants={itemVariants}>
           <div className="flex items-center">
-            <Link href="/soldash/you/expand/collect-data" className="mr-4">
-              <ArrowLeft className="w-6 h-6 text-[#888]" />
-            </Link>
-            <h1 className="text-2xl font-serif font-semibold">Your Complete Sol Chart</h1>
+                      <Link href="/soldash/you/expand/collect-data" className="mr-4">
+            <ArrowLeft className="w-6 h-6 text-[#888]" />
+          </Link>
+          <h1 className="text-2xl font-serif font-semibold">Your Sol Codex</h1>
           </div>
           <div className="flex space-x-3">
             <button 
@@ -189,12 +189,12 @@ export default function ChartPage() {
         {/* Success Message */}
         {showChart && (
           <motion.div 
-            className="bg-[#E8F5E8] border border-[#A8D8A8] p-4 mb-8 text-center"
-            variants={itemVariants}
-          >
-            <div className="text-lg font-serif font-semibold text-[#2D5A2D] mb-1">
-              🎉 Your Sol Chart is Ready!
-            </div>
+                          className="bg-[#E8F5E8] border border-[#A8D8A8] p-4 mb-8 text-center"
+              variants={itemVariants}
+            >
+              <div className="text-lg font-serif font-semibold text-[#2D5A2D] mb-1">
+                🎉 Your Sol Codex is Ready!
+              </div>
             <div className="text-sm text-[#3D6A3D]">
               Generated for {birthData?.date} at {birthData?.time} in {birthData?.location.city}, {birthData?.location.country}
             </div>
