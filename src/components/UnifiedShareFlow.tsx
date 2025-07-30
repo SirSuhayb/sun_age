@@ -45,7 +45,6 @@ export function UnifiedShareFlow({
   }
 
   const getContentIcon = () => {
-    if (!content) return '🌞';
     switch (content.type) {
       case 'sol_age': return '☀️';
       case 'journal_entry': return '📓';
@@ -56,7 +55,6 @@ export function UnifiedShareFlow({
   };
 
   const getContentEmoji = () => {
-    if (!content) return 'Your cosmic journey is ready!';
     switch (content.type) {
       case 'sol_age': return 'Your cosmic age calculation is ready!';
       case 'journal_entry': return 'Your reflection is complete!';
@@ -66,7 +64,7 @@ export function UnifiedShareFlow({
     }
   };
 
-  if (!isOpen || !content) return null;
+  if (!isOpen) return null;
 
   return (
     <>
@@ -244,15 +242,18 @@ export function useUnifiedShare() {
     shareState,
     triggerShare,
     closeShare,
-    ShareFlowComponent: () => (
-      <UnifiedShareFlow
-        isOpen={shareState.isOpen}
-        onClose={closeShare}
-        content={shareState.content}
-        userName={shareState.userName}
-        profilePicUrl={shareState.profilePicUrl}
-        onShareComplete={shareState.onShareComplete}
-      />
-    )
+    ShareFlowComponent: () => {
+      if (!shareState.content) return null;
+      return (
+        <UnifiedShareFlow
+          isOpen={shareState.isOpen}
+          onClose={closeShare}
+          content={shareState.content}
+          userName={shareState.userName}
+          profilePicUrl={shareState.profilePicUrl}
+          onShareComplete={shareState.onShareComplete}
+        />
+      );
+    }
   };
 }

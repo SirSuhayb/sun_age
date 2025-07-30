@@ -8,7 +8,7 @@ interface ShareSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   // Content details for sharing
-  content: {
+  content?: {
     type: 'sol_age' | 'journal_entry' | 'roll' | 'pledge';
     title: string;
     description: string;
