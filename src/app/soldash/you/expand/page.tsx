@@ -30,8 +30,8 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-// SOLAR token contract (replace with actual contract address)
-const SOLAR_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000001' as const; // TODO: Add actual SOLAR token address
+// SOLAR token contract from environment variables
+const SOLAR_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_SOLAR_TOKEN_ADDRESS || '0x0000000000000000000000000000000000000001') as `0x${string}`;
 const SOLAR_TOKEN_ABI = [
   {
     inputs: [{ name: 'account', type: 'address' }],
