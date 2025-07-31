@@ -31,7 +31,7 @@ const itemVariants = {
 };
 
 // SOLAR token contract (replace with actual contract address)
-const SOLAR_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: Add actual SOLAR token address
+const SOLAR_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000001' as const; // TODO: Add actual SOLAR token address
 const SOLAR_TOKEN_ABI = [
   {
     constant: true,
@@ -58,11 +58,16 @@ export default function ExpandPaymentPage() {
     address: SOLAR_TOKEN_ADDRESS,
     abi: SOLAR_TOKEN_ABI,
     functionName: 'balanceOf',
-    args: address ? [address] : undefined,
-    enabled: !!address && isConnected
+    args: address ? [address] : undefined
   });
   
   useEffect(() => {
+    if (!address || !isConnected) {
+      setIsCheckingTokens(false);
+      setHasFreeTier(false);
+      return;
+    }
+    
     if (!isLoadingBalance) {
       if (solarBalance) {
         const balance = Number(formatUnits(solarBalance, 18)); // Assuming 18 decimals
@@ -70,7 +75,7 @@ export default function ExpandPaymentPage() {
       }
       setIsCheckingTokens(false);
     }
-  }, [solarBalance, isLoadingBalance]);
+  }, [solarBalance, isLoadingBalance, address, isConnected]);
 
   const plans = {
     monthly: {
@@ -221,7 +226,20 @@ export default function ExpandPaymentPage() {
             </div>
           </div>
 
-          {/* Plan Selection */}
+          {/* Show loading state while checking tokens */}
+          {isCheckingTokens && isConnected && (
+            <motion.div 
+              className="text-center py-8"
+              variants={itemVariants}
+            >
+              <div className="w-8 h-8 border-2 border-[#E6B13A] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-sm text-[#666]">Checking SOLAR token balance...</p>
+            </motion.div>
+          )}
+          
+          {/* Plan Selection - Only show if not a free tier holder */}
+          {!hasFreeTier && !isCheckingTokens && (
+            <>
           <motion.div className="mb-8" variants={itemVariants}>
             <h3 className="text-xl font-serif font-semibold mb-4 text-center">Choose Your Plan</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -341,6 +359,25 @@ export default function ExpandPaymentPage() {
           >
             Secure payment • Cancel anytime • 7-day free trial
           </motion.div>
+          </>
+          )}
+          
+          {/* Connect wallet prompt for non-connected users */}
+          {!isConnected && !isCheckingTokens && (
+            <motion.div 
+              className="text-center p-6 bg-[#FCF6E5] border border-[#E5E1D8] rounded"
+              variants={itemVariants}
+            >
+              <Wallet className="w-12 h-12 text-[#E6B13A] mx-auto mb-4" />
+              <h3 className="text-lg font-serif font-semibold mb-2">Connect Your Wallet</h3>
+              <p className="text-sm text-[#666] mb-4">
+                Connect your wallet to check if you qualify for free access with SOLAR tokens
+              </p>
+              <p className="text-xs text-[#888]">
+                Holders of 500M+ SOLAR tokens get 1 year free access
+              </p>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Back Link */}
