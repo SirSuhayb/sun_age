@@ -40,6 +40,18 @@ const planetSymbols: Record<string, string> = {
   nnode: '☊',
   snode: '☋'
 };
+
+// Get zodiac sign from degree
+const getZodiacSign = (degree: number): string => {
+  const normalizedDegree = ((degree % 360) + 360) % 360;
+  const signIndex = Math.floor(normalizedDegree / 30);
+  const signs = [
+    'Aries', 'Taurus', 'Gemini', 'Cancer',
+    'Leo', 'Virgo', 'Libra', 'Scorpio',
+    'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+  ];
+  return signs[signIndex] || 'Aries';
+};
 interface BirthData {
   date: string;
   time: string;
@@ -152,12 +164,13 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
           degree: positions.ASC?.degree || 0
         },
         planets: Object.entries(positions)
-          .filter(([name]) => !['ASC', 'MC'].includes(name))
+          .filter(([name]) => !['ASC', 'MC', 'Sun', 'Moon'].includes(name))
           .map(([name, data]: [string, any]) => ({
-            name,
+            name: name.toLowerCase(),
             sign: data.sign || 'Unknown',
             degree: data.degree || 0,
-            house: data.house || 1
+            house: data.house || 1,
+            retrograde: data.retrograde || false
           })),
         houses: houses?.map((house: any, index: number) => ({
           number: index + 1,
@@ -444,17 +457,18 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         house: 1
       },
       planets: [
-        { name: 'mercury', symbol: '☿', sign: getZodiacSign((sunDegree + 10) % 360), degree: (sunDegree + 10) % 360, house: 1 },
-        { name: 'venus', symbol: '♀', sign: getZodiacSign((sunDegree - 30) % 360), degree: (sunDegree - 30) % 360, house: 2 },
-        { name: 'mars', symbol: '♂', sign: getZodiacSign((sunDegree + 180) % 360), degree: (sunDegree + 180) % 360, house: 7 },
-        { name: 'jupiter', symbol: '♃', sign: getZodiacSign((sunDegree + 90) % 360), degree: (sunDegree + 90) % 360, house: 4 },
-        { name: 'saturn', symbol: '♄', sign: getZodiacSign((sunDegree - 90) % 360), degree: (sunDegree - 90) % 360, house: 10 }
+        { name: 'mercury', sign: getZodiacSign((sunDegree + 10) % 360), degree: (sunDegree + 10) % 360, house: 1 },
+        { name: 'venus', sign: getZodiacSign((sunDegree - 30) % 360), degree: (sunDegree - 30) % 360, house: 2 },
+        { name: 'mars', sign: getZodiacSign((sunDegree + 180) % 360), degree: (sunDegree + 180) % 360, house: 7 },
+        { name: 'jupiter', sign: getZodiacSign((sunDegree + 90) % 360), degree: (sunDegree + 90) % 360, house: 4 },
+        { name: 'saturn', sign: getZodiacSign((sunDegree - 90) % 360), degree: (sunDegree - 90) % 360, house: 10 }
       ],
       houses: Array.from({ length: 12 }, (_, i) => ({
         number: i + 1,
         sign: getZodiacSign((risingDegree + i * 30) % 360),
         degree: (risingDegree + i * 30) % 360
-      }))
+      })),
+      aspects: [] // Mock: no aspects calculated for demo
     };
     
     setChartData(mockData);
