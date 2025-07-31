@@ -6,6 +6,22 @@ import { motion } from 'framer-motion';
 // Using AstroChart for rendering: https://github.com/AstroDraw/AstroChart
 // Note: These need to be imported dynamically due to potential client-side only requirements
 import type { Chart as AstroChart } from '@astrodraw/astrochart';
+
+// Zodiac symbols (Unicode characters)
+const zodiacSymbols: Record<string, string> = {
+  Aries: '♈',
+  Taurus: '♉',
+  Gemini: '♊',
+  Cancer: '♋',
+  Leo: '♌',
+  Virgo: '♍',
+  Libra: '♎',
+  Scorpio: '♏',
+  Sagittarius: '♐',
+  Capricorn: '♑',
+  Aquarius: '♒',
+  Pisces: '♓'
+};
 interface BirthData {
   date: string;
   time: string;
