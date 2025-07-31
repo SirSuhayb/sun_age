@@ -453,8 +453,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       },
       rising: { 
         sign: getZodiacSign(risingDegree), 
-        degree: risingDegree % 30,
-        house: 1
+        degree: risingDegree % 30
       },
       planets: [
         { name: 'mercury', sign: getZodiacSign((sunDegree + 10) % 360), degree: (sunDegree + 10) % 360, house: 1 },
