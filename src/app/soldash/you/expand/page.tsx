@@ -1,8 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Check, Star, CreditCard, Wallet } from 'lucide-react';
+import { ArrowLeft, Check, Star, CreditCard, Wallet, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { useAccount, useReadContract } from 'wagmi';
+import { formatUnits } from 'viem';
 
 const features = [
   { icon: '🎯', label: 'Life Focus', description: 'Discover your core life themes and purpose' },
@@ -28,10 +30,47 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
+// SOLAR token contract (replace with actual contract address)
+const SOLAR_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000'; // TODO: Add actual SOLAR token address
+const SOLAR_TOKEN_ABI = [
+  {
+    constant: true,
+    inputs: [{ name: '_owner', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: 'balance', type: 'uint256' }],
+    type: 'function'
+  }
+] as const;
+
+const REQUIRED_SOLAR_AMOUNT = 500_000_000; // 500M SOLAR tokens
+
 export default function ExpandPaymentPage() {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'daimo'>('stripe');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [hasFreeTier, setHasFreeTier] = useState(false);
+  const [isCheckingTokens, setIsCheckingTokens] = useState(true);
+  
+  const { address, isConnected } = useAccount();
+  
+  // Check SOLAR token balance
+  const { data: solarBalance, isLoading: isLoadingBalance } = useReadContract({
+    address: SOLAR_TOKEN_ADDRESS,
+    abi: SOLAR_TOKEN_ABI,
+    functionName: 'balanceOf',
+    args: address ? [address] : undefined,
+    enabled: !!address && isConnected
+  });
+  
+  useEffect(() => {
+    if (!isLoadingBalance) {
+      if (solarBalance) {
+        const balance = Number(formatUnits(solarBalance, 18)); // Assuming 18 decimals
+        setHasFreeTier(balance >= REQUIRED_SOLAR_AMOUNT);
+      }
+      setIsCheckingTokens(false);
+    }
+  }, [solarBalance, isLoadingBalance]);
 
   const plans = {
     monthly: {
@@ -124,6 +163,34 @@ export default function ExpandPaymentPage() {
               Expand your understanding
             </div>
           </div>
+          
+          {/* Free Tier Banner for SOLAR holders */}
+          {hasFreeTier && (
+            <motion.div 
+              className="mb-8 p-6 bg-gradient-to-r from-[#E6B13A]/20 to-[#FCF6E5] border-2 border-[#E6B13A] rounded"
+              variants={itemVariants}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+            >
+              <div className="flex items-center justify-center mb-3">
+                <Sparkles className="w-8 h-8 text-[#E6B13A] mr-3" />
+                <h3 className="text-2xl font-serif font-bold text-[#444]">SOLAR Holder Benefits</h3>
+                <Sparkles className="w-8 h-8 text-[#E6B13A] ml-3" />
+              </div>
+              <p className="text-center text-[#666] mb-4">
+                As a holder of 500M+ SOLAR tokens, you have <strong>free access</strong> to Sol Codex Pro for 1 year!
+              </p>
+              <motion.button
+                onClick={() => window.location.href = '/soldash/you/expand/collect-data'}
+                className="w-full py-4 bg-gradient-to-r from-[#E6B13A] to-[#D4A02A] text-black font-mono text-lg tracking-widest uppercase border-none transition-all hover:shadow-lg"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Access Sol Codex Free
+              </motion.button>
+            </motion.div>
+          )}
 
           {/* Preview Image */}
           <div className="w-full flex justify-center mb-8">
