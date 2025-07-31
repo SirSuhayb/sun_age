@@ -68,9 +68,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       
       // Dynamic import to avoid SSR issues
       // CircularNatalHoroscopeJS - https://github.com/0xStarcat/CircularNatalHoroscopeJS
-      // @ts-expect-error - Library has TypeScript issues
-      const CircularNatalHoroscopeModule = await import('circular-natal-horoscope-js');
-      const { Origin, Horoscope } = CircularNatalHoroscopeModule as any;
+      const { Origin, Horoscope } = await import('circular-natal-horoscope-js');
       
       // Create an Origin instance
       const origin = new Origin({
@@ -138,38 +136,11 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
       setChartData(transformedChartData);
       
-      // Generate SVG chart using CircularNatalHoroscope
-      const chartSvg = horoscope.draw();
-      
-      // Style the SVG to match solChart.svg aesthetic
-      if (chartSvg && chartRef.current) {
-        // Clear previous content
-        chartRef.current.innerHTML = '';
-        
-        // Create container for the chart
-        const container = document.createElement('div');
-        container.className = 'w-full h-full flex items-center justify-center';
-        container.style.minHeight = '400px';
-        
-        // Style the SVG to match our design
-        if (typeof chartSvg === 'string') {
-          container.innerHTML = chartSvg;
-          const svg = container.querySelector('svg');
-          if (svg) {
-            svg.setAttribute('width', '100%');
-            svg.setAttribute('height', '100%');
-            svg.setAttribute('viewBox', '0 0 400 400');
-            svg.style.maxWidth = '400px';
-            svg.style.maxHeight = '400px';
-            svg.style.filter = 'sepia(20%) saturate(200%) hue-rotate(35deg)';
-          }
-        } else {
-          container.appendChild(chartSvg);
-        }
-        
-        chartRef.current.appendChild(container);
+      // Display the chart using our custom SVG generation
+      if (chartRef.current) {
+        chartRef.current.innerHTML = createChartSVG(transformedChartData);
       }
-
+      
       if (onChartGenerated) {
         onChartGenerated(transformedChartData);
       }
