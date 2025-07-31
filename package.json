@@ -20,6 +20,7 @@
     "db:import-prompts": "npx ts-node --project tsconfig.node.json scripts/import-prompts.ts"
   },
   "dependencies": {
+    "@astrodraw/astrochart": "^3.0.2",
     "@daimo/pay": "^1.12.2",
     "@farcaster/auth-client": "^0.6.0",
     "@farcaster/auth-kit": "^0.8.0",

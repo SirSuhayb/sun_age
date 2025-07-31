@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 // Using CircularNatalHoroscopeJS for calculations: https://github.com/0xStarcat/CircularNatalHoroscopeJS
 // Using AstroChart for rendering: https://github.com/AstroDraw/AstroChart
 // Note: These need to be imported dynamically due to potential client-side only requirements
+import type { Chart as AstroChart } from '@astrodraw/astrochart';
 interface BirthData {
   date: string;
   time: string;
@@ -52,9 +53,11 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
   className = ''
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [astroChart, setAstroChart] = useState<AstroChart | null>(null);
 
   const generateChart = async () => {
     if (!birthData || !chartRef.current) return;
@@ -136,10 +139,8 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
       setChartData(transformedChartData);
       
-      // Display the chart using our custom SVG generation
-      if (chartRef.current) {
-        chartRef.current.innerHTML = createChartSVG(transformedChartData);
-      }
+      // Render chart using AstroChart
+      await renderWithAstroChart(transformedChartData);
       
       if (onChartGenerated) {
         onChartGenerated(transformedChartData);
@@ -150,13 +151,132 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       setError('Failed to generate chart. Please check your birth data and try again.');
       
       // Fallback: Generate a mock chart
-      generateMockChart();
+      await generateMockChart();
     } finally {
       setIsGenerating(false);
     }
   };
 
-  // Create SVG chart visualization based on calculated data
+  // Render chart using AstroChart library
+  const renderWithAstroChart = async (data: ChartData) => {
+    if (!chartRef.current) return;
+    
+    try {
+      // Dynamic import AstroChart to avoid SSR issues
+      const { Chart } = await import('@astrodraw/astrochart');
+      
+      // Clear previous content
+      chartRef.current.innerHTML = '';
+      
+      // Create a div for the chart
+      const chartDiv = document.createElement('div');
+      chartDiv.id = 'astrochart-' + Date.now();
+      chartRef.current.appendChild(chartDiv);
+      
+      // Convert our data format to AstroChart format
+      const astroData = {
+        planets: {} as Record<string, number[]>,
+        cusps: data.houses?.map(h => h.degree) || Array.from({ length: 12 }, (_, i) => i * 30)
+      };
+      
+      // Add main luminaries
+      astroData.planets['Sun'] = [data.sun.degree];
+      astroData.planets['Moon'] = [data.moon.degree];
+      
+      // Map planet names to AstroChart format
+      const planetNameMap: Record<string, string> = {
+        mercury: 'Mercury',
+        venus: 'Venus',
+        mars: 'Mars',
+        jupiter: 'Jupiter',
+        saturn: 'Saturn',
+        uranus: 'Uranus',
+        neptune: 'Neptune',
+        pluto: 'Pluto'
+      };
+      
+      // Add other planets
+      data.planets?.forEach(planet => {
+        const mappedName = planetNameMap[planet.name] || planet.name;
+        if (mappedName) {
+          astroData.planets[mappedName] = [planet.degree];
+        }
+      });
+      
+      // Configure AstroChart settings to match our style
+      const settings = {
+        CHART_STROKE_ONLY: false,
+        COLORS_BACKGROUND: '#FFFCF2',
+        COLORS_CIRCLES: '#E6B13A',
+        COLORS_TEXTS: '#444',
+        COLORS_LINES: '#E5E1D8',
+        COLORS_SYMBOLS: '#444',
+        SYMBOL_SCALE: 1.2,
+        CHART_PADDING: 20,
+        CHART_LINE_WIDTH: 1,
+        SYMBOL_SUN: '☉',
+        SYMBOL_MOON: '☽',
+        SYMBOL_MERCURY: '☿',
+        SYMBOL_VENUS: '♀',
+        SYMBOL_MARS: '♂',
+        SYMBOL_JUPITER: '♃',
+        SYMBOL_SATURN: '♄',
+        SYMBOL_URANUS: '♅',
+        SYMBOL_NEPTUNE: '♆',
+        SYMBOL_PLUTO: '♇'
+      };
+      
+      // Create the chart
+      const chart = new Chart('#' + chartDiv.id, 400, 400, settings);
+      const radixChart = chart.radix(astroData);
+      
+      // Store chart instance for potential future use
+      setAstroChart(chart);
+      
+      // Apply custom styling to match solChart.svg aesthetic
+      const svg = chartDiv.querySelector('svg');
+      if (svg) {
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        svg.style.maxWidth = '400px';
+        svg.style.maxHeight = '400px';
+        
+        // Add custom styles
+        const style = document.createElement('style');
+        style.textContent = `
+          #${chartDiv.id} .astrology-radix-planets-marker {
+            fill: #FCF6E5;
+            stroke: #E6B13A;
+          }
+          #${chartDiv.id} .astrology-radix-axis-marker {
+            stroke: #E6B13A;
+            stroke-width: 2;
+          }
+          #${chartDiv.id} .astrology-radix-cusps-line {
+            stroke: #E5E1D8;
+            stroke-dasharray: 2,2;
+          }
+          #${chartDiv.id} .astrology-radix-circle {
+            fill: none;
+            stroke: #E6B13A;
+          }
+          #${chartDiv.id} text {
+            font-family: serif;
+          }
+        `;
+        chartDiv.appendChild(style);
+      }
+      
+    } catch (err) {
+      console.error('Error rendering with AstroChart, falling back to custom SVG:', err);
+      // Fallback to our custom SVG if AstroChart fails
+      if (chartRef.current) {
+        chartRef.current.innerHTML = createChartSVG(data);
+      }
+    }
+  };
+
+  // Create SVG chart visualization based on calculated data (fallback)
   const createChartSVG = (data: ChartData): string => {
     const size = 400;
     const center = size / 2;
@@ -259,7 +379,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     `;
   };
 
-  const generateMockChart = () => {
+  const generateMockChart = async () => {
     if (!chartRef.current || !birthData) return;
     
     // Generate mock chart data based on birth date/time
@@ -302,7 +422,9 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     };
     
     setChartData(mockData);
-    chartRef.current.innerHTML = createChartSVG(mockData);
+    
+    // Try to render with AstroChart first
+    await renderWithAstroChart(mockData);
     
     if (onChartGenerated) {
       onChartGenerated(mockData);
