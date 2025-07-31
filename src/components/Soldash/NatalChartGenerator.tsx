@@ -66,13 +66,11 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       // Parse birth data
       const birthDateTime = new Date(`${birthData.date}T${birthData.time}`);
       
-      // Skip the library for now due to TypeScript issues, use fallback
-      generateFallbackChart();
-      return;
-      
-      // Dynamic import to avoid SSR issues (temporarily disabled)
+      // Dynamic import to avoid SSR issues
       // CircularNatalHoroscopeJS - https://github.com/0xStarcat/CircularNatalHoroscopeJS
-      // const { Origin, Horoscope } = await import('circular-natal-horoscope-js');
+      // @ts-ignore - Library has TypeScript issues
+      const CircularNatalHoroscopeModule = await import('circular-natal-horoscope-js');
+      const { Origin, Horoscope } = CircularNatalHoroscopeModule as any;
       
       // Create an Origin instance
       const origin = new Origin({
