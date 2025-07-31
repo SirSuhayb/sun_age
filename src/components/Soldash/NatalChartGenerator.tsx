@@ -431,7 +431,24 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     }
   };
 
-  const generateFallbackChart = () => {
+  const generateFallbackChart = async () => {
+    // This is now just an alias for generateMockChart
+    await generateMockChart();
+  };
+
+  // Generate chart on mount or when birth data changes
+  useEffect(() => {
+    if (birthData) {
+      generateChart();
+    }
+  }, [birthData]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Render loading state
+  if (isGenerating) {
+    return (
+      <div className={`flex items-center justify-center ${className}`} style={{ minHeight: '400px' }}>
+        <motion.div
+          className="text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
