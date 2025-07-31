@@ -156,85 +156,160 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     }
   };
 
-  const generateMockChart = () => {
-    if (!chartRef.current) return;
+  // Create SVG chart visualization based on calculated data
+  const createChartSVG = (data: ChartData): string => {
+    const size = 400;
+    const center = size / 2;
+    const outerRadius = 180;
+    const innerRadius = 120;
+    const planetRadius = 150;
+    
+    // Calculate planet positions
+    const planetPositions = data.planets?.map(planet => {
+      const angle = (planet.degree - 90) * Math.PI / 180;
+      return {
+        ...planet,
+        x: center + planetRadius * Math.cos(angle),
+        y: center + planetRadius * Math.sin(angle)
+      };
+    }) || [];
 
-    // Create a styled mock chart based on solChart.svg
-    const mockChart = `
-      <div class="w-full h-full flex items-center justify-center" style="min-height: 400px;">
-        <svg width="300" height="300" viewBox="0 0 240 234" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Outer circle -->
-          <circle cx="120" cy="117" r="110" fill="none" stroke="#AE8C25" stroke-width="2"/>
-          <circle cx="120" cy="117" r="90" fill="none" stroke="#B18500" stroke-width="1" opacity="0.5"/>
-          
-          <!-- Inner chart wheel -->
-          <circle cx="120" cy="117" r="70" fill="#FCF6E5" stroke="#E5E1D8" stroke-width="1"/>
-          
-          <!-- House divisions -->
-          ${Array.from({ length: 12 }, (_, i) => {
-            const angle = (i * 30) - 90; // Start from top
-            const x1 = 120 + 70 * Math.cos(angle * Math.PI / 180);
-            const y1 = 117 + 70 * Math.sin(angle * Math.PI / 180);
-            const x2 = 120 + 110 * Math.cos(angle * Math.PI / 180);
-            const y2 = 117 + 110 * Math.sin(angle * Math.PI / 180);
-            return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#D7D7D7" stroke-width="1"/>`;
-          }).join('')}
-          
-          <!-- Zodiac signs -->
-          ${['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'].map((sign, i) => {
-            const angle = (i * 30) - 75; // Offset for center of house
-            const x = 120 + 100 * Math.cos(angle * Math.PI / 180);
-            const y = 117 + 100 * Math.sin(angle * Math.PI / 180);
-            return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="#AE8C25" font-size="16">${sign}</text>`;
-          }).join('')}
-          
-          <!-- Center -->
-          <circle cx="120" cy="117" r="25" fill="#E6B13A" opacity="0.3"/>
-          <text x="120" y="125" text-anchor="middle" fill="#444" font-size="12" font-family="serif">Your Chart</text>
-        </svg>
-      </div>
+    return `
+      <svg viewBox="0 0 ${size} ${size}" style="width: 100%; height: 100%; max-width: 400px; max-height: 400px;">
+        <defs>
+          <style>
+            .zodiac-text { fill: #666; font-size: 14px; font-family: serif; }
+            .planet-text { fill: #444; font-size: 16px; font-family: serif; font-weight: bold; }
+            .degree-text { fill: #888; font-size: 10px; font-family: monospace; }
+            .house-line { stroke: #E5E1D8; stroke-width: 1; stroke-dasharray: 2,2; }
+            .zodiac-line { stroke: #E6B13A; stroke-width: 1; }
+          </style>
+        </defs>
+        
+        <!-- Background -->
+        <rect width="${size}" height="${size}" fill="#FFFCF2" opacity="0.5"/>
+        
+        <!-- Outer circle (Zodiac wheel) -->
+        <circle cx="${center}" cy="${center}" r="${outerRadius}" 
+                fill="none" stroke="#E6B13A" stroke-width="2"/>
+        
+        <!-- Inner circle (House wheel) -->
+        <circle cx="${center}" cy="${center}" r="${innerRadius}" 
+                fill="#FFFCF2" stroke="#E6B13A" stroke-width="1"/>
+        
+        <!-- Zodiac divisions -->
+        ${Array.from({ length: 12 }).map((_, i) => {
+          const angle = (i * 30 - 90) * Math.PI / 180;
+          const x1 = center + innerRadius * Math.cos(angle);
+          const y1 = center + innerRadius * Math.sin(angle);
+          const x2 = center + outerRadius * Math.cos(angle);
+          const y2 = center + outerRadius * Math.sin(angle);
+          return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="zodiac-line"/>`;
+        }).join('')}
+        
+        <!-- House divisions -->
+        ${data.houses?.map((house) => {
+          const angle = (house.degree - 90) * Math.PI / 180;
+          const x1 = center;
+          const y1 = center;
+          const x2 = center + innerRadius * Math.cos(angle);
+          const y2 = center + innerRadius * Math.sin(angle);
+          return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="house-line"/>`;
+        }).join('') || ''}
+        
+        <!-- Zodiac signs -->
+        ${Object.entries(zodiacSymbols).map(([sign, symbol], i) => {
+          const angle = ((i * 30 + 15) - 90) * Math.PI / 180;
+          const x = center + (outerRadius + innerRadius) / 2 * Math.cos(angle);
+          const y = center + (outerRadius + innerRadius) / 2 * Math.sin(angle) + 5;
+          return `<text x="${x}" y="${y}" text-anchor="middle" class="zodiac-text">${symbol}</text>`;
+        }).join('')}
+        
+        <!-- House numbers -->
+        ${Array.from({ length: 12 }).map((_, i) => {
+          const houseAngle = data.houses?.[i]?.degree || (i * 30);
+          const nextHouseAngle = data.houses?.[i + 1]?.degree || ((i + 1) * 30);
+          const midAngle = ((houseAngle + nextHouseAngle) / 2 - 90) * Math.PI / 180;
+          const x = center + (innerRadius * 0.7) * Math.cos(midAngle);
+          const y = center + (innerRadius * 0.7) * Math.sin(midAngle) + 3;
+          return `<text x="${x}" y="${y}" text-anchor="middle" class="degree-text">${i + 1}</text>`;
+        }).join('')}
+        
+        <!-- Planets -->
+        ${planetPositions.map(planet => `
+          <g transform="translate(${planet.x},${planet.y})">
+            <circle r="15" fill="#FCF6E5" stroke="#E6B13A" stroke-width="1"/>
+            <text y="5" text-anchor="middle" class="planet-text">${planet.symbol}</text>
+            ${planet.retrograde ? `<text y="15" text-anchor="middle" class="degree-text">℞</text>` : ''}
+          </g>
+        `).join('')}
+        
+        <!-- Center info -->
+        <circle cx="${center}" cy="${center}" r="60" fill="#FCF6E5" stroke="#E6B13A" stroke-width="1"/>
+        <text x="${center}" y="${center - 20}" text-anchor="middle" class="planet-text">
+          ${planetSymbols.sun} ${data.sun.sign}
+        </text>
+        <text x="${center}" y="${center}" text-anchor="middle" class="zodiac-text">
+          ${planetSymbols.moon} ${data.moon.sign}
+        </text>
+        <text x="${center}" y="${center + 20}" text-anchor="middle" class="zodiac-text">
+          ASC ${data.rising.sign}
+        </text>
+      </svg>
     `;
+  };
 
-    chartRef.current.innerHTML = mockChart;
-
-    // Set mock chart data
-    const mockChartData: ChartData = {
-      sun: { sign: 'Aquarius', degree: 15, house: 5 },
-      moon: { sign: 'Pisces', degree: 22, house: 6 },
-      rising: { sign: 'Gemini', degree: 8 },
+  const generateMockChart = () => {
+    if (!chartRef.current || !birthData) return;
+    
+    // Generate mock chart data based on birth date/time
+    const birthDateTime = new Date(`${birthData.date}T${birthData.time}`);
+    const dayOfYear = Math.floor((birthDateTime.getTime() - new Date(birthDateTime.getFullYear(), 0, 0).getTime()) / 86400000);
+    
+    // Simple calculations for demo
+    const sunDegree = (dayOfYear * 360 / 365) % 360;
+    const moonDegree = (sunDegree + 120 + birthDateTime.getHours() * 15) % 360;
+    const risingDegree = ((birthDateTime.getHours() + birthDateTime.getMinutes() / 60) * 15) % 360;
+    
+    const mockData: ChartData = {
+      sun: { 
+        sign: getZodiacSign(sunDegree), 
+        degree: sunDegree % 30,
+        house: Math.floor(((sunDegree - risingDegree + 360) % 360) / 30) + 1
+      },
+      moon: { 
+        sign: getZodiacSign(moonDegree), 
+        degree: moonDegree % 30,
+        house: Math.floor(((moonDegree - risingDegree + 360) % 360) / 30) + 1
+      },
+      rising: { 
+        sign: getZodiacSign(risingDegree), 
+        degree: risingDegree % 30,
+        house: 1
+      },
       planets: [
-        { name: 'Mercury', sign: 'Aquarius', degree: 25, house: 5 },
-        { name: 'Venus', sign: 'Capricorn', degree: 18, house: 4 },
-        { name: 'Mars', sign: 'Aries', degree: 12, house: 7 }
+        { name: 'mercury', symbol: '☿', sign: getZodiacSign((sunDegree + 10) % 360), degree: (sunDegree + 10) % 360, house: 1 },
+        { name: 'venus', symbol: '♀', sign: getZodiacSign((sunDegree - 30) % 360), degree: (sunDegree - 30) % 360, house: 2 },
+        { name: 'mars', symbol: '♂', sign: getZodiacSign((sunDegree + 180) % 360), degree: (sunDegree + 180) % 360, house: 7 },
+        { name: 'jupiter', symbol: '♃', sign: getZodiacSign((sunDegree + 90) % 360), degree: (sunDegree + 90) % 360, house: 4 },
+        { name: 'saturn', symbol: '♄', sign: getZodiacSign((sunDegree - 90) % 360), degree: (sunDegree - 90) % 360, house: 10 }
       ],
       houses: Array.from({ length: 12 }, (_, i) => ({
         number: i + 1,
-        sign: ['Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces', 'Aries', 'Taurus'][i],
-        degree: i * 30
-      })),
-      aspects: [
-        { planet1: 'Sun', planet2: 'Moon', aspect: 'Sextile', orb: 2.5 },
-        { planet1: 'Sun', planet2: 'Mercury', aspect: 'Conjunction', orb: 1.2 }
-      ]
+        sign: getZodiacSign((risingDegree + i * 30) % 360),
+        degree: (risingDegree + i * 30) % 360
+      }))
     };
-
-    setChartData(mockChartData);
+    
+    setChartData(mockData);
+    chartRef.current.innerHTML = createChartSVG(mockData);
+    
     if (onChartGenerated) {
-      onChartGenerated(mockChartData);
+      onChartGenerated(mockData);
     }
   };
 
-  useEffect(() => {
-    if (birthData && chartRef.current) {
-      generateChart();
-    }
-  }, [birthData]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (isGenerating) {
-    return (
-      <div className={`flex items-center justify-center ${className}`} style={{ minHeight: '400px' }}>
-        <motion.div
-          className="text-center"
+  const generateFallbackChart = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
