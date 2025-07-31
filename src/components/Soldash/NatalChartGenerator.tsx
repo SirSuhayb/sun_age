@@ -68,7 +68,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       
       // Dynamic import to avoid SSR issues
       // CircularNatalHoroscopeJS - https://github.com/0xStarcat/CircularNatalHoroscopeJS
-      // @ts-ignore - Library has TypeScript issues
+      // @ts-expect-error - Library has TypeScript issues
       const CircularNatalHoroscopeModule = await import('circular-natal-horoscope-js');
       const { Origin, Horoscope } = CircularNatalHoroscopeModule as any;
       
