@@ -22,6 +22,24 @@ const zodiacSymbols: Record<string, string> = {
   Aquarius: '♒',
   Pisces: '♓'
 };
+
+// Planet symbols (Unicode characters)
+const planetSymbols: Record<string, string> = {
+  sun: '☉',
+  moon: '☽',
+  mercury: '☿',
+  venus: '♀',
+  mars: '♂',
+  jupiter: '♃',
+  saturn: '♄',
+  uranus: '♅',
+  neptune: '♆',
+  pluto: '♇',
+  chiron: '⚷',
+  lilith: '⚸',
+  nnode: '☊',
+  snode: '☋'
+};
 interface BirthData {
   date: string;
   time: string;
@@ -43,6 +61,7 @@ interface ChartData {
     sign: string;
     degree: number;
     house: number;
+    retrograde?: boolean;
   }>;
   houses: Array<{
     number: number;
@@ -305,6 +324,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       const angle = (planet.degree - 90) * Math.PI / 180;
       return {
         ...planet,
+        symbol: planetSymbols[planet.name.toLowerCase()] || planet.name.charAt(0).toUpperCase(),
         x: center + planetRadius * Math.cos(angle),
         y: center + planetRadius * Math.sin(angle)
       };
