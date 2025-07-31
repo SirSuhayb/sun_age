@@ -68,27 +68,34 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       
       // Dynamic import to avoid SSR issues
       // CircularNatalHoroscopeJS - https://github.com/0xStarcat/CircularNatalHoroscopeJS
-      const { default: CircularNatalHoroscope } = await import('circular-natal-horoscope-js');
+      const { Origin, Horoscope } = await import('circular-natal-horoscope-js');
       
-      // Configure chart data for CircularNatalHoroscope
-      const horoscopeData = {
+      // Create an Origin instance
+      const origin = new Origin({
         year: birthDateTime.getFullYear(),
-        month: birthDateTime.getMonth() + 1, // CircularNatalHoroscope expects 1-12
-        day: birthDateTime.getDate(),
+        month: birthDateTime.getMonth(), // Origin expects 0-11
+        date: birthDateTime.getDate(),
         hour: birthDateTime.getHours(),
         minute: birthDateTime.getMinutes(),
         latitude: birthData.location.latitude,
-        longitude: birthData.location.longitude,
-        timezone: birthData.location.timezone
-      };
+        longitude: birthData.location.longitude
+      });
 
       // Generate the horoscope
-      const horoscope = new CircularNatalHoroscope(horoscopeData);
+      const horoscope = new Horoscope({
+        origin: origin,
+        houseSystem: "placidus",
+        zodiac: "tropical",
+        aspectPoints: ['bodies', 'points', 'angles'],
+        aspectWithPoints: ['bodies', 'points', 'angles'],
+        aspectTypes: ["major", "minor"],
+        language: 'en'
+      });
       
       // Get calculated positions
-      const positions = horoscope.getPositions();
-      const houses = horoscope.getHouses();
-      const aspects = horoscope.getAspects();
+      const positions = horoscope.CelestialBodies;
+      const houses = horoscope.Houses;
+      const aspects = horoscope.Aspects;
 
       // Transform data into our format
       const transformedChartData: ChartData = {
