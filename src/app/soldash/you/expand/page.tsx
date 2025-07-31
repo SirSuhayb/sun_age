@@ -34,10 +34,10 @@ const itemVariants = {
 const SOLAR_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000001' as const; // TODO: Add actual SOLAR token address
 const SOLAR_TOKEN_ABI = [
   {
-    constant: true,
-    inputs: [{ name: '_owner', type: 'address' }],
+    inputs: [{ name: 'account', type: 'address' }],
     name: 'balanceOf',
-    outputs: [{ name: 'balance', type: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function'
   }
 ] as const;
@@ -69,9 +69,15 @@ export default function ExpandPaymentPage() {
     }
     
     if (!isLoadingBalance) {
-      if (solarBalance) {
-        const balance = Number(formatUnits(solarBalance, 18)); // Assuming 18 decimals
-        setHasFreeTier(balance >= REQUIRED_SOLAR_AMOUNT);
+      if (solarBalance !== undefined && solarBalance !== null) {
+        try {
+          const balanceInWei = solarBalance as bigint;
+          const balance = Number(formatUnits(balanceInWei, 18)); // Assuming 18 decimals
+          setHasFreeTier(balance >= REQUIRED_SOLAR_AMOUNT);
+        } catch (error) {
+          console.error('Error parsing SOLAR balance:', error);
+          setHasFreeTier(false);
+        }
       }
       setIsCheckingTokens(false);
     }
