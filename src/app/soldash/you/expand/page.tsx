@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check, Star, CreditCard, Wallet, Sparkles } from 'lucide-react';
+import { DaimoPayButton } from '@daimo/pay';
 import Link from 'next/link';
 import { useAccount, useReadContract } from 'wagmi';
 import { formatUnits } from 'viem';
@@ -30,8 +31,8 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-// SOLAR token contract from environment variables
-const SOLAR_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_SOLAR_TOKEN_ADDRESS || '0x0000000000000000000000000000000000000001') as `0x${string}`;
+// SOLAR token contract - using the same as SolarPledge
+const SOLAR_TOKEN_ADDRESS = '0x746042147240304098C837563aAEc0F671881B07' as `0x${string}`; // SOLAR on Base
 const SOLAR_TOKEN_ABI = [
   {
     inputs: [{ name: 'account', type: 'address' }],
@@ -120,30 +121,16 @@ export default function ExpandPaymentPage() {
     }
   };
 
-  const handleDaimoPayment = async () => {
-    setIsProcessing(true);
-    try {
-      // TODO: Integrate Daimo payment
-      console.log('Processing Daimo payment for', selectedPlan, 'plan');
-      
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Redirect to data collection
-      window.location.href = '/soldash/you/expand/collect-data';
-    } catch (error) {
-      console.error('Daimo payment failed:', error);
-    } finally {
-      setIsProcessing(false);
-    }
+  const handleDaimoPaymentComplete = () => {
+    // Redirect to data collection after successful payment
+    window.location.href = '/soldash/you/expand/collect-data';
   };
 
   const handlePayment = async () => {
     if (paymentMethod === 'stripe') {
       await handleStripePayment();
-    } else {
-      await handleDaimoPayment();
     }
+    // Daimo is handled by the DaimoPayButton component
   };
 
   return (
@@ -333,30 +320,58 @@ export default function ExpandPaymentPage() {
           </motion.div>
 
           {/* CTA Button */}
-          <motion.button
-            onClick={handlePayment}
-            disabled={isProcessing}
-            className={`w-full py-4 ${
-              isProcessing 
-                ? 'bg-[#D7D7D7] cursor-not-allowed' 
-                : 'bg-[#E6B13A] hover:bg-[#D4A02A]'
-            } text-black font-mono text-lg tracking-widest uppercase border-none transition-colors flex items-center justify-center space-x-2`}
-            variants={itemVariants}
-            whileHover={!isProcessing ? { scale: 1.02 } : {}}
-            whileTap={!isProcessing ? { scale: 0.98 } : {}}
-          >
-            {isProcessing ? (
-              <>
-                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
-                <span>Processing...</span>
-              </>
-            ) : (
-              <>
-                {paymentMethod === 'stripe' ? <CreditCard className="w-5 h-5" /> : <Wallet className="w-5 h-5" />}
-                <span>Subscribe for {plans[selectedPlan].total}</span>
-              </>
-            )}
-          </motion.button>
+          {paymentMethod === 'stripe' ? (
+            <motion.button
+              onClick={handlePayment}
+              disabled={isProcessing}
+              className={`w-full py-4 ${
+                isProcessing 
+                  ? 'bg-[#D7D7D7] cursor-not-allowed' 
+                  : 'bg-[#E6B13A] hover:bg-[#D4A02A]'
+              } text-black font-mono text-lg tracking-widest uppercase border-none transition-colors flex items-center justify-center space-x-2`}
+              variants={itemVariants}
+              whileHover={!isProcessing ? { scale: 1.02 } : {}}
+              whileTap={!isProcessing ? { scale: 0.98 } : {}}
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-5 h-5" />
+                  <span>Subscribe for {plans[selectedPlan].total}</span>
+                </>
+              )}
+            </motion.button>
+          ) : (
+            <DaimoPayButton.Custom
+              appId="solara-codex" // TODO: Replace with your real App ID
+              toAddress={process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}` || '0x11BA1632fd6Cc120D309158298e3a0df3B7ba283'}
+              toChain={8453} // Base mainnet
+              toToken="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" // USDC on Base
+              toUnits={plans[selectedPlan].price.toString()}
+              intent={`Sol Codex ${selectedPlan} subscription`}
+              externalId={`sol-codex-${selectedPlan}`}
+              onPaymentCompleted={(e) => {
+                handleDaimoPaymentComplete();
+              }}
+            >
+              {({ show }) => (
+                <motion.button
+                  onClick={show}
+                  className="w-full py-4 bg-[#E6B13A] hover:bg-[#D4A02A] text-black font-mono text-lg tracking-widest uppercase border-none transition-colors flex items-center justify-center space-x-2"
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Wallet className="w-5 h-5" />
+                  <span>Subscribe for {plans[selectedPlan].total}</span>
+                </motion.button>
+              )}
+            </DaimoPayButton.Custom>
+          )}
 
           {/* Security Note */}
           <motion.div 
