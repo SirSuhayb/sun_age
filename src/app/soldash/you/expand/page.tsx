@@ -38,7 +38,8 @@ export default function ExpandPaymentPage() {
       price: 7.77,
       period: 'month',
       total: '$7.77/month',
-      description: 'Monthly access to your complete Sol Chart'
+      description: 'Monthly access to your Sol Codex',
+      savings: false
     },
     yearly: {
       price: 77,
