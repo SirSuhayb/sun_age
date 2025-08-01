@@ -113,10 +113,21 @@ export default function ExpandPaymentPage() {
         }),
       });
 
-      const { url } = await response.json();
-      window.location.href = url;
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      if (!data.url) {
+        throw new Error('No checkout URL received');
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
     } catch (error) {
       console.error('Stripe payment failed:', error);
+      alert(`Payment setup failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsProcessing(false);
     }
   };

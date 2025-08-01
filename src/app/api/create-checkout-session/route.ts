@@ -48,8 +48,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/soldash/you/expand/collect-data?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/soldash/you/expand`,
+      success_url: `${req.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/soldash/you/expand/collect-data?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/soldash/you/expand`,
       subscription_data: {
         trial_period_days: 7, // 7-day free trial
         metadata: {
@@ -65,11 +65,20 @@ export async function POST(req: NextRequest) {
       billing_address_collection: 'required',
     });
 
+    if (!session.url) {
+      console.error('No checkout URL in session:', session);
+      return NextResponse.json(
+        { error: 'Failed to generate checkout URL' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('Error creating checkout session:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Error creating checkout session' },
+      { error: `Error creating checkout session: ${errorMessage}` },
       { status: 500 }
     );
   }
