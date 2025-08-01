@@ -54,7 +54,15 @@ export default function ChartPage() {
       console.log('Payment session:', sessionId);
     }
 
-    // For now, simulate getting birth data from localStorage
+    // Check for existing chart data first
+    const savedChartData = localStorage.getItem('chartData');
+    if (savedChartData) {
+      const parsedChartData = JSON.parse(savedChartData);
+      setChartData(parsedChartData);
+      setShowChart(true);
+    }
+    
+    // Get birth data from localStorage
     const savedBirthData = localStorage.getItem('birthData');
     if (savedBirthData) {
       const data = JSON.parse(savedBirthData);
@@ -94,6 +102,10 @@ export default function ChartPage() {
 
   const handleChartGenerated = (generatedChartData: any) => {
     setChartData(generatedChartData);
+    
+    // Save chart data to localStorage so user can return to it
+    localStorage.setItem('chartData', JSON.stringify(generatedChartData));
+    
     setShowChart(true);
   };
 

@@ -9,6 +9,8 @@ import { formatUnits } from 'viem';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { StripePaymentForm } from '~/components/Soldash/StripePaymentForm';
+import { checkSubscriptionStatus, saveSubscriptionData } from '~/lib/subscription';
+import { useRouter } from 'next/navigation';
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -57,6 +59,7 @@ export default function ExpandPaymentPage() {
   const [hasFreeTier, setHasFreeTier] = useState(false);
   const [isCheckingTokens, setIsCheckingTokens] = useState(true);
   
+  const router = useRouter();
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   
@@ -67,6 +70,19 @@ export default function ExpandPaymentPage() {
     functionName: 'balanceOf',
     args: address ? [address] : undefined
   });
+  
+  // Check if user already has subscription
+  useEffect(() => {
+    const subscription = checkSubscriptionStatus();
+    if (subscription.hasAccess) {
+      // Redirect to chart or collect data based on whether they have chart data
+      if (subscription.chartData) {
+        router.push('/soldash/you/expand/chart');
+      } else {
+        router.push('/soldash/you/expand/collect-data');
+      }
+    }
+  }, [router]);
   
   useEffect(() => {
     if (!address || !isConnected) {
@@ -80,7 +96,13 @@ export default function ExpandPaymentPage() {
         try {
           const balanceInWei = solarBalance as bigint;
           const balance = Number(formatUnits(balanceInWei, 18)); // Assuming 18 decimals
-          setHasFreeTier(balance >= REQUIRED_SOLAR_AMOUNT);
+          const qualifiesForFreeTier = balance >= REQUIRED_SOLAR_AMOUNT;
+          setHasFreeTier(qualifiesForFreeTier);
+          
+          // If they qualify for free tier, save it
+          if (qualifiesForFreeTier) {
+            saveSubscriptionData('solar');
+          }
         } catch (error) {
           console.error('Error parsing SOLAR balance:', error);
           setHasFreeTier(false);
@@ -108,6 +130,8 @@ export default function ExpandPaymentPage() {
   };
 
   const handlePaymentSuccess = () => {
+    // Save subscription data
+    saveSubscriptionData(selectedPlan);
     // Redirect to data collection after successful payment
     window.location.href = '/soldash/you/expand/collect-data';
   };

@@ -219,9 +219,15 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
   // Render chart using AstroChart library
   const renderWithAstroChart = async (data: ChartData) => {
-    if (!chartRef.current) return;
+    if (!chartRef.current) {
+      console.log('Chart ref not available, falling back to SVG');
+      setSvgContent(createChartSVG(data));
+      return;
+    }
     
     try {
+      console.log('Starting AstroChart render with data:', data);
+      
       // Dynamic import AstroChart to avoid SSR issues
       const { Chart } = await import('@astrodraw/astrochart');
       

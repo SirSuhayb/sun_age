@@ -1,5 +1,7 @@
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { checkSubscriptionStatus } from '~/lib/subscription';
 
 const features = [
   { icon: '🎯', label: 'Life Focus' },
@@ -11,6 +13,40 @@ const features = [
 ];
 
 const ExpandUnderstanding: React.FC = () => {
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [hasChart, setHasChart] = useState(false);
+  
+  useEffect(() => {
+    const subscription = checkSubscriptionStatus();
+    setHasSubscription(subscription.hasAccess);
+    setHasChart(!!subscription.chartData);
+  }, []);
+  
+  const handleButtonClick = () => {
+    if (hasSubscription) {
+      // If they have subscription but no chart, go to data collection
+      if (!hasChart) {
+        window.location.href = '/soldash/you/expand/collect-data';
+      } else {
+        // If they have both subscription and chart, go to chart view
+        window.location.href = '/soldash/you/expand/chart';
+      }
+    } else {
+      // No subscription, go to payment page
+      window.location.href = '/soldash/you/expand';
+    }
+  };
+  
+  const getButtonText = () => {
+    if (hasSubscription && hasChart) {
+      return 'View Your Sol Codex';
+    } else if (hasSubscription && !hasChart) {
+      return 'Complete Your Sol Codex';
+    } else {
+      return 'Unlock Sol Codex';
+    }
+  };
+  
   return (
     <div className="w-full max-w-xl mx-auto p-8 bg-[#FEFDF8] border border-[#D7D7D7] rounded-none flex flex-col items-center">
       <div className="text-2xl font-serif font-semibold text-center mb-2">Expand your understanding</div>
@@ -35,9 +71,9 @@ const ExpandUnderstanding: React.FC = () => {
       </div>
               <button
           className="w-full py-4 bg-[#E6B13A] text-black font-mono text-lg tracking-widest uppercase border-none rounded-none mt-2 hover:bg-[#D4A02A] transition-colors"
-          onClick={() => window.location.href = '/soldash/you/expand'}
+          onClick={handleButtonClick}
         >
-          Unlock Sol Codex
+          {getButtonText()}
         </button>
     </div>
   );
