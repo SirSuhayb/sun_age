@@ -44,7 +44,10 @@ const Header: React.FC<HeaderProps> = ({ formattedDate, onAboutClick, onSolarCli
   const handleConnectWallet = async () => {
     try {
       if (connectors && connectors.length > 0) {
-        await connect({ connector: connectors[0] });
+        // For web users, prefer injected wallet (MetaMask, etc.) over Farcaster frame
+        const webConnector = connectors.find(c => c.id === 'injected' || c.name.toLowerCase().includes('injected')) || connectors[0];
+        console.log('Connecting with connector:', webConnector.name, webConnector.id);
+        await connect({ connector: webConnector });
       }
     } catch (error) {
       console.error('Failed to connect wallet:', error);
