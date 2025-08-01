@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Clock, Calendar } from 'lucide-react';
 import Link from 'next/link';
-import { geocodeLocation } from '~/lib/geocoding';
+import { geocodeLocation, getTimezoneFromCoordinates, type GeocodingResult } from '~/lib/geocoding';
+import { LocationAutocomplete } from '~/components/Soldash/LocationAutocomplete';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,6 +29,7 @@ export default function CollectDataPage() {
     timezone: 'auto'
   });
 
+  const [locationData, setLocationData] = useState<GeocodingResult | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -36,6 +38,27 @@ export default function CollectDataPage() {
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handleLocationChange = (value: string, suggestion?: any) => {
+    setFormData(prev => ({ ...prev, birthLocation: value }));
+    
+    // If a suggestion was selected, store the location data
+    if (suggestion) {
+      setLocationData({
+        latitude: parseFloat(suggestion.lat),
+        longitude: parseFloat(suggestion.lon),
+        timezone: 'auto', // Will be fetched later
+        formattedAddress: suggestion.display_name
+      });
+    } else {
+      setLocationData(null);
+    }
+    
+    // Clear error
+    if (errors.birthLocation) {
+      setErrors(prev => ({ ...prev, birthLocation: '' }));
     }
   };
 
@@ -66,8 +89,20 @@ export default function CollectDataPage() {
     setIsSubmitting(true);
     
     try {
-      // Geocode the location to get real coordinates
-      const geoResult = await geocodeLocation(formData.birthLocation);
+      let geoResult: GeocodingResult;
+      
+      // If we have location data from the autocomplete, use it
+      if (locationData) {
+        // Get timezone for the selected location
+        const timezone = await getTimezoneFromCoordinates(locationData.latitude, locationData.longitude);
+        geoResult = {
+          ...locationData,
+          timezone
+        };
+      } else {
+        // Otherwise, geocode the manually entered location
+        geoResult = await geocodeLocation(formData.birthLocation);
+      }
 
       const birthData = {
         date: formData.birthDate,
@@ -192,18 +227,14 @@ export default function CollectDataPage() {
                 <MapPin className="w-4 h-4 inline mr-2" />
                 Birth Location
               </label>
-              <input
-                type="text"
+              <LocationAutocomplete
                 value={formData.birthLocation}
-                onChange={(e) => handleInputChange('birthLocation', e.target.value)}
-                className={`w-full p-3 border ${errors.birthLocation ? 'border-red-400' : 'border-[#D7D7D7]'} bg-[#FCF6E5] font-mono focus:outline-none focus:border-[#E6B13A]`}
-                placeholder="City, State/Province, Country (e.g., New York, NY, USA)"
+                onChange={handleLocationChange}
+                placeholder="Start typing your birth city..."
+                error={errors.birthLocation}
               />
-              {errors.birthLocation && (
-                <p className="text-red-500 text-sm mt-1">{errors.birthLocation}</p>
-              )}
               <p className="text-xs text-[#888] mt-1">
-                Include the city and country where you were born. This determines your chart&apos;s geographical coordinates.
+                Select your birth city from the dropdown for accurate coordinates. Popular cities are shown when you click the field.
               </p>
             </motion.div>
 

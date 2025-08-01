@@ -1,4 +1,4 @@
-interface GeocodingResult {
+export interface GeocodingResult {
   latitude: number;
   longitude: number;
   timezone: string;
@@ -70,6 +70,28 @@ const MAJOR_CITIES: Record<string, GeocodingResult> = {
   }
 };
 
+// Get timezone from coordinates
+export async function getTimezoneFromCoordinates(lat: number, lon: number): Promise<string> {
+  try {
+    // Using timezone lookup based on coordinates
+    const timestamp = Math.floor(Date.now() / 1000);
+    const response = await fetch(
+      `https://api.timezonedb.com/v2.1/get-time-zone?key=demo&format=json&by=position&lat=${lat}&lng=${lon}&time=${timestamp}`
+    );
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.zoneName || 'UTC';
+    }
+  } catch (error) {
+    console.error('Error fetching timezone:', error);
+  }
+  
+  // Fallback: estimate timezone based on longitude
+  const offset = Math.round(lon / 15);
+  return `Etc/GMT${offset >= 0 ? '-' : '+'}${Math.abs(offset)}`;
+}
+
 export async function geocodeLocation(location: string): Promise<GeocodingResult> {
   // Normalize the input
   const normalizedLocation = location.toLowerCase().trim();
@@ -96,21 +118,15 @@ export async function geocodeLocation(location: string): Promise<GeocodingResult
       const data = await response.json();
       if (data && data.length > 0) {
         const result = data[0];
+        const lat = parseFloat(result.lat);
+        const lon = parseFloat(result.lon);
         
         // Get timezone based on coordinates
-        const timezoneResponse = await fetch(
-          `https://api.timezonedb.com/v2.1/get-time-zone?key=demo&format=json&by=position&lat=${result.lat}&lng=${result.lon}`
-        );
-        
-        let timezone = 'UTC'; // Default
-        if (timezoneResponse.ok) {
-          const tzData = await timezoneResponse.json();
-          timezone = tzData.zoneName || 'UTC';
-        }
+        const timezone = await getTimezoneFromCoordinates(lat, lon);
         
         return {
-          latitude: parseFloat(result.lat),
-          longitude: parseFloat(result.lon),
+          latitude: lat,
+          longitude: lon,
           timezone: timezone,
           formattedAddress: result.display_name
         };
