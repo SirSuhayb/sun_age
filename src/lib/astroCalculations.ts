@@ -192,6 +192,7 @@ export async function calculateNatalChart(birthData: {
     timezone?: string;
   };
 }): Promise<ChartData> {
+  console.log('calculateNatalChart called with:', birthData);
   try {
     // Parse date and time
     const [year, month, day] = birthData.date.split('-').map(Number);

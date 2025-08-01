@@ -134,6 +134,11 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
     } catch (err) {
       console.error('Error generating chart:', err);
+      console.error('Error details:', {
+        birthData,
+        errorMessage: err instanceof Error ? err.message : 'Unknown error',
+        errorStack: err instanceof Error ? err.stack : undefined
+      });
       setError('Failed to generate accurate chart. Showing approximate positions.');
       
       // Fallback: Generate a mock chart with better calculations
@@ -451,6 +456,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
   };
 
   const generateMockChart = async () => {
+    console.log('⚠️ USING MOCK CHART GENERATION - This should not happen!');
     if (!chartRef.current || !birthData) return;
     
     // Generate mock chart data based on birth date/time
@@ -465,6 +471,15 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     // Rising sign based on time of day and location
     const hourAngle = (birthDateTime.getHours() + birthDateTime.getMinutes() / 60) * 15;
     const risingDegree = (hourAngle + 90) % 360; // +90 for eastern horizon
+    
+    console.log('Mock chart debug:', {
+      birthDateTime: birthDateTime.toString(),
+      hourAngle,
+      risingDegree,
+      risingSign: getZodiacSign(risingDegree),
+      sunDegree,
+      sunSign: getZodiacSign(sunDegree)
+    });
     
     const mockData: ChartData = {
       sun: { 
@@ -491,7 +506,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       houses: Array.from({ length: 12 }, (_, i) => ({
         number: i + 1,
         sign: getZodiacSign((risingDegree + i * 30) % 360),
-        degree: (risingDegree + i * 30) % 360
+        degree: ((risingDegree + i * 30) % 360) % 30
       })),
       aspects: [] // Mock: no aspects calculated for demo
     };
