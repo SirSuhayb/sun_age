@@ -113,15 +113,19 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     setError(null);
 
     try {
-      // Parse birth data
+      // Parse birth data with timezone consideration
+      // Create a date string that respects the local time at birth location
       const birthDateTime = new Date(`${birthData.date}T${birthData.time}`);
+      
+      // Note: The birth time should be interpreted as local time at the birth location
+      // CircularNatalHoroscopeJS expects the time components in local time
       
       // Dynamic import to avoid SSR issues
       // CircularNatalHoroscopeJS - https://github.com/0xStarcat/CircularNatalHoroscopeJS
       const { Origin, Horoscope } = await import('circular-natal-horoscope-js');
       
       // Create an Origin instance
-      const origin = new Origin({
+      const originData = {
         year: birthDateTime.getFullYear(),
         month: birthDateTime.getMonth(), // Origin expects 0-11
         date: birthDateTime.getDate(),
@@ -129,7 +133,15 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         minute: birthDateTime.getMinutes(),
         latitude: birthData.location.latitude,
         longitude: birthData.location.longitude
+      };
+      
+      console.log('Birth data for chart calculation:', {
+        input: birthData,
+        parsed: originData,
+        dateTime: birthDateTime.toString()
       });
+      
+      const origin = new Origin(originData);
 
       // Generate the horoscope
       const horoscope = new Horoscope({

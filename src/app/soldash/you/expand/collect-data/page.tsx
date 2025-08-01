@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Clock, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { geocodeLocation } from '~/lib/geocoding';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -65,13 +66,8 @@ export default function CollectDataPage() {
     setIsSubmitting(true);
     
     try {
-      // TODO: Geocode the location to get coordinates
-      // For now, use mock coordinates
-      const mockCoordinates = {
-        latitude: 37.7749,
-        longitude: -122.4194,
-        timezone: 'America/Los_Angeles'
-      };
+      // Geocode the location to get real coordinates
+      const geoResult = await geocodeLocation(formData.birthLocation);
 
       const birthData = {
         date: formData.birthDate,
@@ -79,9 +75,9 @@ export default function CollectDataPage() {
         location: {
           city: formData.birthLocation.split(',')[0]?.trim() || formData.birthLocation,
           country: formData.birthLocation.split(',').pop()?.trim() || 'Unknown',
-          latitude: mockCoordinates.latitude,
-          longitude: mockCoordinates.longitude,
-          timezone: mockCoordinates.timezone
+          latitude: geoResult.latitude,
+          longitude: geoResult.longitude,
+          timezone: geoResult.timezone
         }
       };
 
