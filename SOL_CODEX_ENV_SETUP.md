@@ -10,24 +10,30 @@
    - Production: `sk_live_...`
    - Required for: Preview, Production
 
-2. **STRIPE_SOL_CODEX_MONTHLY_PRICE_ID**
+2. **NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY**
+   - Your Stripe publishable key (for client-side)
+   - Test mode: `pk_test_...`
+   - Production: `pk_live_...`
+   - Required for: Preview, Production
+
+3. **STRIPE_SOL_CODEX_MONTHLY_PRICE_ID**
    - The Stripe Price ID for monthly subscription ($7.77/month)
    - Format: `price_...`
    - Required for: Preview, Production
 
-3. **STRIPE_SOL_CODEX_YEARLY_PRICE_ID**
+4. **STRIPE_SOL_CODEX_YEARLY_PRICE_ID**
    - The Stripe Price ID for yearly subscription ($77.00/year)
    - Format: `price_...`
    - Required for: Preview, Production
 
 ### Other Configuration
 
-4. **NEXT_PUBLIC_TREASURY_ADDRESS** (Optional)
+5. **NEXT_PUBLIC_TREASURY_ADDRESS** (Optional)
    - Your wallet address for receiving Daimo payments
    - Default: `0x11BA1632fd6Cc120D309158298e3a0df3B7ba283`
    - Required for: Preview, Production
 
-5. **NEXT_PUBLIC_BASE_URL** (Optional)
+6. **NEXT_PUBLIC_BASE_URL** (Optional)
    - Your deployment URL (e.g., `https://yourdomain.com`)
    - Used for Stripe redirect URLs
    - If not set, uses request origin automatically

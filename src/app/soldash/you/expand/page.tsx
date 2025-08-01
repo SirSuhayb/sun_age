@@ -6,6 +6,12 @@ import { DaimoPayButton } from '@daimo/pay';
 import Link from 'next/link';
 import { useAccount, useReadContract } from 'wagmi';
 import { formatUnits } from 'viem';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { StripePaymentForm } from '~/components/Soldash/StripePaymentForm';
+
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const features = [
   { icon: '🎯', label: 'Life Focus', description: 'Discover your core life themes and purpose' },
@@ -48,7 +54,6 @@ const REQUIRED_SOLAR_AMOUNT = 500_000_000; // 500M SOLAR tokens
 export default function ExpandPaymentPage() {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'daimo'>('stripe');
-  const [isProcessing, setIsProcessing] = useState(false);
   const [hasFreeTier, setHasFreeTier] = useState(false);
   const [isCheckingTokens, setIsCheckingTokens] = useState(true);
   
@@ -101,49 +106,9 @@ export default function ExpandPaymentPage() {
     }
   };
 
-  const handleStripePayment = async () => {
-    setIsProcessing(true);
-    try {
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan: selectedPlan,
-        }),
-      });
-
-      const data = await response.json();
-      console.log('Checkout session response:', data);
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout session');
-      }
-
-      if (!data.url) {
-        console.error('No URL in response:', data);
-        throw new Error('No checkout URL received');
-      }
-
-      console.log('Redirecting to:', data.url);
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
-    } catch (error) {
-      console.error('Stripe payment failed:', error);
-      alert(`Payment setup failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      setIsProcessing(false);
-    }
-  };
-
-  const handleDaimoPaymentComplete = () => {
+  const handlePaymentSuccess = () => {
     // Redirect to data collection after successful payment
     window.location.href = '/soldash/you/expand/collect-data';
-  };
-
-  const handlePayment = async () => {
-    if (paymentMethod === 'stripe') {
-      await handleStripePayment();
-    }
-    // Daimo is handled by the DaimoPayButton component
   };
 
   return (
@@ -332,32 +297,17 @@ export default function ExpandPaymentPage() {
             </div>
           </motion.div>
 
-          {/* CTA Button */}
+          {/* Payment Form */}
           {paymentMethod === 'stripe' ? (
-            <motion.button
-              onClick={handlePayment}
-              disabled={isProcessing}
-              className={`w-full py-4 ${
-                isProcessing 
-                  ? 'bg-[#D7D7D7] cursor-not-allowed' 
-                  : 'bg-[#E6B13A] hover:bg-[#D4A02A]'
-              } text-black font-mono text-lg tracking-widest uppercase border-none transition-colors flex items-center justify-center space-x-2`}
-              variants={itemVariants}
-              whileHover={!isProcessing ? { scale: 1.02 } : {}}
-              whileTap={!isProcessing ? { scale: 0.98 } : {}}
-            >
-              {isProcessing ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-5 h-5" />
-                  <span>Subscribe for {plans[selectedPlan].total}</span>
-                </>
-              )}
-            </motion.button>
+            <motion.div variants={itemVariants}>
+              <Elements stripe={stripePromise}>
+                <StripePaymentForm
+                  selectedPlan={selectedPlan}
+                  planPrice={plans[selectedPlan].total}
+                  onSuccess={handlePaymentSuccess}
+                />
+              </Elements>
+            </motion.div>
           ) : (
             <DaimoPayButton.Custom
               toAddress={process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}` || '0x11BA1632fd6Cc120D309158298e3a0df3B7ba283'}
@@ -367,7 +317,7 @@ export default function ExpandPaymentPage() {
               intent={`Sol Codex ${selectedPlan} subscription`}
               externalId={`sol-codex-${selectedPlan}`}
               onPaymentCompleted={(e) => {
-                handleDaimoPaymentComplete();
+                handlePaymentSuccess();
               }}
             >
               {({ show }) => (
@@ -384,14 +334,6 @@ export default function ExpandPaymentPage() {
               )}
             </DaimoPayButton.Custom>
           )}
-
-          {/* Security Note */}
-          <motion.div 
-            className="text-center mt-4 text-sm text-[#888]"
-            variants={itemVariants}
-          >
-            Secure payment • Cancel anytime • 7-day free trial
-          </motion.div>
           </>
           )}
           
