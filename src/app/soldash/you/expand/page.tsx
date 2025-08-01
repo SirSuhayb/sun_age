@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Check, Star, CreditCard, Wallet, Sparkles } from 'lucide-react';
 import { DaimoPayButton } from '@daimo/pay';
 import Link from 'next/link';
-import { useAccount, useReadContract } from 'wagmi';
+import { useAccount, useReadContract, useConnect } from 'wagmi';
 import { formatUnits } from 'viem';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -58,6 +58,7 @@ export default function ExpandPaymentPage() {
   const [isCheckingTokens, setIsCheckingTokens] = useState(true);
   
   const { address, isConnected } = useAccount();
+  const { connect, connectors } = useConnect();
   
   // Check SOLAR token balance
   const { data: solarBalance, isLoading: isLoadingBalance } = useReadContract({
@@ -349,9 +350,17 @@ export default function ExpandPaymentPage() {
               <p className="text-sm text-[#666] mb-4">
                 Connect your wallet to check if you qualify for free access with SOLAR tokens
               </p>
-              <p className="text-xs text-[#888]">
+              <p className="text-xs text-[#888] mb-6">
                 Holders of 500M+ SOLAR tokens get 1 year free access
               </p>
+              <motion.button
+                onClick={() => connectors[0] && connect({ connector: connectors[0] })}
+                className="px-6 py-3 bg-[#E6B13A] hover:bg-[#D4A02A] text-black font-mono text-sm uppercase tracking-wide transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                Connect Wallet
+              </motion.button>
             </motion.div>
           )}
         </motion.div>
