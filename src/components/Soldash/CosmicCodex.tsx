@@ -1,122 +1,130 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { getCosmicEventsForDate, contextualizeCosmicMoment, analyzeCosmicPatterns } from '~/lib/astrology';
-import { getWorldEventForDate } from '~/lib/worldEvent';
-import { getLifePhase } from '~/lib/solarIdentity';
+import { generateCosmicCodexTimeline, type CosmicCodexTimeline } from '~/lib/astrology';
+import { getSolarArchetype } from '~/lib/solarIdentity';
+
+/**
+ * CosmicCodex Component Architecture
+ * 
+ * BEFORE PAYMENT (Current State):
+ * - Shows as an upsell component with preview stats
+ * - Teases the full timeline experience
+ * - Works alongside SolCycle which shows individual past sol cycle analysis
+ * 
+ * AFTER PAYMENT (Proposed):
+ * - Transforms into a full timeline visualization
+ * - Shows all cosmic events from birth to present
+ * - Could either:
+ *   Option A: Replace SolCycle entirely with timeline markers that expand to show details
+ *   Option B: Keep SolCycle as a "deep dive" into specific cycles from the timeline
+ *   Option C: Merge both - timeline overview with SolCycle as the detail view when clicking a period
+ * 
+ * RECOMMENDED APPROACH (Option C):
+ * 1. CosmicCodex becomes the main timeline overview after payment
+ * 2. Clicking on any sol cycle period in the timeline opens SolCycle with that specific date
+ * 3. SolCycle remains focused on individual cycle analysis (cosmic events, world events, interpretation)
+ * 4. This creates a hierarchy: Timeline Overview → Specific Cycle Detail
+ * 
+ * UI FLOW:
+ * - Journey tab shows both components
+ * - Before payment: SolCycle (previous cycle) + CosmicCodex (upsell)
+ * - After payment: CosmicCodex (full timeline) + SolCycle (selected cycle detail)
+ * - Timeline could highlight "significant" cycles that user can explore
+ */
 
 interface CosmicCodexProps {
   birthDate?: string;
   archetype?: string;
   currentAge?: number;
+  isPaid?: boolean; // Will be true after user pays
+  onCycleSelect?: (date: Date) => void; // Callback when user clicks a cycle in timeline
 }
-
-// Updated milestones with more dynamic positioning
-const generateTimelineMilestones = (userAge: number) => [
-  { x: 60, label: `Age ${Math.max(5, userAge - 15)}`, type: 'LIFE_MARKER', eventY: 52, labelY: 50, eventAlign: 'top' },
-  { x: 150, label: 'COSMIC EVENT', type: 'COSMIC_EVENT', eventY: 52, labelY: 50, eventAlign: 'top', isEvent: true },
-  { x: 60, label: `Age ${Math.max(10, userAge - 10)}`, type: 'LIFE_MARKER', eventY: 140, labelY: 168, eventAlign: 'bottom' },
-  { x: 250, label: 'WORLD EVENT', type: 'WORLD_EVENT', eventY: 140, labelY: 168, eventAlign: 'bottom' },
-  { x: 340, label: 'COSMIC EVENT', type: 'COSMIC_EVENT', eventY: 52, labelY: 50, eventAlign: 'top', isEvent: true },
-];
-
-const EVENT_COLORS = {
-  'WORLD_EVENT': '#3730A3',
-  'COSMIC_EVENT': '#3730A3',
-  'LIFE_MARKER': '#666666',
-};
 
 export default function CosmicCodex({ 
   birthDate,
   archetype = 'Sol Traveler',
-  currentAge = 25 
+  currentAge = 25,
+  isPaid = false
 }: CosmicCodexProps) {
-  const [cosmicContext, setCosmicContext] = useState<{
-    cosmicMoment: string;
-    personalContext: string;
-    trajectory: string;
-    pattern: string | null;
-    phenomenaLikelihood: number;
-  } | null>(null);
-  
-  const [worldEvent, setWorldEvent] = useState<{ text: string, url?: string } | null>(null);
-  const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [timelinePreview, setTimelinePreview] = useState<{
+    totalEvents: number;
+    majorTransformations: number;
+    breakthroughMoments: number;
+    dominantPattern: string;
+  } | null>(null);
+  const [fullTimeline, setFullTimeline] = useState<CosmicCodexTimeline | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const loadCosmicContext = useCallback(async () => {
+  // Generate preview stats without showing actual events
+  const generatePreviewStats = useCallback(async () => {
     if (!birthDate) return;
     
     setLoading(true);
     try {
-      const birth = new Date(birthDate);
-      const currentDate = new Date();
+      const timeline = await generateCosmicCodexTimeline(
+        new Date(birthDate),
+        archetype,
+        false // Don't fetch world events for preview
+      );
       
-      // Look back at a significant moment (could be previous sol cycle or meaningful date)
-      const lookbackDate = new Date(currentDate);
-      lookbackDate.setFullYear(lookbackDate.getFullYear() - 1); // Example: 1 year ago
-      
-      // Get cosmic events for that date
-      const cosmicEvents = getCosmicEventsForDate(lookbackDate, birth);
-      
-      // Get user's life phase at that time
-      const ageAtEvent = Math.floor((lookbackDate.getTime() - birth.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-      const lifePhase = getLifePhase(ageAtEvent);
-      
-      // Contextualize the cosmic moment
-      const context = contextualizeCosmicMoment(cosmicEvents, lifePhase.name, archetype, lookbackDate);
-      
-      // Analyze patterns for phenomena likelihood
-      const patterns = analyzeCosmicPatterns(cosmicEvents, lifePhase.name, lookbackDate);
-      
-      setCosmicContext({
-        cosmicMoment: context.cosmicMoment,
-        personalContext: context.personalContext,
-        trajectory: context.trajectory,
-        pattern: patterns.pattern,
-        phenomenaLikelihood: patterns.phenomenaLikelihood
+      setTimelinePreview({
+        totalEvents: timeline.totalEvents,
+        majorTransformations: timeline.majorTransformations.length,
+        breakthroughMoments: timeline.breakthroughMoments.length,
+        dominantPattern: timeline.lifePatterns.dominantPattern
       });
 
-      // Get world event for context
-      const worldEventData = await getWorldEventForDate(lookbackDate);
-      setWorldEvent(worldEventData);
-      
+      // If paid, load full timeline
+      if (isPaid) {
+        setFullTimeline(timeline);
+      }
     } catch (error) {
-      console.error('Error loading cosmic context:', error);
+      console.error('Error generating timeline preview:', error);
     } finally {
       setLoading(false);
     }
-  }, [birthDate, archetype]);
+  }, [birthDate, archetype, isPaid]);
 
   useEffect(() => {
     if (birthDate) {
-      loadCosmicContext();
+      generatePreviewStats();
     }
-  }, [birthDate, loadCosmicContext]);
+  }, [birthDate, generatePreviewStats]);
 
-  const renderPatternBadge = () => {
-    if (!cosmicContext?.pattern) return null;
-    
-    const patternColors = {
-      'BREAKTHROUGH': '#FFD700',
-      'SERENDIPITY': '#FF69B4', 
-      'TRANSFORMATION': '#8A2BE2',
-      'AWAKENING': '#00CED1'
-    };
-
+  // If user has paid, show full timeline view
+  if (isPaid && fullTimeline) {
     return (
-      <div 
-        className="inline-block px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wide mb-2"
-        style={{ 
-          backgroundColor: patternColors[cosmicContext.pattern] || '#D4AF37',
-          color: 'white'
-        }}
-      >
-        {cosmicContext.pattern} PATTERN
+      <div className="w-full flex flex-col items-center">
+        <div className="w-full mt-1 mb-2" style={{
+          background: '#FEFDF8',
+          border: '1px solid #D7D7D7',
+          boxSizing: 'border-box',
+        }}>
+          <div className="px-6 pt-10 pb-10">
+            {/* Full Timeline View - Coming Soon */}
+            <div className="text-2xl font-serif text-black text-center mb-4 font-normal" style={{ letterSpacing: '-0.04em' }}>
+              Your Complete Cosmic Timeline
+            </div>
+            
+            <div className="text-center text-gray-600 mb-8">
+              <p className="text-lg">Timeline visualization coming soon...</p>
+              <p className="text-sm mt-2">
+                {fullTimeline.totalEvents} cosmic moments analyzed from birth to present
+              </p>
+            </div>
+            
+            {/* Placeholder for timeline visualization */}
+            <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-gray-500">Interactive timeline will appear here</span>
+            </div>
+          </div>
+        </div>
       </div>
     );
-  };
+  }
 
-  const milestones = generateTimelineMilestones(currentAge);
-
+  // Upsell view (default)
   return (
     <div className="w-full flex flex-col items-center">
       <div
@@ -138,37 +146,7 @@ export default function CosmicCodex({
             JOURNEY THROUGH TIME TO UNCOVER THE COSMIC PATTERNS THAT REVEAL YOUR TRUE TRAJECTORY.
           </div>
 
-          {/* Dynamic Cosmic Context Preview */}
-          {cosmicContext && (
-            <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
-              {renderPatternBadge()}
-              
-              <div className="text-lg font-serif text-gray-800 font-bold mb-2">
-                Cosmic Moment: {cosmicContext.cosmicMoment}
-              </div>
-              
-              <div className="text-base font-serif text-gray-700 mb-3 leading-relaxed">
-                {cosmicContext.personalContext}
-              </div>
-              
-              <div className="text-sm font-mono text-gray-600 uppercase tracking-wide">
-                Pattern Recognition: {Math.round(cosmicContext.phenomenaLikelihood * 100)}% likelihood of meaningful phenomena
-              </div>
-              
-              {worldEvent && (
-                <div className="mt-4 pt-4 border-t border-blue-200">
-                  <div className="text-sm font-mono text-blue-700 uppercase tracking-wide mb-1">
-                    World Context
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {worldEvent.text}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Timeline Section with SVG */}
+          {/* Timeline Preview Image */}
           <div className="w-full flex justify-center mb-10">
             <div style={{ width: 420, maxWidth: '100%', background: '#FFF7DD', border: '1px solid #E0D09D', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Image
@@ -182,77 +160,106 @@ export default function CosmicCodex({
             </div>
           </div>
 
-          {/* Enhanced Description */}
+          {/* Teaser Stats */}
+          {timelinePreview && !loading && (
+            <div className="mb-8 grid grid-cols-2 gap-4 max-w-md mx-auto">
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-700">{timelinePreview.totalEvents}</div>
+                <div className="text-sm text-gray-600">Cosmic Moments</div>
+              </div>
+              
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-700">{timelinePreview.majorTransformations}</div>
+                <div className="text-sm text-gray-600">Major Transformations</div>
+              </div>
+              
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-700">{timelinePreview.breakthroughMoments}</div>
+                <div className="text-sm text-gray-600">Breakthrough Moments</div>
+              </div>
+              
+              <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                <div className="text-lg font-bold text-yellow-700">{timelinePreview.dominantPattern}</div>
+                <div className="text-sm text-gray-600">Dominant Pattern</div>
+              </div>
+            </div>
+          )}
+
+          {/* Callout */}
           <div className="text-lg font-serif text-[#555] font-bold mb-3 text-left" style={{ letterSpacing: '-0.01em' }}>
             The stars remember what you&apos;ve forgotten.
           </div>
           
-          <div className="text-lg font-serif text-[#555] leading-tight text-left mb-6" style={{ letterSpacing: '-0.01em', maxWidth: 480 }}>
+          <div className="text-lg font-serif text-[#555] leading-tight text-left mb-8" style={{ letterSpacing: '-0.01em', maxWidth: 480 }}>
             Every moment of your journey through time carries encoded wisdom—patterns that reveal not just where you&apos;ve been, but where you&apos;re destined to go. The cosmos doesn&apos;t just witness your story; it holds the keys to unlock your future.
           </div>
 
-          {cosmicContext && (
-            <div className="text-base font-serif text-[#666] leading-tight text-left mb-8" style={{ letterSpacing: '-0.01em', maxWidth: 520 }}>
-              <strong>Your Trajectory:</strong> {cosmicContext.trajectory}
-            </div>
-          )}
-
-          {/* Enhanced Call to Action */}
-          <div className="mb-4">
-            <button
-              onClick={() => setShowPreview(!showPreview)}
-              className="w-full py-4 bg-[#D4AF37] text-black font-mono text-base tracking-widest uppercase border border-black rounded-none mt-2 hover:bg-[#B8941F] transition-colors"
-              style={{ letterSpacing: '0.04em' }}
-            >
-              {showPreview ? 'HIDE PREVIEW' : 'PREVIEW YOUR COSMIC JOURNEY'}
-            </button>
-          </div>
+          {/* What You'll Discover Button */}
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className="w-full py-4 bg-[#D4AF37] text-black font-mono text-base tracking-widest uppercase border border-black rounded-none mt-2 hover:bg-[#B8941F] transition-colors"
+            style={{ letterSpacing: '0.04em' }}
+          >
+            {showPreview ? 'HIDE DETAILS' : 'WHAT YOU\'LL DISCOVER'}
+          </button>
 
           {/* Preview Section */}
           {showPreview && (
             <div className="mt-6 p-6 bg-gray-50 border border-gray-300">
               <div className="text-lg font-serif text-gray-800 font-bold mb-4">
-                What Your Full Cosmic Codex Will Reveal:
+                Your Personal Cosmic Codex Includes:
               </div>
               
-              <div className="space-y-3 text-base text-gray-700">
+              <div className="space-y-4 text-base text-gray-700">
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-[#D4AF37] rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <strong>Birth to Present Timeline:</strong> Every significant cosmic event during your lifetime with personalized interpretation
+                    <strong>Complete Birth-to-Present Timeline:</strong> Interactive visualization of every significant cosmic event during your lifetime, with personalized interpretations based on your {archetype} archetype
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-[#D4AF37] rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <strong>Pattern Recognition:</strong> Identification of breakthrough moments, serendipitous alignments, and transformation periods
+                    <strong>Pattern Analysis:</strong> Discover your dominant life patterns, breakthrough moments, and transformation cycles unique to your cosmic journey
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-[#D4AF37] rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <strong>World Event Context:</strong> How global events intersected with your personal cosmic moments
+                    <strong>World Event Synchronicities:</strong> See how major world events aligned with your personal cosmic moments
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-[#D4AF37] rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <strong>Future Trajectory:</strong> Insights into upcoming cosmic opportunities based on your unique pattern
+                    <strong>Future Trajectory Insights:</strong> Understand your cosmic cycles to anticipate upcoming opportunities and transformations
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-[#D4AF37] rounded-full mt-2 flex-shrink-0"></div>
+                  <div>
+                    <strong>Sol Cycle Integration:</strong> See how your past Sol cycles align with cosmic patterns for deeper self-understanding
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-gray-300">
-                <button
-                  className="w-full py-3 bg-black text-white font-mono text-sm tracking-wider uppercase hover:bg-gray-800 transition-colors"
-                  style={{ letterSpacing: '0.04em' }}
-                  disabled
-                >
-                  UNLOCK FULL COSMIC CODEX - COMING SOON
-                </button>
+              <div className="mt-8 pt-6 border-t border-gray-300">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-black mb-2">$33</div>
+                  <div className="text-sm text-gray-600 mb-4">One-time unlock • Lifetime access</div>
+                  <button
+                    className="w-full py-3 bg-black text-white font-mono text-sm tracking-wider uppercase hover:bg-gray-800 transition-colors"
+                    style={{ letterSpacing: '0.04em' }}
+                    disabled
+                  >
+                    UNLOCK YOUR COSMIC CODEX
+                  </button>
+                  <div className="text-xs text-gray-500 mt-2">Payment integration coming soon</div>
+                </div>
               </div>
             </div>
           )}
@@ -260,19 +267,4 @@ export default function CosmicCodex({
       </div>
     </div>
   );
-}
-
-// Starburst SVG helper
-function Starburst({ x, y, color }: { x: number; y: number; color: string }) {
-  // 16-pointed starburst
-  const points = Array.from({ length: 16 }).map((_, i) => {
-    const angle = (Math.PI * 2 * i) / 16;
-    const r = i % 2 === 0 ? 28 : 12;
-    return [
-      x + Math.cos(angle) * r,
-      y + Math.sin(angle) * r,
-    ];
-  });
-  const d = points.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(' ') + ' Z';
-  return <path d={d} fill="none" stroke={color} strokeWidth={3} />;
 } 
