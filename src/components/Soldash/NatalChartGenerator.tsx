@@ -105,6 +105,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [astroChart, setAstroChart] = useState<AstroChart | null>(null);
+  const [svgContent, setSvgContent] = useState<string | null>(null);
 
   const generateChart = async () => {
     if (!birthData || !chartRef.current) return;
@@ -556,6 +557,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         ref={chartRef} 
         className="w-full h-full border border-[#E5E1D8] bg-[#FCF6E5] p-4"
         style={{ minHeight: '400px' }}
+        dangerouslySetInnerHTML={svgContent ? { __html: svgContent } : undefined}
       />
       {chartData && (
         <div className="mt-4 text-center text-sm text-[#666]">
