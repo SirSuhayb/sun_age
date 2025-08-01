@@ -165,15 +165,21 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       chartDiv.id = 'astrochart-' + Date.now();
       chartRef.current.appendChild(chartDiv);
       
+      // Helper function to convert sign + degree to absolute degree
+      const getAbsoluteDegree = (sign: string, degree: number): number => {
+        const signIndex = Object.keys(zodiacSymbols).indexOf(sign.toLowerCase());
+        return signIndex * 30 + degree;
+      };
+      
       // Convert our data format to AstroChart format
       const astroData = {
         planets: {} as Record<string, number[]>,
-        cusps: data.houses?.map(h => h.degree) || Array.from({ length: 12 }, (_, i) => i * 30)
+        cusps: data.houses?.map(h => getAbsoluteDegree(h.sign, h.degree)) || Array.from({ length: 12 }, (_, i) => i * 30)
       };
       
       // Add main luminaries
-      astroData.planets['Sun'] = [data.sun.degree];
-      astroData.planets['Moon'] = [data.moon.degree];
+      astroData.planets['Sun'] = [getAbsoluteDegree(data.sun.sign, data.sun.degree)];
+      astroData.planets['Moon'] = [getAbsoluteDegree(data.moon.sign, data.moon.degree)];
       
       // Map planet names to AstroChart format
       const planetNameMap: Record<string, string> = {
@@ -191,7 +197,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       data.planets?.forEach(planet => {
         const mappedName = planetNameMap[planet.name] || planet.name;
         if (mappedName) {
-          astroData.planets[mappedName] = [planet.degree];
+          astroData.planets[mappedName] = [getAbsoluteDegree(planet.sign, planet.degree)];
         }
       });
       
@@ -274,11 +280,19 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     const innerRadius = 120;
     const planetRadius = 150;
     
+    // Helper function to convert sign + degree to absolute degree
+    const getAbsoluteDegree = (sign: string, degree: number): number => {
+      const signIndex = Object.keys(zodiacSymbols).indexOf(sign.toLowerCase());
+      return signIndex * 30 + degree;
+    };
+    
     // Calculate planet positions
     const planetPositions = data.planets?.map(planet => {
-      const angle = (planet.degree - 90) * Math.PI / 180;
+      const absoluteDegree = getAbsoluteDegree(planet.sign, planet.degree);
+      const angle = (absoluteDegree - 90) * Math.PI / 180;
       return {
         ...planet,
+        absoluteDegree,
         symbol: planetSymbols[planet.name.toLowerCase()] || planet.name.charAt(0).toUpperCase(),
         x: center + planetRadius * Math.cos(angle),
         y: center + planetRadius * Math.sin(angle)
@@ -320,7 +334,8 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         
         <!-- House divisions -->
         ${data.houses?.map((house) => {
-          const angle = (house.degree - 90) * Math.PI / 180;
+          const absoluteDegree = getAbsoluteDegree(house.sign, house.degree);
+          const angle = (absoluteDegree - 90) * Math.PI / 180;
           const x1 = center;
           const y1 = center;
           const x2 = center + innerRadius * Math.cos(angle);
@@ -338,13 +353,43 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         
         <!-- House numbers -->
         ${Array.from({ length: 12 }).map((_, i) => {
-          const houseAngle = data.houses?.[i]?.degree || (i * 30);
-          const nextHouseAngle = data.houses?.[i + 1]?.degree || ((i + 1) * 30);
+          const house = data.houses?.[i];
+          const nextHouse = data.houses?.[i + 1] || data.houses?.[0];
+          const houseAngle = house ? getAbsoluteDegree(house.sign, house.degree) : (i * 30);
+          const nextHouseAngle = nextHouse ? getAbsoluteDegree(nextHouse.sign, nextHouse.degree) : ((i + 1) * 30);
           const midAngle = ((houseAngle + nextHouseAngle) / 2 - 90) * Math.PI / 180;
           const x = center + (innerRadius * 0.7) * Math.cos(midAngle);
           const y = center + (innerRadius * 0.7) * Math.sin(midAngle) + 3;
           return `<text x="${x}" y="${y}" text-anchor="middle" class="degree-text">${i + 1}</text>`;
         }).join('')}
+        
+        <!-- Sun -->
+        ${(() => {
+          const sunAbsoluteDegree = getAbsoluteDegree(data.sun.sign, data.sun.degree);
+          const sunAngle = (sunAbsoluteDegree - 90) * Math.PI / 180;
+          const sunX = center + planetRadius * Math.cos(sunAngle);
+          const sunY = center + planetRadius * Math.sin(sunAngle);
+          return `
+            <g transform="translate(${sunX},${sunY})">
+              <circle r="15" fill="#FFD700" stroke="#E6B13A" stroke-width="1"/>
+              <text y="5" text-anchor="middle" class="planet-text">${planetSymbols.sun}</text>
+            </g>
+          `;
+        })()}
+        
+        <!-- Moon -->
+        ${(() => {
+          const moonAbsoluteDegree = getAbsoluteDegree(data.moon.sign, data.moon.degree);
+          const moonAngle = (moonAbsoluteDegree - 90) * Math.PI / 180;
+          const moonX = center + planetRadius * Math.cos(moonAngle);
+          const moonY = center + planetRadius * Math.sin(moonAngle);
+          return `
+            <g transform="translate(${moonX},${moonY})">
+              <circle r="15" fill="#C0C0C0" stroke="#E6B13A" stroke-width="1"/>
+              <text y="5" text-anchor="middle" class="planet-text">${planetSymbols.moon}</text>
+            </g>
+          `;
+        })()}
         
         <!-- Planets -->
         ${planetPositions.map(planet => `
@@ -355,16 +400,32 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
           </g>
         `).join('')}
         
+        <!-- Ascendant marker -->
+        ${(() => {
+          const ascAbsoluteDegree = getAbsoluteDegree(data.rising.sign, data.rising.degree);
+          const ascAngle = (ascAbsoluteDegree - 90) * Math.PI / 180;
+          const x1 = center + (innerRadius - 10) * Math.cos(ascAngle);
+          const y1 = center + (innerRadius - 10) * Math.sin(ascAngle);
+          const x2 = center + (outerRadius + 10) * Math.cos(ascAngle);
+          const y2 = center + (outerRadius + 10) * Math.sin(ascAngle);
+          const textX = x2 + 15 * Math.cos(ascAngle);
+          const textY = y2 + 15 * Math.sin(ascAngle);
+          return `
+            <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#E6B13A" stroke-width="3"/>
+            <text x="${textX}" y="${textY}" text-anchor="middle" class="zodiac-text" font-weight="bold">ASC</text>
+          `;
+        })()}
+        
         <!-- Center info -->
         <circle cx="${center}" cy="${center}" r="60" fill="#FCF6E5" stroke="#E6B13A" stroke-width="1"/>
         <text x="${center}" y="${center - 20}" text-anchor="middle" class="planet-text">
-          ${planetSymbols.sun} ${data.sun.sign}
+          ${data.rising.sign}
         </text>
         <text x="${center}" y="${center}" text-anchor="middle" class="zodiac-text">
-          ${planetSymbols.moon} ${data.moon.sign}
+          ASC ${data.rising.degree.toFixed(1)}°
         </text>
-        <text x="${center}" y="${center + 20}" text-anchor="middle" class="zodiac-text">
-          ASC ${data.rising.sign}
+        <text x="${center}" y="${center + 20}" text-anchor="middle" class="degree-text">
+          Rising Sign
         </text>
       </svg>
     `;
