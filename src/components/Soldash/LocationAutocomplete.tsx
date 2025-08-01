@@ -94,7 +94,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
   // Format display name for better readability
   const formatDisplayName = (item: any) => {
-    const parts = [];
+    const parts: string[] = [];
     
     if (item.address?.city) parts.push(item.address.city);
     else if (item.address?.town) parts.push(item.address.town);
