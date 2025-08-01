@@ -36,6 +36,16 @@ NEXT_PUBLIC_RPC_URL=https://mainnet.base.org
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
 STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 
+# Stripe Product IDs (for extra rolls packages)
+STRIPE_PRODUCT_5_ROLLS=prod_SmzzvVCD2whk9F
+STRIPE_PRODUCT_15_ROLLS=prod_SmzzYVzhfDrVWR
+STRIPE_PRODUCT_30_ROLLS=prod_Smzz6zviXMDFpr
+
+# Stripe Price IDs (if needed)
+STRIPE_PRICE_5_ROLLS=price_1RrPzOAS1eL7o0YXr6rDWbgB
+STRIPE_PRICE_15_ROLLS=price_1RrPzOAS1eL7o0YXJhyKXB7d
+STRIPE_PRICE_30_ROLLS=price_1RrPzPAS1eL7o0YXqPRjveiB
+
 # =============================================================================
 # APP CONFIGURATION
 # =============================================================================

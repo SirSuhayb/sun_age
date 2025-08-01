@@ -20,22 +20,22 @@ const stripeInstance = stripe(stripeSecretKey);
 // Product configurations
 const products = [
   {
-    name: '5 Extra Rolls',
+    name: 'Cosmic Starter',
     description: 'Get 5 additional rolls for your surprise-me feature',
-    price: 500, // $5.00 in cents
+    price: 299, // $2.99 in cents
     rolls: 5
   },
   {
-    name: '15 Extra Rolls',
+    name: 'Solar Seeker',
     description: 'Get 15 additional rolls for your surprise-me feature',
-    price: 1200, // $12.00 in cents
+    price: 799, // $7.99 in cents
     rolls: 15
   },
   {
-    name: '50 Extra Rolls',
-    description: 'Get 50 additional rolls for your surprise-me feature',
-    price: 3500, // $35.00 in cents
-    rolls: 50
+    name: 'Galactic Guide',
+    description: 'Get 30 additional rolls for your surprise-me feature',
+    price: 1499, // $14.99 in cents
+    rolls: 30
   }
 ];
 
