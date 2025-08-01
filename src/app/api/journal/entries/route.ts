@@ -76,14 +76,17 @@ export async function POST(req: NextRequest) {
         console.log('[API] Request body type:', typeof body);
         console.log('[API] Request body keys:', Object.keys(body));
         
-        const { content, sol_day, userFid } = body;
+        const { content, sol_day, userFid, guidance_id, guidance_title, guidance_prompt } = body;
 
         console.log('[API] Extracted fields:', { 
             content: !!content, 
             contentLength: content?.length,
             sol_day, 
             userFid, 
-            userFidType: typeof userFid 
+            userFidType: typeof userFid,
+            guidance_id,
+            guidance_title,
+            guidance_prompt
         });
 
         // Validate content
@@ -130,6 +133,10 @@ export async function POST(req: NextRequest) {
             sol_day,
             word_count: content.trim().split(/\s+/).length,
             preservation_status: userFid ? 'synced' : 'local',
+            // Include guidance metadata if provided
+            ...(guidance_id && { guidance_id }),
+            ...(guidance_title && { guidance_title }),
+            ...(guidance_prompt && { guidance_prompt }),
         };
 
         console.log('[API] Creating new entry:', newEntry);

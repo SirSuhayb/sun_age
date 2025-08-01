@@ -44,6 +44,10 @@ export function useFrameSDK() {
           setContext(frameContext);
           setIsInFrame(true);
           setIsFramePinned(frameContext.client.added);
+        } else if (mounted && process.env.NODE_ENV === 'development') {
+          // Development override for testing
+          console.log('[useFrameSDK] Development mode: forcing isInFrame to true for testing');
+          setIsInFrame(true);
         }
       } catch (err) {
         console.error('[useFrameSDK] SDK initialization error:', err);

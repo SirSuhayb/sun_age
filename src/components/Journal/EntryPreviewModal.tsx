@@ -67,7 +67,7 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="fixed inset-0 z-[2147483647] flex items-end justify-center">
           {/* Sunrise gradient overlay */}
           <div className="absolute inset-0 bg-solara-sunrise" style={{ zIndex: 0 }} />
           {/* Modal card with animation */}
@@ -76,7 +76,7 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
             transition={{ duration: 0.28, ease: 'easeOut' }}
-            className="relative z-10 w-full max-w-md h-[75vh] flex flex-col shadow-xl"
+            className="relative z-[2147483647] w-full max-w-md h-[75vh] flex flex-col shadow-xl"
             style={{ borderRadius: 0 }}
           >
             <div className="backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 w-full h-full flex flex-col rounded-none" style={{ borderRadius: 0 }}>
@@ -106,7 +106,7 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
               {/* Divider */}
               <div className="border-t border-gray-200 w-full mb-2" />
               {/* Content area (scrollable if needed) */}
-              <div className="flex-1 overflow-y-auto pb-2 px-8" style={{ color: '#222222' }}>
+              <div className="flex-1 overflow-y-auto pb-2 px-8 min-h-0" style={{ color: '#222222' }}>
                 <div className="font-serif text-[18px] font-normal leading-[26px] tracking-tight whitespace-pre-line" style={{ letterSpacing: '-0.03em', color: '#222222', paddingTop: 8, paddingBottom: 8 }}>
                   {previewText}
                 </div>
@@ -189,7 +189,7 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
               </div>
               {/* Actions Section (only for own entry) */}
               {isOwnEntry && (
-                <div className="flex gap-2 px-8 pb-6 pt-2 justify-center">
+                <div className="flex-shrink-0 flex gap-2 px-8 pb-6 pt-2 justify-center border-t border-gray-200 bg-white/80">
                   <button
                     className="font-mono text-[16px] tracking-tight py-3 rounded-none text-sm w-1/2 border border-black bg-white text-black hover:bg-gray-100 transition-colors"
                     style={{ letterSpacing: '-0.04em', fontWeight: 400 }}
@@ -197,7 +197,7 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
                   >
                     EDIT REFLECTION
                   </button>
-                  {entry.preservation_status === 'synced' && (
+                  {(entry.preservation_status === 'synced' || entry.preservation_status === 'preserved') && (
                     <button
                       className="font-mono text-[16px] tracking-tight py-3 rounded-none text-sm w-1/2 border border-black bg-[#d4af37] text-black hover:bg-[#e6c75a] transition-colors"
                       style={{ letterSpacing: '-0.04em', fontWeight: 400 }}

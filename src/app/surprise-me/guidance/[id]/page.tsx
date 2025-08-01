@@ -9,17 +9,63 @@ import { ArrowLeft, X, Star, Zap } from 'lucide-react';
 import type { DailyRoll } from '~/lib/surpriseMe';
 import Image from 'next/image';
 import { solarEarningsManager } from '~/lib/solarEarnings';
+import { NotificationManager } from '~/lib/notifications';
 import ProductImage from '@/components/ProductImage';
 import { PulsingStarSpinner } from '~/components/ui/PulsingStarSpinner';
 import { surpriseMeFramework } from '~/lib/surpriseMe';
+import EntryPreviewModalClient from '~/components/Journal/EntryPreviewModalClient';
+import { JournalEntryEditor } from '~/components/Journal/JournalEntryEditor';
+import { useJournal } from '~/hooks/useJournal';
+import { useFrameSDK } from '~/hooks/useFrameSDK';
+import { Toast } from '~/components/ui/toast';
+import { SuccessModal } from '~/components/ui/SuccessModal';
 
 export default function GuidancePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [rollData, setRollData] = useState<DailyRoll | null>(null);
   const [hasCompletedGuidance, setHasCompletedGuidance] = useState(false);
-  const [showReflectionModal, setShowReflectionModal] = useState(false);
-  const [reflectionText, setReflectionText] = useState('');
+
+  const [editingEntry, setEditingEntry] = useState<any>(null);
+  
+  // Toast and modal state
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successModalData, setSuccessModalData] = useState<{ title: string; message: string; solarEarned?: number } | null>(null);
   const { id } = use(params);
+
+  // Get user's sol age from localStorage
+  const [userSolAge, setUserSolAge] = useState<number>(1);
+  
+  useEffect(() => {
+    try {
+      const bookmark = localStorage.getItem('sunCycleBookmark');
+      if (bookmark) {
+        const parsed = JSON.parse(bookmark);
+        setUserSolAge(parsed.days || 1);
+      }
+    } catch (e) {
+      console.error('Error parsing bookmark:', e);
+    }
+  }, []);
+
+  // Get journal functions
+  const { createEntry, updateEntry, migrateLocalEntries, entries, loadEntries } = useJournal();
+  
+  // Get Farcaster context
+  const { context, sdk, isInFrame } = useFrameSDK();
+  
+  console.log('[Guidance] Frame SDK values:', {
+    hasContext: !!context,
+    hasSdk: !!sdk,
+    isInFrame,
+    userFid: context?.user?.fid
+  });
+  
+  // Get userFid from Farcaster context or dev override
+  const isDev = process.env.NODE_ENV === 'development';
+  const farcasterUserFid = context?.user?.fid;
+  const devUserFid = isDev ? 5543 : undefined;
+  const userFid = farcasterUserFid || devUserFid;
 
   useEffect(() => {
     // Load roll data from localStorage
@@ -43,13 +89,26 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
       }
     }
 
-    // Check if guidance has already been completed today
+    // Check if this specific guidance activity has already been completed today
     const earnings = solarEarningsManager.getEarnings();
     const todayGuidanceDate = new Date().toDateString();
-    const todayGuidance = earnings.earningsHistory.filter(h => h.date === todayGuidanceDate && h.bonusType === 'guidance');
+    const todayGuidance = earnings.earningsHistory.filter(h => 
+      h.date === todayGuidanceDate && 
+      h.bonusType === 'guidance' && 
+      h.reason.includes(id)
+    );
     if (todayGuidance.length > 0) {
       setHasCompletedGuidance(true);
     }
+
+    // Reset guidance completion status daily
+    const lastCompletionDate = localStorage.getItem(`guidance_${id}_lastCompletion`);
+    const today = new Date().toDateString();
+    if (lastCompletionDate !== today) {
+      setHasCompletedGuidance(false);
+      localStorage.setItem(`guidance_${id}_lastCompletion`, today);
+    }
+
   }, [id, rollData]); // Added rollData back to dependencies
 
   // Migration function to handle old data structure
@@ -91,29 +150,218 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
   };
 
   const handleAddReflection = () => {
-    setShowReflectionModal(true);
+    console.log('Opening journal entry editor for reflection');
+    // Create a new journal entry for the reflection with guidance metadata
+    const entry = {
+      id: '',
+      user_fid: 0, // This will be set when actually saving
+      sol_day: userSolAge, // Use the user's actual sol age
+      content: '',
+      preservation_status: 'local',
+      word_count: 0,
+      created_at: new Date().toISOString(),
+      // Add guidance metadata
+      guidance_id: rollData?.id || '',
+      guidance_title: rollData?.title || '',
+      guidance_prompt: rollData?.journalPrompt || ''
+    };
+    setEditingEntry(entry);
   };
 
-  const handleShareReflection = async () => {
-    if (!reflectionText.trim()) {
-      alert('Please add a reflection before sharing.');
-      return;
-    }
-
-    // Here you would implement the sharing logic
-    // For now, we'll just complete the guidance
+  const handleSaveForLater = async () => {
     if (!rollData) return;
     
-    // Award SOLAR for guidance completion
-    const guidanceEarnings = solarEarningsManager.awardGuidanceCompletion(rollData.rarity, rollData.title);
+    const notificationManager = NotificationManager.getInstance();
     
-    // Show completion message
-    alert(`Reflection shared! You earned ${guidanceEarnings.totalEarned} SOLAR for completing your guidance.`);
+    // Request notification permission if not already granted
+    const permissionGranted = await notificationManager.requestPermission();
     
-    setHasCompletedGuidance(true);
-    setShowReflectionModal(false);
-    router.push('/soldash');
+    // Save guidance for later with reminder
+    notificationManager.saveGuidanceForLater(
+      rollData.id,
+      rollData.title,
+      rollData.journalPrompt || '',
+      userFid // Pass userFid for Farcaster notifications
+    );
+    
+    // Show success toast with context-aware message
+    const isInFarcaster = typeof window !== 'undefined' && window.location.href.includes('farcaster');
+    const message = isInFarcaster
+      ? 'Guidance saved! You\'ll get a Farcaster notification tomorrow at 10 AM.'
+      : permissionGranted 
+        ? 'Guidance saved! You\'ll get a reminder tomorrow at 10 AM.' 
+        : 'Guidance saved! Enable notifications to get reminders.';
+    
+    setToast({ 
+      message,
+      type: 'success' 
+    });
+    
+    // Navigate to main sol oracle page
+    router.push('/surprise-me');
   };
+
+
+
+  // Show the journal entry editor if editingEntry is set
+  console.log('Checking editingEntry condition, current value:', editingEntry);
+  if (editingEntry) {
+    console.log('Rendering journal entry editor with entry:', editingEntry);
+    return (
+      <JournalEntryEditor
+        entry={editingEntry}
+                        onSave={async (entryToSave) => {
+                  console.log('Saving entry:', entryToSave);
+                  try {
+                    if (editingEntry && editingEntry.id) {
+                      // Update existing entry
+                      await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid);
+                    } else {
+                      // Create a new entry with guidance metadata
+                      const newEntry = await createEntry({ 
+                        content: entryToSave.content, 
+                        sol_day: userSolAge,
+                        guidance_id: rollData?.id || '',
+                        guidance_title: rollData?.title || '',
+                        guidance_prompt: rollData?.journalPrompt || ''
+                      }, userFid);
+                      // Update the editing entry state so future auto-saves update this entry, not create new ones
+                      setEditingEntry(newEntry);
+                    }
+            
+                    // Award SOLAR for guidance completion
+                    if (rollData) {
+                      const guidanceEarnings = solarEarningsManager.awardGuidanceCompletion(rollData.rarity, rollData.title);
+                      console.log(`Reflection saved! You earned ${guidanceEarnings.totalEarned} SOLAR for completing your guidance.`);
+                      setHasCompletedGuidance(true);
+                    }
+                    
+                    // For guidance entries, we'll let the share flow handle navigation
+                    // Don't navigate away yet - let the share flow take over
+                  } catch (error) {
+                    console.error('Error saving entry:', error);
+                    setToast({ message: 'Failed to save reflection. Please try again.', type: 'error' });
+                  }
+                }}
+                        onAutoSave={async (entryToSave) => {
+                  console.log('Auto-saving entry:', entryToSave);
+                  try {
+                    if (editingEntry && editingEntry.id) {
+                      // Update existing entry
+                      await updateEntry(editingEntry.id, { content: entryToSave.content }, userFid);
+                      // Update the editing entry state with the new content
+                      setEditingEntry(prev => prev ? { ...prev, content: entryToSave.content } : null);
+                    } else {
+                      // Create a new entry with guidance metadata
+                      const newEntry = await createEntry({ 
+                        content: entryToSave.content, 
+                        sol_day: userSolAge,
+                        guidance_id: rollData?.id || '',
+                        guidance_title: rollData?.title || '',
+                        guidance_prompt: rollData?.journalPrompt || ''
+                      }, userFid);
+                      // Update the editing entry state so future auto-saves update this entry, not create new ones
+                      setEditingEntry(newEntry);
+                    }
+                  } catch (error) {
+                    console.error('Error auto-saving entry:', error);
+                  }
+                }}
+        onFinish={() => {
+          setEditingEntry(null);
+          router.push('/soldash');
+        }}
+                                        onShare={async () => {
+                  try {
+                    // 1. First, ensure the entry is saved with the current content
+                    console.log('[Guidance] Ensuring entry is saved before migration:', {
+                      id: editingEntry.id,
+                      content: editingEntry.content?.slice(0, 50) + '...',
+                      guidance_id: editingEntry.guidance_id
+                    });
+                    
+                    // Force save the entry to ensure content is updated
+                    await updateEntry(editingEntry.id, { content: editingEntry.content }, userFid);
+                    
+                    // 2. Migrate local entries to database
+                    console.log('[Guidance] Starting migration...');
+                    const migrationResult = await migrateLocalEntries(userFid);
+                    console.log('[Guidance] Migration result:', migrationResult);
+
+                    // 3. Wait for migration to complete
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // 4. Find the synced entry by content matching
+                    console.log('[Guidance] Finding synced entry...');
+                    const apiResponse = await fetch(`/api/journal/entries?userFid=${userFid}`);
+                    const apiData = await apiResponse.json();
+                    const apiEntries = apiData.entries || [];
+                    
+                    console.log('[Guidance] Available API entries:', apiEntries.length);
+                    
+                    // Find the entry that was just migrated by matching content and guidance metadata
+                    const syncedEntry = apiEntries.find(entry => 
+                      entry.content === editingEntry.content && 
+                      entry.preservation_status === 'synced' &&
+                      entry.guidance_id === editingEntry.guidance_id
+                    );
+
+                    if (!syncedEntry) {
+                      console.error('[Guidance] Could not find synced entry. Available entries:', apiEntries);
+                      setToast({ message: 'Entry not found after migration. Please try again.', type: 'error' });
+                      return; // Don't throw, just show toast and return
+                    }
+
+                    console.log('[Guidance] Found synced entry:', {
+                      id: syncedEntry.id,
+                      content: syncedEntry.content?.slice(0, 50) + '...',
+                      guidance_id: syncedEntry.guidance_id
+                    });
+
+                    // 5. Share the synced entry
+                    const { composeAndShareEntry } = await import('~/lib/journal');
+                    console.log('[Guidance] About to share synced entry:', {
+                      entryId: syncedEntry.id,
+                      sdk: !!sdk,
+                      isInFrame,
+                      userFid,
+                      sdkType: typeof sdk,
+                      isInFrameType: typeof isInFrame
+                    });
+                    await composeAndShareEntry(syncedEntry, sdk, isInFrame, userFid);
+
+                    // 6. Show success modal and navigate
+                    if (rollData) {
+                      const guidanceEarnings = solarEarningsManager.awardGuidanceCompletion(rollData.rarity, rollData.title, id);
+                      
+                      // Mark guidance reminder as completed
+                      const notificationManager = NotificationManager.getInstance();
+                      notificationManager.markGuidanceCompleted(rollData.id);
+                      
+                      setSuccessModalData({
+                        title: 'Reflection Shared!',
+                        message: 'Your reflection has been successfully shared to Farcaster.',
+                        solarEarned: guidanceEarnings.totalEarned
+                      });
+                      setShowSuccessModal(true);
+                      setHasCompletedGuidance(true);
+                    } else {
+                      setSuccessModalData({
+                        title: 'Reflection Shared!',
+                        message: 'Your reflection has been successfully shared to Farcaster.'
+                      });
+                      setShowSuccessModal(true);
+                    }
+                    setEditingEntry(null);
+                  } catch (error) {
+                    console.error('Error in guidance share flow:', error);
+                    setToast({ message: 'Failed to share reflection. Please try again.', type: 'error' });
+                  }
+                }}
+        mode="edit"
+      />
+    );
+  }
 
   if (!rollData) {
     return (
@@ -137,7 +385,32 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFCF2]/50 backdrop-blur-sm relative z-50">
+    <>
+      {/* Toast */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      
+      {/* Success Modal */}
+      {showSuccessModal && successModalData && (
+        <SuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => {
+            setShowSuccessModal(false);
+            setSuccessModalData(null);
+            router.push('/soldash/journal');
+          }}
+          title={successModalData.title}
+          message={successModalData.message}
+          solarEarned={successModalData.solarEarned}
+        />
+      )}
+      
+      <div className="min-h-screen bg-[#FFFCF2]/50 backdrop-blur-sm pt-24">
       {/* Navigation */}
       <div className="bg-white border-b border-gray-200 px-4 py-6 flex items-center justify-between">
         <button 
@@ -145,12 +418,6 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
           className="text-gray-700 hover:text-black transition-colors font-mono text-sm uppercase tracking-wide"
         >
           ← BACK TO ORACLE
-        </button>
-        <button
-          onClick={() => router.back()}
-          className="text-gray-500 hover:text-black text-xl font-bold"
-        >
-          ×
         </button>
       </div>
 
@@ -362,82 +629,14 @@ export default function GuidancePage({ params }: { params: Promise<{ id: string 
             {hasCompletedGuidance ? 'GUIDANCE COMPLETED' : 'COMPLETE GUIDANCE'}
           </button>
           <button
-            onClick={() => router.push('/soldash')}
+            onClick={handleSaveForLater}
             className="w-full bg-white text-black font-mono font-base uppercase text-sm py-4 border border-gray-300 hover:bg-gray-100 transition-colors"
           >
             SAVE FOR LATER
           </button>
         </div>
       </div>
-
-      {/* Reflection Modal - Journal-Styled */}
-      {showReflectionModal && (
-        <div className="fixed inset-0 z-[99999] flex justify-center items-end w-screen h-screen top-0 left-0">
-          {/* Sunrise gradient overlay */}
-          <div className="absolute inset-0 bg-solara-sunrise" />
-          
-          {/* Modal with journal styling */}
-          <div className="relative z-10 backdrop-blur-md bg-[#FFFCF2]/50 border border-gray-200 w-full max-w-md h-[95vh] max-h-[800px] flex flex-col animate-slide-up">
-            
-            {/* Header */}
-            <div className="flex-shrink-0 p-6 pb-4">
-              <div className="relative flex justify-center items-center">
-                <div className="text-center">
-                  <h3 className="text-xl font-mono text-black">GUIDANCE REFLECTION</h3>
-                  <p className="text-sm text-gray-500 font-mono">
-                    {rollData?.title}
-                  </p>
-                </div>
-                <button 
-                  onClick={() => setShowReflectionModal(false)} 
-                  className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-black"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Content Area */}
-            <div className="flex-1 flex flex-col px-6 overflow-y-auto">
-              {/* Prompt Display */}
-              <div className="mb-6 p-4 border border-gray-200 bg-[#FFFCF2]/50 backdrop-blur-md">
-                <div className="text-xs font-semibold tracking-widest text-yellow-700 mb-2">GUIDANCE PROMPT</div>
-                <p className="text-black font-serif text-xl tracking-[-0.04em]">
-                  {rollData?.journalPrompt || 'What impossible idea downloaded during your lightning session?'}
-                </p>
-              </div>
-
-              {/* Textarea */}
-              <textarea
-                value={reflectionText}
-                onChange={(e) => setReflectionText(e.target.value)}
-                placeholder="Share your experience with this guidance..."
-                className="flex-grow w-full bg-transparent text-black placeholder-gray-500/80 p-2 text-2xl font-serif focus:outline-none resize-none tracking-[-0.02em] placeholder:text-2xl placeholder:italic"
-              />
-            </div>
-
-            {/* Footer */}
-            <div className="flex-shrink-0 p-6 pt-4">
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowReflectionModal(false)}
-                  className="flex-1 px-4 py-3 border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 font-mono text-sm uppercase tracking-widest transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleShareReflection}
-                  className="flex-1 px-4 py-3 bg-[#d4af37] text-black font-mono text-sm uppercase tracking-widest hover:bg-[#e6c75a] transition-colors"
-                >
-                  Share & Complete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
+    </>
   );
 } 

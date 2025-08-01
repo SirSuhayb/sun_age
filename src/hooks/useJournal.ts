@@ -73,7 +73,11 @@ export function useJournal() {
           const requestBody = {
             content: entry.content,
             sol_day: entry.sol_day,
-            userFid: userFid
+            userFid: userFid,
+            // Include guidance metadata in migration
+            guidance_id: entry.guidance_id,
+            guidance_title: entry.guidance_title,
+            guidance_prompt: entry.guidance_prompt
           };
           
           console.log('[useJournal] Sending migration request:', {
@@ -120,11 +124,22 @@ export function useJournal() {
 
       console.log('[useJournal] Migration complete. Migrated:', migrated, 'Errors:', errors);
 
-      // Remove migrated entries from local storage
+      // Remove migrated entries from local storage and add synced entries
       if (migrated > 0) {
-        const remainingEntries = entries.filter(e => e.preservation_status !== 'local');
-        setEntries(remainingEntries);
-        saveToLocalStorage(remainingEntries);
+        // Get the successful migration results
+        const successfulMigrations = results
+          .filter(r => r.status === 'fulfilled')
+          .map(r => (r as PromiseFulfilledResult<any>).value);
+        
+        // Remove local entries and add synced entries
+        const remainingLocalEntries = entries.filter(e => e.preservation_status !== 'local');
+        const syncedEntries = successfulMigrations.map(m => m.newEntry);
+        const allEntries = [...remainingLocalEntries, ...syncedEntries];
+        
+        console.log('[useJournal] After migration - remaining local:', remainingLocalEntries.length, 'synced:', syncedEntries.length, 'total:', allEntries.length);
+        
+        setEntries(allEntries);
+        saveToLocalStorage(allEntries);
       }
 
       return { migrated, errors };
@@ -149,7 +164,11 @@ export function useJournal() {
         content: data.content,
         word_count: data.content.trim().split(/\s+/).length,
         preservation_status: 'local',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        // Add guidance metadata if provided
+        guidance_id: data.guidance_id,
+        guidance_title: data.guidance_title,
+        guidance_prompt: data.guidance_prompt
       };
 
       setEntries(prev => {
@@ -263,6 +282,10 @@ export function useJournal() {
           ...entryToUpdate,
           content: data.content,
           word_count: data.content.trim().split(/\s+/).length,
+          // Preserve guidance metadata
+          guidance_id: entryToUpdate.guidance_id,
+          guidance_title: entryToUpdate.guidance_title,
+          guidance_prompt: entryToUpdate.guidance_prompt,
         };
         setEntries(prev => {
           const newEntries = prev.map(e => (e.id === id ? updatedEntry : e));

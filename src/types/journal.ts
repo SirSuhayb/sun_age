@@ -8,6 +8,10 @@ export interface JournalEntry {
   word_count: number;
   created_at: string;
   preserved_at?: string;
+  // Guidance metadata
+  guidance_id?: string;
+  guidance_title?: string;
+  guidance_prompt?: string;
 }
 
 export interface WisdomExtract {
@@ -45,6 +49,9 @@ export interface WisdomSuggestion {
 export interface CreateJournalEntryRequest {
   content: string;
   sol_day: number;
+  guidance_id?: string;
+  guidance_title?: string;
+  guidance_prompt?: string;
 }
 
 export interface UpdateJournalEntryRequest {
@@ -76,4 +83,5 @@ export type JournalTabState = 'timeline' | 'create' | 'edit' | 'view';
 export interface JournalFilters {
   preservation_status?: 'all' | 'local' | 'preserved';
   search?: string;
+  guidance_only?: boolean;
 } 

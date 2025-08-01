@@ -16,6 +16,7 @@ interface JournalEntryEditorProps {
   onFinish: () => void;
   onEdit?: () => void;
   mode?: 'edit' | 'read';
+  onShare?: () => Promise<void>;
 }
 
 interface DailyPromptDisplayProps {
@@ -42,6 +43,22 @@ function DailyPromptDisplay({ onDismiss }: DailyPromptDisplayProps) {
     );
 }
 
+function GuidanceContextDisplay({ entry }: { entry: JournalEntry }) {
+    if (!entry.guidance_title || !entry.guidance_prompt) {
+        return null;
+    }
+
+    return (
+        <div className="relative mb-4 p-4 border border-[#d4af37] bg-[#FFFCF2]/50 backdrop-blur-md">
+            <div className="text-xs font-semibold tracking-widest text-[#d4af37] mb-2">GUIDANCE REFLECTION</div>
+            <div className="mb-3">
+                <div className="text-sm font-mono text-[#d4af37] mb-1">{entry.guidance_title}</div>
+            </div>
+            <p className="text-black font-serif text-lg tracking-[-0.02em]">{entry.guidance_prompt}</p>
+        </div>
+    );
+}
+
 // Utility to decode HTML entities (minimal for apostrophe, can expand as needed)
 function decodeHtmlEntities(str: string) {
   if (!str) return str;
@@ -53,7 +70,7 @@ function decodeHtmlEntities(str: string) {
     .replace(/&gt;/g, '>');
 }
 
-export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit, mode = 'edit' }: JournalEntryEditorProps) {
+export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit, onShare, mode = 'edit' }: JournalEntryEditorProps) {
   const [content, setContent] = useState(entry.content || '');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -104,9 +121,24 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
     setIsSharing(true);
     setError(null);
     try {
-      await composeAndShareEntry(entry, sdk, isInFrame, entry.user_fid);
-      // Optional: Show success feedback
-      console.log('Entry shared successfully');
+      if (onShare) {
+        // Use custom share handler if provided
+        await onShare();
+      } else {
+        // For guidance entries, ensure they're saved first
+        if (entry.guidance_title && entry.preservation_status === 'local') {
+          console.log('Saving guidance entry before sharing...');
+          // Save the entry first
+          await onSave({ id: entry.id, content });
+          // Wait a moment for the save to complete
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        // Use default share logic
+        await composeAndShareEntry(entry, sdk, isInFrame, entry.user_fid);
+        // Optional: Show success feedback
+        console.log('Entry shared successfully');
+      }
     } catch (e: any) {
       setError(e.message || "Failed to share entry");
     } finally {
@@ -172,7 +204,8 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
                   </button>
               </div>
 
-              {showDailyPrompt && !isReadMode && <DailyPromptDisplay onDismiss={() => setShowDailyPrompt(false)} />}
+              {showDailyPrompt && !isReadMode && !entry.guidance_title && <DailyPromptDisplay onDismiss={() => setShowDailyPrompt(false)} />}
+              <GuidanceContextDisplay entry={entry} />
 
               {isReadMode ? (
                 <div className="flex-grow w-full bg-transparent text-black p-2 text-2xl font-serif tracking-[-0.02em] whitespace-pre-wrap">
@@ -182,7 +215,7 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  placeholder="What has your sol revealed to you today?"
+                  placeholder={entry.guidance_title ? "Share your reflection on this guidance..." : "What has your sol revealed to you today?"}
                   className="flex-grow w-full bg-transparent text-black placeholder-gray-500/80 p-2 text-2xl font-serif focus:outline-none resize-none tracking-[-0.02em] placeholder:text-2xl placeholder:italic"
                 />
               )}
@@ -307,27 +340,49 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
                         </div>
                       )}
                       <div className="flex gap-2">
-                        <button onClick={handleSave} className="flex-1 border border-black bg-white text-black font-mono py-3 rounded-none hover:bg-gray-100 transition-colors text-sm" disabled={isSaving}>
-                        {isSaving ? (
-                          <div className="flex items-center justify-center">
-                            <PulsingStarSpinner />
-                            SAVING...
-                          </div>
-                        ) : "SAVE REFLECTION"}
-                        </button>
-                        {entry.preservation_status === 'synced' && (
-                          <button
-                            onClick={handleShare}
-                            className="flex-1 border border-black bg-[#d4af37] text-black font-mono py-3 rounded-none hover:bg-[#e6c75a] transition-colors text-sm"
-                            disabled={isSharing}
+                        {entry.guidance_title ? (
+                          // For guidance entries: Show SAVE + SHARE button
+                          <button 
+                            onClick={async () => {
+                              await handleSave();
+                              await handleShare();
+                            }} 
+                            className="flex-1 border border-black bg-[#d4af37] text-black font-mono py-3 rounded-none hover:bg-[#e6c75a] transition-colors text-sm" 
+                            disabled={isSaving || isSharing}
                           >
-                            {isSharing ? (
+                            {isSaving || isSharing ? (
                               <div className="flex items-center justify-center">
                                 <PulsingStarSpinner />
-                                SHARING...
+                                {isSaving ? "SAVING..." : "SHARING..."}
                               </div>
-                            ) : "SHARE ENTRY"}
+                            ) : "SAVE + SHARE"}
                           </button>
+                        ) : (
+                          // For regular entries: Show separate SAVE and SHARE buttons
+                          <>
+                            <button onClick={handleSave} className="flex-1 border border-black bg-white text-black font-mono py-3 rounded-none hover:bg-gray-100 transition-colors text-sm" disabled={isSaving}>
+                              {isSaving ? (
+                                <div className="flex items-center justify-center">
+                                  <PulsingStarSpinner />
+                                  SAVING...
+                                </div>
+                              ) : "SAVE REFLECTION"}
+                            </button>
+                            {entry.preservation_status === 'synced' && (
+                              <button
+                                onClick={handleShare}
+                                className="flex-1 border border-black bg-[#d4af37] text-black font-mono py-3 rounded-none hover:bg-[#e6c75a] transition-colors text-sm"
+                                disabled={isSharing}
+                              >
+                                {isSharing ? (
+                                  <div className="flex items-center justify-center">
+                                    <PulsingStarSpinner />
+                                    SHARING...
+                                  </div>
+                                ) : "SHARE ENTRY"}
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>

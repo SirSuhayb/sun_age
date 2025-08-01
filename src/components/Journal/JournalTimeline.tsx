@@ -33,6 +33,22 @@ export const PreservationStatus = ({ status }: { status: 'local' | 'synced' | 'p
   );
 };
 
+export const GuidanceBadge = ({ title, entry }: { title?: string; entry: JournalEntry }) => {
+  // Simple check: if there's any guidance metadata, show the badge
+  const isGuidance = title || entry.guidance_id || entry.guidance_title || entry.guidance_prompt;
+  
+  if (!isGuidance) {
+    return null;
+  }
+  
+  return (
+    <div className="flex items-center text-xs font-mono tracking-widest text-[#d4af37]">
+      <span className="w-2 h-2 rounded-full mr-2 bg-[#d4af37]"></span>
+      GUIDANCE
+    </div>
+  );
+};
+
 // Skeleton loading component
 const EntrySkeleton = () => (
   <div className="border border-gray-300 p-6 bg-white/90 animate-pulse">
@@ -93,7 +109,9 @@ export function JournalTimeline({ entries, loading = false, onStartWriting, onEd
 
   return (
     <div className="space-y-4">
-      {entries.map((entry) => (
+      {entries.map((entry) => {
+        console.log('Rendering entry:', entry.id, 'guidance_title:', entry.guidance_title, 'guidance_id:', entry.guidance_id, 'guidance_prompt:', entry.guidance_prompt, 'full entry:', entry);
+        return (
         <div
           key={entry.id}
           className="border border-gray-300 p-6 bg-white/90 cursor-pointer group"
@@ -105,7 +123,10 @@ export function JournalTimeline({ entries, loading = false, onStartWriting, onEd
         >
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-mono text-xs">SOL {entry.sol_day}</h4>
-            <PreservationStatus status={entry.preservation_status} />
+            <div className="flex items-center gap-2">
+              <PreservationStatus status={entry.preservation_status} />
+              <GuidanceBadge title={entry.guidance_title} entry={entry} />
+            </div>
           </div>
           <p className="text-gray-800 font-serif text-xl mb-6 leading-snug line-clamp-3">
             {entry.content}
@@ -130,7 +151,8 @@ export function JournalTimeline({ entries, loading = false, onStartWriting, onEd
             <span className="text-gray-500">{entry.word_count} words</span>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

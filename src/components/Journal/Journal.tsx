@@ -51,9 +51,10 @@ export function Journal({ solAge }: JournalProps) {
   const [migrationError, setMigrationError] = useState<string | null>(null);
   const [isSharing, setIsSharing] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
-  const [devFarcaster, setDevFarcaster] = useState(false);
+  const [devFarcaster, setDevFarcaster] = useState(true); // Enable for testing
   const [showFilters, setShowFilters] = useState(false);
   const [preservationFilter, setPreservationFilter] = useState<'all' | 'local' | 'synced' | 'preserved'>('all');
+  const [guidanceFilter, setGuidanceFilter] = useState(false);
   const { sdk, isInFrame, context, connectManually, refreshContext, loading: frameLoading } = useFrameSDK();
   const [previewEntry, setPreviewEntry] = useState<JournalEntry | null>(null);
   
@@ -77,11 +78,12 @@ export function Journal({ solAge }: JournalProps) {
   // Compute local entries from the returned entries
   const localEntries = entries.filter(entry => entry.preservation_status === 'local');
 
-  // Filter entries based on search query and preservation status
+  // Filter entries based on search query, preservation status, and guidance filter
   const filteredEntries = entries.filter(entry => {
     const matchesSearch = entry.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = preservationFilter === 'all' || entry.preservation_status === preservationFilter;
-    return matchesSearch && matchesFilter;
+    const matchesGuidance = !guidanceFilter || (entry.guidance_id && entry.guidance_title);
+    return matchesSearch && matchesFilter && matchesGuidance;
   });
 
   // Group entries by month and year
@@ -338,6 +340,10 @@ export function Journal({ solAge }: JournalProps) {
 
   const handleFilterChange = (filter: 'all' | 'local' | 'synced' | 'preserved') => {
     setPreservationFilter(filter);
+  };
+
+  const handleGuidanceFilterChange = (showGuidanceOnly: boolean) => {
+    setGuidanceFilter(showGuidanceOnly);
   };
 
   // Handler for "Add a reflection" CTA
@@ -643,6 +649,16 @@ export function Journal({ solAge }: JournalProps) {
             >
               PRESERVED
             </button>
+            <button
+              onClick={() => handleGuidanceFilterChange(!guidanceFilter)}
+              className={`px-3 py-1 text-xs font-mono tracking-widest border transition-colors ${
+                guidanceFilter
+                  ? 'bg-[#d4af37] text-black border-[#d4af37]'
+                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              GUIDANCE
+            </button>
           </div>
         </div>
       )}
@@ -735,8 +751,13 @@ export function Journal({ solAge }: JournalProps) {
                   <div key={entry.id}>
                     {/* Render the journal card as before (reuse the card rendering logic) */}
                     <div
-                      className="border border-gray-300 p-6 bg-white/90"
+                      className="border border-gray-300 p-6 bg-white/90 cursor-pointer group"
                       style={{ marginBottom: 0 }}
+                      onClick={(e) => {
+                        // Prevent click if a button was clicked
+                        if ((e.target as HTMLElement).tagName === 'BUTTON') return;
+                        handleRead(entry);
+                      }}
                     >
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-mono text-xs">SOL {entry.sol_day}</span>
@@ -777,12 +798,7 @@ export function Journal({ solAge }: JournalProps) {
                               className="text-[#BFA12A] hover:text-[#8c7a2a] underline underline-offset-2"
                             >SHARE</button>
                           )}
-                          {entry.preservation_status === 'preserved' && (
-                            <button
-                              onClick={() => handleRead(entry)}
-                              className="text-gray-500 hover:text-black underline underline-offset-2"
-                            >READ</button>
-                          )}
+
                         </div>
                         <span className="text-gray-400">{entry.word_count} words</span>
                       </div>

@@ -329,7 +329,7 @@ export class SolarEarningsManager {
   }
 
   // NEW: Award SOLAR for guidance completion based on rarity
-  awardGuidanceCompletion(rarity: string, rollTitle: string): RollEarnings {
+  awardGuidanceCompletion(rarity: string, rollTitle: string, activityId?: string): RollEarnings {
     const earnings = this.getEarnings();
     const today = new Date().toDateString();
 
@@ -359,7 +359,7 @@ export class SolarEarningsManager {
     updatedEarnings.earningsHistory.push({
       date: today,
       amount: totalEarned,
-      reason: `Guidance completion: "${rollTitle}" (${rarity})`,
+      reason: `Guidance completion: "${rollTitle}" (${rarity}) [${activityId || 'unknown'}]`,
       streak: earnings.dailyStreak,
       bonusType: 'guidance'
     });

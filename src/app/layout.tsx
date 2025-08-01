@@ -11,6 +11,8 @@ import { Info } from "lucide-react";
 // import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "~/components/ui/tooltip";
 import HeaderClient from "../components/SunCycleAge/HeaderClient";
 import { SocialTagToastProvider } from "../components/SocialTagToastProvider";
+import { NotificationChecker } from "~/components/NotificationChecker";
+import { FarcasterNotificationHandler } from "~/components/FarcasterNotificationHandler";
 // import { Inter } from "next/font/google";
 // import { PostHogIdentify } from "~/components/posthog-identify";
 
@@ -101,6 +103,10 @@ export default function RootLayout({
             {/* Skip to content link */}
             <a href="#main-content" className="skip-link absolute left-2 top-2 z-50 bg-white text-gray-800 px-4 py-2 rounded focus:block focus:outline-none focus:ring-2 focus:ring-blue-400 sr-only focus:not-sr-only">Skip to content</a>
             <ThemeProviderClient>
+              {/* Notification checker for guidance reminders */}
+              <NotificationChecker />
+              {/* Farcaster notification handler */}
+              <FarcasterNotificationHandler />
               {/* Light mode: solid background. Dark mode: gradient. */}
               <div className="pointer-events-none fixed inset-0 z-0" style={{ background: '#ffffff' }} />
               {/* Light mode: noise texture overlay */}
