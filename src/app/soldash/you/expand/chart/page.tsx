@@ -24,7 +24,7 @@ const itemVariants = {
 const generateKeyInsights = (chartData: any) => {
   if (!chartData) return [];
   
-  const insights = [];
+  const insights: string[] = [];
   
   // Sun sign insight
   if (chartData.sun) {
