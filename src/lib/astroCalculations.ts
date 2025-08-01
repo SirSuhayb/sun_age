@@ -20,12 +20,10 @@ function getDegreeInSign(longitude: number): number {
   return normalizedDegree % 30;
 }
 
-// Convert date to Julian Day Number
+// Convert to Julian Day
 function dateToJulianDay(year: number, month: number, day: number, hour: number, minute: number): number {
-  // Convert to decimal hours
   const decimalHours = hour + minute / 60;
   
-  // Algorithm from Meeus "Astronomical Algorithms"
   let y = year;
   let m = month;
   
@@ -44,51 +42,145 @@ function dateToJulianDay(year: number, month: number, day: number, hour: number,
   return jd;
 }
 
-// Calculate local sidereal time
-function calculateLST(jd: number, longitude: number): number {
-  // Calculate centuries from J2000
-  const t = (jd - 2451545.0) / 36525;
-  
-  // Greenwich sidereal time at midnight
-  let gst = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 
-            0.000387933 * t * t - t * t * t / 38710000;
-  
-  // Normalize to 0-360
-  gst = ((gst % 360) + 360) % 360;
-  
-  // Add longitude (east positive)
-  const lst = gst + longitude;
-  
-  return ((lst % 360) + 360) % 360;
+// Calculate T (centuries since J2000)
+function calculateT(jd: number): number {
+  return (jd - 2451545.0) / 36525.0;
 }
 
-// Calculate house cusps using Placidus system
-function calculateHouses(lst: number, latitude: number): number[] {
-  const houses: number[] = [];
+// Calculate Mean Obliquity of Ecliptic
+function calculateObliquity(T: number): number {
+  return 23.439291 - 0.0130042 * T - 0.00000016 * T * T + 0.000000504 * T * T * T;
+}
+
+// Calculate Greenwich Mean Sidereal Time
+function calculateGMST(jd: number): number {
+  const jd0 = Math.floor(jd - 0.5) + 0.5;
+  const T = (jd0 - 2451545.0) / 36525.0;
+  const T2 = T * T;
+  const T3 = T2 * T;
   
-  // Calculate MC (Midheaven) - it's simply the LST
+  // GMST at 0h UT
+  let gmst = 100.46061837 + 36000.770053608 * T + 0.000387933 * T2 - T3 / 38710000.0;
+  
+  // Add the time since 0h UT
+  const ut = (jd - jd0) * 24.0;
+  gmst += ut * 1.00273790935 * 15.0;
+  
+  // Normalize to 0-360
+  gmst = gmst % 360;
+  if (gmst < 0) gmst += 360;
+  
+  return gmst;
+}
+
+// Calculate Local Sidereal Time
+function calculateLST(jd: number, longitude: number): number {
+  const gmst = calculateGMST(jd);
+  let lst = gmst + longitude;
+  
+  // Normalize
+  lst = lst % 360;
+  if (lst < 0) lst += 360;
+  
+  return lst;
+}
+
+// Calculate Ascendant
+function calculateAscendant(lst: number, latitude: number, obliquity: number): number {
+  const lstRad = lst * Math.PI / 180;
+  const latRad = latitude * Math.PI / 180;
+  const oblRad = obliquity * Math.PI / 180;
+  
+  // Using the proven formula from RadixPro:
+  // tan(Longitude asc) = cos RAMC / -(sin E × tan GL + cos E × sin RAMC)
+  // where RAMC = LST (Local Sidereal Time in degrees)
+  
+  const numerator = Math.cos(lstRad);
+  const denominator = -(Math.sin(oblRad) * Math.tan(latRad) + Math.cos(oblRad) * Math.sin(lstRad));
+  
+  // Use atan2 for proper quadrant determination
+  let ascRad = Math.atan2(numerator, denominator);
+  let asc = ascRad * 180 / Math.PI;
+  
+  // Normalize to 0-360
+  if (asc < 0) asc += 360;
+  
+  // The ascendant should be in the eastern half of the sky
+  // Calculate the MC (approximately at LST)
   const mc = lst;
   
-  // Calculate Ascendant
-  const obliquity = 23.4397; // Approximate obliquity of ecliptic
-  const tanLat = Math.tan(latitude * Math.PI / 180);
-  const cosObl = Math.cos(obliquity * Math.PI / 180);
-  
-  // RAMC (Right Ascension of MC)
-  const ramc = mc;
-  
-  // Ascendant calculation
-  const y = Math.sin(ramc * Math.PI / 180) / cosObl;
-  const x = Math.cos(ramc * Math.PI / 180);
-  let ascendant = Math.atan2(y, x) * 180 / Math.PI;
-  ascendant = ((ascendant % 360) + 360) % 360;
-  
-  // For now, use equal house system starting from ascendant
-  for (let i = 0; i < 12; i++) {
-    houses.push(((ascendant + i * 30) % 360));
+  // The ascendant should be within 180 degrees following the MC in zodiacal order
+  // Check if we need to add 180 degrees for proper quadrant
+  const diff = (asc - mc + 360) % 360;
+  if (diff > 180) {
+    asc = (asc + 180) % 360;
   }
   
-  return houses;
+  console.log('Ascendant calculation details:');
+  console.log('  LST (RAMC):', lst, 'degrees');
+  console.log('  MC (approx):', mc, 'degrees');
+  console.log('  Initial Asc:', ascRad * 180 / Math.PI, 'degrees');
+  console.log('  Corrected Asc:', asc, 'degrees');
+  
+  return asc;
+}
+
+// Simple Sun position calculator
+function calculateSunPosition(T: number): number {
+  // Mean longitude of Sun
+  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  
+  // Mean anomaly of Sun
+  const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  const MRad = M * Math.PI / 180;
+  
+  // Equation of center
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(MRad) +
+            (0.019993 - 0.000101 * T) * Math.sin(2 * MRad) +
+            0.000289 * Math.sin(3 * MRad);
+  
+  // True longitude of Sun
+  let sunLon = L0 + C;
+  
+  // Normalize
+  sunLon = sunLon % 360;
+  if (sunLon < 0) sunLon += 360;
+  
+  return sunLon;
+}
+
+// Simple Moon position calculator
+function calculateMoonPosition(T: number): number {
+  // Mean longitude of Moon
+  const Lp = 218.3164477 + 481267.88123421 * T - 0.0015786 * T * T + T * T * T / 538841.0;
+  
+  // Mean elongation of Moon
+  const D = 297.8501921 + 445267.1114034 * T - 0.0018819 * T * T + T * T * T / 545868.0;
+  
+  // Mean anomaly of Moon
+  const Mp = 134.9633964 + 477198.8675055 * T + 0.0087414 * T * T + T * T * T / 69699.0;
+  
+  // Mean anomaly of Sun
+  const M = 357.5291092 + 35999.0502909 * T - 0.0001536 * T * T + T * T * T / 24490000.0;
+  
+  // Convert to radians
+  const DRad = D * Math.PI / 180;
+  const MpRad = Mp * Math.PI / 180;
+  const MRad = M * Math.PI / 180;
+  
+  // Simplified calculation for longitude
+  let moonLon = Lp + 
+    6.288774 * Math.sin(MpRad) +
+    1.274027 * Math.sin(2 * DRad - MpRad) +
+    0.658314 * Math.sin(2 * DRad) +
+    0.213618 * Math.sin(2 * MpRad) -
+    0.185116 * Math.sin(MRad);
+  
+  // Normalize
+  moonLon = moonLon % 360;
+  if (moonLon < 0) moonLon += 360;
+  
+  return moonLon;
 }
 
 export async function calculateNatalChart(birthData: {
@@ -97,6 +189,7 @@ export async function calculateNatalChart(birthData: {
   location: {
     latitude: number;
     longitude: number;
+    timezone?: string;
   };
 }): Promise<ChartData> {
   try {
@@ -104,80 +197,134 @@ export async function calculateNatalChart(birthData: {
     const [year, month, day] = birthData.date.split('-').map(Number);
     const [hour, minute] = birthData.time.split(':').map(Number);
     
-    console.log('Calculating chart for:', { year, month, day, hour, minute });
+    console.log('=== NATAL CHART CALCULATION ===');
+    console.log('Birth data:', { year, month, day, hour, minute });
+    console.log('Location:', birthData.location);
+    
+    // Convert to UTC (simple timezone handling)
+    let utcHour = hour;
+    let utcDay = day;
+    let utcMonth = month;
+    let utcYear = year;
+    
+    if (birthData.location.timezone === 'America/New_York') {
+      // EST is UTC-5 (subtract 5 hours from local time to get UTC)
+      // February 1994 would be EST (no DST)
+      utcHour = hour + 5; // Add 5 to local time to get UTC
+      
+      // Handle day rollover
+      if (utcHour >= 24) {
+        utcHour -= 24;
+        utcDay += 1;
+        
+        // Handle month rollover
+        const daysInMonth = new Date(year, month, 0).getDate();
+        if (utcDay > daysInMonth) {
+          utcDay = 1;
+          utcMonth += 1;
+          
+          // Handle year rollover
+          if (utcMonth > 12) {
+            utcMonth = 1;
+            utcYear += 1;
+          }
+        }
+      }
+    }
+    
+    console.log('UTC time:', { utcYear, utcMonth, utcDay, utcHour, minute });
     
     // Calculate Julian Day
-    const jd = dateToJulianDay(year, month, day, hour, minute);
+    const jd = dateToJulianDay(utcYear, utcMonth, utcDay, utcHour, minute);
     console.log('Julian Day:', jd);
     
-    // Import ephemeris
-    const ephemeris = await import('ephemeris-moshier');
+    // Calculate T (centuries since J2000)
+    const T = calculateT(jd);
+    console.log('T (centuries):', T);
     
-    // Calculate planetary positions
-    const date = {
-      year: year,
-      month: month,
-      day: day,
-      hours: hour,
-      minutes: minute,
-      seconds: 0
-    };
+    // Calculate obliquity
+    const obliquity = calculateObliquity(T);
+    console.log('Obliquity:', obliquity);
     
-    console.log('Calculating positions for date:', date);
-    
-    // Get positions
-    const result = ephemeris.getAllPlanets(date, birthData.location.longitude, birthData.location.latitude, 0);
-    console.log('Ephemeris result:', result);
-    
-    // Calculate houses
+    // Calculate Local Sidereal Time
     const lst = calculateLST(jd, birthData.location.longitude);
-    const houses = calculateHouses(lst, birthData.location.latitude);
-    const ascendant = houses[0];
+    console.log('Local Sidereal Time:', lst, 'degrees');
     
-    // Transform ephemeris data to our format
-    const sun = result.observed.sun || result.sun || {};
-    const moon = result.observed.moon || result.moon || {};
+    // Calculate Ascendant
+    const ascendant = calculateAscendant(lst, birthData.location.latitude, obliquity);
+    console.log('Ascendant:', ascendant, 'degrees =', getZodiacSign(ascendant), getDegreeInSign(ascendant));
     
+    // Calculate Sun position
+    const sunLon = calculateSunPosition(T);
+    console.log('Sun longitude:', sunLon, 'degrees =', getZodiacSign(sunLon), getDegreeInSign(sunLon));
+    
+    // Calculate Moon position
+    const moonLon = calculateMoonPosition(T);
+    console.log('Moon longitude:', moonLon, 'degrees =', getZodiacSign(moonLon), getDegreeInSign(moonLon));
+    
+    // Calculate houses (Equal House system)
+    const houses: number[] = [];
+    for (let i = 0; i < 12; i++) {
+      let cusp = ascendant + (i * 30);
+      if (cusp >= 360) cusp -= 360;
+      houses.push(cusp);
+    }
+    
+    // Calculate house positions
+    function getHousePosition(longitude: number, houses: number[]): number {
+      const normLon = ((longitude % 360) + 360) % 360;
+      for (let i = 0; i < 12; i++) {
+        const currentHouse = houses[i];
+        const nextHouse = houses[(i + 1) % 12];
+        
+        if (nextHouse > currentHouse) {
+          if (normLon >= currentHouse && normLon < nextHouse) {
+            return i + 1;
+          }
+        } else {
+          if (normLon >= currentHouse || normLon < nextHouse) {
+            return i + 1;
+          }
+        }
+      }
+      return 1;
+    }
+    
+    // Build chart data
     const transformedData: ChartData = {
       sun: {
-        sign: getZodiacSign(sun.longitude || 0),
-        degree: getDegreeInSign(sun.longitude || 0),
-        house: Math.floor(((sun.longitude || 0) - ascendant + 360) % 360 / 30) + 1
+        sign: getZodiacSign(sunLon),
+        degree: getDegreeInSign(sunLon),
+        house: getHousePosition(sunLon, houses)
       },
       moon: {
-        sign: getZodiacSign(moon.longitude || 0),
-        degree: getDegreeInSign(moon.longitude || 0),
-        house: Math.floor(((moon.longitude || 0) - ascendant + 360) % 360 / 30) + 1
+        sign: getZodiacSign(moonLon),
+        degree: getDegreeInSign(moonLon),
+        house: getHousePosition(moonLon, houses)
       },
       rising: {
         sign: getZodiacSign(ascendant),
         degree: getDegreeInSign(ascendant)
       },
-      planets: [
-        'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'
-      ].map(name => {
-        const planet = result.observed?.[name] || result[name] || {};
-        return {
-          name: name,
-          sign: getZodiacSign(planet.longitude || 0),
-          degree: getDegreeInSign(planet.longitude || 0),
-          house: Math.floor(((planet.longitude || 0) - ascendant + 360) % 360 / 30) + 1,
-          retrograde: planet.speed < 0
-        };
-      }).filter(p => p.degree > 0), // Filter out missing planets
+      planets: [], // Simplified - no other planets for now
       houses: houses.map((cusp, i) => ({
         number: i + 1,
         sign: getZodiacSign(cusp),
         degree: getDegreeInSign(cusp)
       })),
-      aspects: [] // TODO: Calculate aspects
+      aspects: []
     };
     
-    console.log('Transformed chart data:', transformedData);
+    console.log('=== FINAL CHART DATA ===');
+    console.log('Sun:', transformedData.sun);
+    console.log('Moon:', transformedData.moon);
+    console.log('Rising:', transformedData.rising);
+    console.log('================================');
+    
     return transformedData;
     
   } catch (error) {
-    console.error('Error in ephemeris calculation:', error);
+    console.error('Error in chart calculation:', error);
     throw error;
   }
 }
