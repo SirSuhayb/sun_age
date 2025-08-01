@@ -587,7 +587,12 @@ export default function SurpriseMePage() {
             </div>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => connect({ connector: connectors[0] })}
+                onClick={() => {
+                  // For web users, prefer injected wallet (MetaMask, etc.) over Farcaster frame
+                  const webConnector = connectors.find(c => c.id === 'injected' || c.name.toLowerCase().includes('injected')) || connectors[0];
+                  console.log('Connecting with connector:', webConnector.name, webConnector.id);
+                  connect({ connector: webConnector });
+                }}
                 className="px-4 py-2 bg-blue-600 text-white font-mono text-xs hover:bg-blue-700 transition-colors"
               >
                 CONNECT
