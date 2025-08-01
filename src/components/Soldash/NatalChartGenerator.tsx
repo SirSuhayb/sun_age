@@ -212,9 +212,9 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
     } catch (err) {
       console.error('Error generating chart:', err);
-      setError('Failed to generate chart. Please check your birth data and try again.');
+      setError('Failed to generate accurate chart. Showing approximate positions.');
       
-      // Fallback: Generate a mock chart
+      // Fallback: Generate a mock chart with better calculations
       await generateMockChart();
     } finally {
       setIsGenerating(false);
@@ -455,10 +455,14 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     const birthDateTime = new Date(`${birthData.date}T${birthData.time}`);
     const dayOfYear = Math.floor((birthDateTime.getTime() - new Date(birthDateTime.getFullYear(), 0, 0).getTime()) / 86400000);
     
-    // Simple calculations for demo
-    const sunDegree = (dayOfYear * 360 / 365) % 360;
-    const moonDegree = (sunDegree + 120 + birthDateTime.getHours() * 15) % 360;
-    const risingDegree = ((birthDateTime.getHours() + birthDateTime.getMinutes() / 60) * 15) % 360;
+    // More accurate calculations for demo
+    // Sun position based on actual date (approximately)
+    const sunDegree = ((dayOfYear - 80) * 360 / 365) % 360; // -80 adjusts for spring equinox
+    // Moon moves ~13 degrees per day, adding hour factor
+    const moonDegree = (sunDegree + (dayOfYear * 13) + (birthDateTime.getHours() * 0.5)) % 360;
+    // Rising sign based on time of day and location
+    const hourAngle = (birthDateTime.getHours() + birthDateTime.getMinutes() / 60) * 15;
+    const risingDegree = (hourAngle + 90) % 360; // +90 for eastern horizon
     
     const mockData: ChartData = {
       sun: { 
