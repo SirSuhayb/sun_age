@@ -310,11 +310,11 @@ export default function ExpandPaymentPage() {
             </motion.div>
           ) : (
             <DaimoPayButton.Custom
-              appId="solara" // App ID is required but doesn't need to be registered
+              appId="pay-demo" // Using the same appId as rolls page
               toAddress={process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}` || '0x11BA1632fd6Cc120D309158298e3a0df3B7ba283'}
               toChain={8453} // Base mainnet
               toToken="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" // USDC on Base
-              toUnits={plans[selectedPlan].price.toString()}
+              toUnits={(plans[selectedPlan].price * 100).toString()} // Convert to cents
               intent={`Sol Codex ${selectedPlan} subscription`}
               externalId={`sol-codex-${selectedPlan}`}
               onPaymentCompleted={(e) => {
