@@ -1,4 +1,6 @@
 import { Horoscope, Origin } from 'circular-natal-horoscope-js';
+import { getLifePhase } from './solarIdentity';
+import { getWorldEventForDate } from './worldEvent';
 
 // List of major aspects
 const MAJOR_ASPECTS = ['conjunction', 'opposition', 'trine', 'square', 'sextile'];
@@ -10,7 +12,73 @@ const KNOWN_EVENTS: { [key: string]: string[] } = {
     'Moon in Cancer',
     'Mars in Cancer'
   ],
+  // Jupiter-Pluto conjunctions - major transformational events
+  '2020-04-04': ['Jupiter Conjunction Pluto'],
+  '2020-06-30': ['Jupiter Conjunction Pluto'],
+  '2020-11-12': ['Jupiter Conjunction Pluto'],
+  // Saturn-Pluto conjunction - generational shift
+  '2020-01-12': ['Saturn Conjunction Pluto'],
+  // Great conjunction events
+  '2020-12-21': ['Jupiter Conjunction Saturn'],
+  // Other significant cosmic events
+  '2019-01-21': ['Total Lunar Eclipse'],
+  '2017-08-21': ['Total Solar Eclipse'],
+  '2024-04-08': ['Total Solar Eclipse'],
   // Add more known events as needed
+};
+
+// Enhanced cosmic event pattern recognition
+const COSMIC_PATTERNS = {
+  BREAKTHROUGH_INDICATORS: [
+    'Jupiter Conjunction Pluto',
+    'Jupiter Conjunction Uranus', 
+    'Uranus Conjunction Sun',
+    'Jupiter Trine Sun',
+    'Uranus Trine Mercury'
+  ],
+  SERENDIPITY_INDICATORS: [
+    'Venus Conjunction Jupiter',
+    'Moon Conjunction Venus',
+    'Jupiter Sextile Sun',
+    'Venus Trine Jupiter'
+  ],
+  TRANSFORMATION_INDICATORS: [
+    'Pluto Conjunction Sun',
+    'Saturn Conjunction Pluto',
+    'Pluto Square Sun',
+    'Pluto Opposition Sun'
+  ],
+  AWAKENING_INDICATORS: [
+    'Uranus Conjunction Sun',
+    'Uranus Conjunction Moon',
+    'Jupiter Conjunction Sun',
+    'Sun Conjunction Uranus'
+  ]
+};
+
+// Contextual event interpretations based on life phase and cosmic moment
+const CONTEXTUAL_INTERPRETATIONS = {
+  'Jupiter Conjunction Pluto': {
+    'Explorer Phase': 'A profound transformation in your worldview and personal power, marking a key turning point in your journey of self-discovery.',
+    'Emergence Phase': 'A moment of expansive transformation that reshaped your understanding of your place in the world and your potential impact.',
+    'Builder Phase': 'Deep structural changes in your life foundations, with opportunities to rebuild on a more authentic and powerful scale.',
+    'Mastery Phase': 'A pivotal moment where your accumulated wisdom met transformative power, enabling profound shifts in your life\'s direction.',
+    'Wisdom Phase': 'A culmination of life experience meeting cosmic transformation, offering opportunities to guide others through similar changes.'
+  },
+  'Saturn Conjunction Pluto': {
+    'Explorer Phase': 'Early lessons in the balance between structure and transformation, teaching you about lasting change.',
+    'Emergence Phase': 'A formative experience in understanding how to build something enduring while navigating deep change.',
+    'Builder Phase': 'A crucial test of your foundations, requiring you to rebuild structures that could withstand transformation.',
+    'Mastery Phase': 'The meeting of your mastered discipline with transformative forces, creating lasting legacy potential.',
+    'Wisdom Phase': 'A moment where your life\'s work met the forces of generational change, offering wisdom for navigating transitions.'
+  },
+  'Jupiter Conjunction Saturn': {
+    'Explorer Phase': 'A rare alignment that opened new pathways while teaching the value of patience and planning.',
+    'Emergence Phase': 'The perfect balance of expansion and discipline, offering structured growth opportunities.',
+    'Builder Phase': 'An ideal time for ambitious projects that combine vision with practical implementation.',
+    'Mastery Phase': 'The culmination of experience meeting new opportunities for significant achievement.',
+    'Wisdom Phase': 'A time to manifest your greatest visions through the wisdom of accumulated experience.'
+  }
 };
 
 // Cosmic event interpretations for each sol archetype (past tense for previous sol cycles)
@@ -419,4 +487,393 @@ export function interpretCosmicEventsForArchetype(events: string[], archetype: s
 
   // Default interpretation
   return `A cosmic moment that aligns with your ${archetype.toLowerCase()} essence, offering insights and opportunities for growth.`;
+} 
+
+// Enhanced pattern recognition for user experiences
+export function analyzeCosmicPatterns(events: string[], userPhase: string, date: Date): {
+  pattern: string | null;
+  interpretation: string;
+  phenomenaLikelihood: number;
+} {
+  const breakthrough = COSMIC_PATTERNS.BREAKTHROUGH_INDICATORS.some(indicator => 
+    events.some(event => event.includes(indicator.replace(' ', ' '))));
+  
+  const serendipity = COSMIC_PATTERNS.SERENDIPITY_INDICATORS.some(indicator => 
+    events.some(event => event.includes(indicator.replace(' ', ' '))));
+    
+  const transformation = COSMIC_PATTERNS.TRANSFORMATION_INDICATORS.some(indicator => 
+    events.some(event => event.includes(indicator.replace(' ', ' '))));
+    
+  const awakening = COSMIC_PATTERNS.AWAKENING_INDICATORS.some(indicator => 
+    events.some(event => event.includes(indicator.replace(' ', ' '))));
+
+  let pattern: string | null = null;
+  let interpretation = 'A quiet cosmic moment that offered space for reflection and inner growth.';
+  let phenomenaLikelihood = 0.2; // Base likelihood of meaningful phenomena
+
+  if (breakthrough) {
+    pattern = 'BREAKTHROUGH';
+    interpretation = `A cosmic alignment that created optimal conditions for breakthrough insights and innovative solutions. Your mind was primed for "aha!" moments and creative leaps.`;
+    phenomenaLikelihood = 0.8;
+  } else if (serendipity) {
+    pattern = 'SERENDIPITY';
+    interpretation = `A harmonious cosmic dance that increased the likelihood of meaningful coincidences, unexpected opportunities, and fortuitous encounters.`;
+    phenomenaLikelihood = 0.7;
+  } else if (transformation) {
+    pattern = 'TRANSFORMATION';
+    interpretation = `Deep cosmic currents that supported profound personal transformation and the release of what no longer served your highest path.`;
+    phenomenaLikelihood = 0.6;
+  } else if (awakening) {
+    pattern = 'AWAKENING';
+    interpretation = `An electric cosmic moment that heightened your awareness and opened new dimensions of understanding about yourself and your path.`;
+    phenomenaLikelihood = 0.7;
+  }
+
+  return { pattern, interpretation, phenomenaLikelihood };
+}
+
+// Enhanced cosmic event contextualizer
+export function contextualizeCosmicMoment(events: string[], userPhase: string, archetype: string, date: Date): {
+  cosmicMoment: string;
+  personalContext: string;
+  trajectory: string;
+  rawEvents: string[];
+} {
+  if (events.length === 0) {
+    return {
+      cosmicMoment: 'Cosmic Quiet',
+      personalContext: 'A moment of cosmic stillness that invited deep reflection and inner alignment.',
+      trajectory: `This quiet space in your ${userPhase.toLowerCase()} supported integration of recent experiences and preparation for what's to come.`,
+      rawEvents: []
+    };
+  }
+
+  const primaryEvent = events[0];
+  
+  // Check for specific contextual interpretations
+  for (const [eventPattern, phaseInterpretations] of Object.entries(CONTEXTUAL_INTERPRETATIONS)) {
+    if (primaryEvent.includes(eventPattern)) {
+      const contextualInterpretation = phaseInterpretations[userPhase] || phaseInterpretations['Builder Phase'];
+      return {
+        cosmicMoment: eventPattern,
+        personalContext: contextualInterpretation,
+        trajectory: generateTrajectoryInsight(eventPattern, userPhase, archetype),
+        rawEvents: events
+      };
+    }
+  }
+
+  // Fall back to archetype-based interpretation
+  const interpretation = interpretCosmicEventsForArchetype(events, archetype);
+  
+  return {
+    cosmicMoment: primaryEvent,
+    personalContext: `During your ${userPhase.toLowerCase()}, ${interpretation.toLowerCase()}`,
+    trajectory: generateTrajectoryInsight(primaryEvent, userPhase, archetype),
+    rawEvents: events
+  };
+}
+
+function generateTrajectoryInsight(cosmicEvent: string, userPhase: string, archetype: string): string {
+  const trajectoryTemplates = {
+    'Jupiter Conjunction Pluto': `This transformative alignment during your ${userPhase.toLowerCase()} set the stage for profound personal evolution, preparing you for greater alignment with your ${archetype.toLowerCase()} essence.`,
+    'Saturn Conjunction Pluto': `The structural transformation of this cosmic moment helped establish the foundation for your current path as a ${archetype.toLowerCase()}.`,
+    'Jupiter Conjunction Saturn': `This rare alignment during your ${userPhase.toLowerCase()} created a bridge between vision and manifestation that continues to influence your trajectory today.`
+  };
+
+  return trajectoryTemplates[cosmicEvent] || 
+    `This cosmic moment during your ${userPhase.toLowerCase()} was part of the larger pattern that shaped your evolution as a ${archetype.toLowerCase()}.`;
+} 
+
+// Comprehensive cosmic timeline system for premium experience
+export interface CosmicTimelineEvent {
+  date: Date;
+  age: number;
+  lifePhase: string;
+  cosmicEvents: string[];
+  cosmicMoment: string;
+  personalContext: string;
+  worldEvent?: { text: string; url?: string };
+  pattern: string | null;
+  phenomenaLikelihood: number;
+  significance: 'major' | 'moderate' | 'minor';
+  trajectory: string;
+}
+
+export interface CosmicCodexTimeline {
+  birthDate: Date;
+  archetype: string;
+  totalEvents: number;
+  majorTransformations: CosmicTimelineEvent[];
+  breakthroughMoments: CosmicTimelineEvent[];
+  serendipityWindows: CosmicTimelineEvent[];
+  allEvents: CosmicTimelineEvent[];
+  futurePotentials: CosmicTimelineEvent[];
+  lifePatterns: {
+    dominantPattern: string;
+    secondaryPatterns: string[];
+    cycleLength: number;
+    nextMajorEvent?: Date;
+  };
+}
+
+/**
+ * Generates a comprehensive cosmic timeline from birth to present (and future potential)
+ * This is the foundation for the premium cosmic codex experience
+ */
+export async function generateCosmicCodexTimeline(
+  birthDate: Date, 
+  archetype: string,
+  includeWorldEvents: boolean = true
+): Promise<CosmicCodexTimeline> {
+  const timeline: CosmicTimelineEvent[] = [];
+  const currentDate = new Date();
+  
+  // Calculate significant dates throughout the user's life
+  const significantDates = generateSignificantDates(birthDate, currentDate);
+  
+  for (const date of significantDates) {
+    const ageAtEvent = Math.floor((date.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    const lifePhase = getLifePhase(ageAtEvent);
+    
+    // Get cosmic events for this date
+    const cosmicEvents = getCosmicEventsForDate(date, birthDate);
+    
+    if (cosmicEvents.length > 0) {
+      // Contextualize the cosmic moment
+      const cosmicContext = contextualizeCosmicMoment(cosmicEvents, lifePhase.name, archetype, date);
+      
+      // Analyze patterns
+      const patterns = analyzeCosmicPatterns(cosmicEvents, lifePhase.name, date);
+      
+      // Determine significance based on patterns and cosmic events
+      const significance = determinePhenomenaSignificance(cosmicEvents, patterns);
+      
+      // Get world event if requested
+      let worldEvent: { text: string; url?: string } | undefined = undefined;
+      if (includeWorldEvents) {
+        try {
+          worldEvent = await getWorldEventForDate(date);
+        } catch (error) {
+          console.log(`Could not fetch world event for ${date.toISOString()}`);
+        }
+      }
+      
+      const timelineEvent: CosmicTimelineEvent = {
+        date,
+        age: ageAtEvent,
+        lifePhase: lifePhase.name,
+        cosmicEvents,
+        cosmicMoment: cosmicContext.cosmicMoment,
+        personalContext: cosmicContext.personalContext,
+        worldEvent,
+        pattern: patterns.pattern,
+        phenomenaLikelihood: patterns.phenomenaLikelihood,
+        significance,
+        trajectory: cosmicContext.trajectory
+      };
+      
+      timeline.push(timelineEvent);
+    }
+  }
+  
+  // Sort timeline by date
+  timeline.sort((a, b) => a.date.getTime() - b.date.getTime());
+  
+  // Generate future potentials (next 2-3 years)
+  const futurePotentials = generateFuturePotentials(birthDate, archetype, currentDate);
+  
+  // Analyze life patterns
+  const lifePatterns = analyzeLifePatterns(timeline);
+  
+  // Categorize events by type
+  const majorTransformations = timeline.filter(e => 
+    e.pattern === 'TRANSFORMATION' && e.significance === 'major'
+  );
+  
+  const breakthroughMoments = timeline.filter(e => 
+    e.pattern === 'BREAKTHROUGH' && e.phenomenaLikelihood > 0.6
+  );
+  
+  const serendipityWindows = timeline.filter(e => 
+    e.pattern === 'SERENDIPITY' && e.phenomenaLikelihood > 0.5
+  );
+  
+  return {
+    birthDate,
+    archetype,
+    totalEvents: timeline.length,
+    majorTransformations,
+    breakthroughMoments,
+    serendipityWindows,
+    allEvents: timeline,
+    futurePotentials,
+    lifePatterns
+  };
+}
+
+/**
+ * Generates significant dates throughout a person's life for cosmic analysis
+ */
+function generateSignificantDates(birthDate: Date, currentDate: Date): Date[] {
+  const dates: Date[] = [];
+  const birthYear = birthDate.getFullYear();
+  const currentYear = currentDate.getFullYear();
+  
+  // Add birthday each year (solar return)
+  for (let year = birthYear; year <= currentYear; year++) {
+    const solarReturn = new Date(year, birthDate.getMonth(), birthDate.getDate());
+    if (solarReturn <= currentDate) {
+      dates.push(solarReturn);
+    }
+  }
+  
+  // Add major cosmic event dates that occurred during the person's lifetime
+  const cosmicEventDates = Object.keys(KNOWN_EVENTS).map(dateStr => new Date(dateStr));
+  for (const eventDate of cosmicEventDates) {
+    if (eventDate >= birthDate && eventDate <= currentDate) {
+      dates.push(eventDate);
+    }
+  }
+  
+  // Add additional significant dates (every 7 years for major life transitions)
+  for (let age = 7; age <= Math.floor((currentDate.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)); age += 7) {
+    const transitionDate = new Date(birthDate);
+    transitionDate.setFullYear(transitionDate.getFullYear() + age);
+    if (transitionDate <= currentDate) {
+      dates.push(transitionDate);
+    }
+  }
+  
+  // Remove duplicates and sort
+  const uniqueDates = Array.from(new Set(dates.map(d => d.getTime()))).map(time => new Date(time));
+  return uniqueDates.sort((a, b) => a.getTime() - b.getTime());
+}
+
+/**
+ * Determines the significance of cosmic phenomena based on events and patterns
+ */
+function determinePhenomenaSignificance(
+  cosmicEvents: string[], 
+  patterns: { pattern: string | null; phenomenaLikelihood: number }
+): 'major' | 'moderate' | 'minor' {
+  // Check for major cosmic events
+  const majorEvents = [
+    'Jupiter Conjunction Pluto',
+    'Saturn Conjunction Pluto', 
+    'Jupiter Conjunction Saturn',
+    'Total Solar Eclipse',
+    'Total Lunar Eclipse'
+  ];
+  
+  const hasMajorEvent = cosmicEvents.some(event => 
+    majorEvents.some(major => event.includes(major))
+  );
+  
+  if (hasMajorEvent || patterns.phenomenaLikelihood > 0.7) {
+    return 'major';
+  } else if (patterns.phenomenaLikelihood > 0.4) {
+    return 'moderate';
+  } else {
+    return 'minor';
+  }
+}
+
+/**
+ * Generates future cosmic potentials for the next 2-3 years
+ */
+function generateFuturePotentials(
+  birthDate: Date, 
+  archetype: string, 
+  currentDate: Date
+): CosmicTimelineEvent[] {
+  const futurePotentials: CosmicTimelineEvent[] = [];
+  const futureYears = 3;
+  
+  for (let year = 1; year <= futureYears; year++) {
+    const futureDate = new Date(currentDate);
+    futureDate.setFullYear(futureDate.getFullYear() + year);
+    
+    // Solar return analysis
+    const solarReturn = new Date(futureDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+    const ageAtEvent = Math.floor((solarReturn.getTime() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    const lifePhase = getLifePhase(ageAtEvent);
+    
+    // Generate potential cosmic events (this would be enhanced with actual ephemeris data)
+    const potentialEvents = [`Solar Return Year ${ageAtEvent + 1}`, 'Potential cosmic alignment'];
+    
+    const futureEvent: CosmicTimelineEvent = {
+      date: solarReturn,
+      age: ageAtEvent,
+      lifePhase: lifePhase.name,
+      cosmicEvents: potentialEvents,
+      cosmicMoment: `Year ${ageAtEvent + 1} Solar Return`,
+      personalContext: `A year of continued ${archetype.toLowerCase()} evolution during your ${lifePhase.name.toLowerCase()}`,
+      pattern: null,
+      phenomenaLikelihood: 0.5,
+      significance: 'moderate',
+      trajectory: `This upcoming year offers opportunities to deepen your ${archetype.toLowerCase()} mastery`
+    };
+    
+    futurePotentials.push(futureEvent);
+  }
+  
+  return futurePotentials;
+}
+
+/**
+ * Analyzes patterns across a person's cosmic timeline
+ */
+function analyzeLifePatterns(timeline: CosmicTimelineEvent[]): {
+  dominantPattern: string;
+  secondaryPatterns: string[];
+  cycleLength: number;
+  nextMajorEvent?: Date;
+} {
+  const patternCounts: Record<string, number> = {};
+  
+  // Count pattern occurrences
+  timeline.forEach(event => {
+    if (event.pattern) {
+      patternCounts[event.pattern] = (patternCounts[event.pattern] || 0) + 1;
+    }
+  });
+  
+  // Find dominant pattern
+  const dominantPattern = Object.entries(patternCounts)
+    .sort(([,a], [,b]) => b - a)[0]?.[0] || 'GROWTH';
+  
+  // Find secondary patterns
+  const secondaryPatterns = Object.entries(patternCounts)
+    .sort(([,a], [,b]) => b - a)
+    .slice(1, 3)
+    .map(([pattern]) => pattern);
+  
+  // Calculate average cycle length between major events
+  const majorEvents = timeline.filter(e => e.significance === 'major');
+  let cycleLength = 7; // Default 7-year cycle
+  
+  if (majorEvents.length > 1) {
+    const intervals: number[] = [];
+    for (let i = 1; i < majorEvents.length; i++) {
+      const interval = (majorEvents[i].date.getTime() - majorEvents[i-1].date.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+      intervals.push(interval);
+    }
+    cycleLength = Math.round(intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length);
+  }
+  
+  // Predict next major event
+  const lastMajorEvent = majorEvents[majorEvents.length - 1];
+  let nextMajorEvent: Date | undefined = undefined;
+  if (lastMajorEvent) {
+    nextMajorEvent = new Date(lastMajorEvent.date);
+    nextMajorEvent.setFullYear(nextMajorEvent.getFullYear() + cycleLength);
+  }
+  
+  return {
+    dominantPattern,
+    secondaryPatterns,
+    cycleLength,
+    nextMajorEvent
+  };
 } 
