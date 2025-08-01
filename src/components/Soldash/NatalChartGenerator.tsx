@@ -114,12 +114,15 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     setError(null);
 
     try {
-      // Parse birth data with timezone consideration
-      // Create a date string that respects the local time at birth location
-      const birthDateTime = new Date(`${birthData.date}T${birthData.time}`);
+      // Parse birth data - the time is already in local time at birth location
+      const [year, month, day] = birthData.date.split('-').map(Number);
+      const [hour, minute] = birthData.time.split(':').map(Number);
       
-      // Note: The birth time should be interpreted as local time at the birth location
-      // CircularNatalHoroscopeJS expects the time components in local time
+      console.log('Parsing birth data:', {
+        date: birthData.date,
+        time: birthData.time,
+        parsed: { year, month, day, hour, minute }
+      });
       
       // Dynamic import to avoid SSR issues
       // CircularNatalHoroscopeJS - https://github.com/0xStarcat/CircularNatalHoroscopeJS
@@ -127,19 +130,18 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       
       // Create an Origin instance
       const originData = {
-        year: birthDateTime.getFullYear(),
-        month: birthDateTime.getMonth(), // Origin expects 0-11
-        date: birthDateTime.getDate(),
-        hour: birthDateTime.getHours(),
-        minute: birthDateTime.getMinutes(),
+        year: year,
+        month: month - 1, // Origin expects 0-11, but input is 1-12
+        date: day,
+        hour: hour,
+        minute: minute,
         latitude: birthData.location.latitude,
         longitude: birthData.location.longitude
       };
       
       console.log('Birth data for chart calculation:', {
         input: birthData,
-        parsed: originData,
-        dateTime: birthDateTime.toString()
+        parsed: originData
       });
       
       const origin = new Origin(originData);
@@ -200,8 +202,13 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
       setChartData(transformedChartData);
       
-      // Render chart using AstroChart
-      await renderWithAstroChart(transformedChartData);
+      // Try to render chart using AstroChart first
+      try {
+        await renderWithAstroChart(transformedChartData);
+      } catch (renderError) {
+        console.error('AstroChart rendering failed, using SVG fallback:', renderError);
+        setSvgContent(createChartSVG(transformedChartData));
+      }
       
       if (onChartGenerated) {
         onChartGenerated(transformedChartData);
@@ -337,9 +344,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     } catch (err) {
       console.error('Error rendering with AstroChart, falling back to custom SVG:', err);
       // Fallback to our custom SVG if AstroChart fails
-      if (chartRef.current) {
-        chartRef.current.innerHTML = createChartSVG(data);
-      }
+      setSvgContent(createChartSVG(data));
     }
   };
 
@@ -541,7 +546,12 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
           <div className="text-2xl mb-2">⚠️</div>
           <div className="text-red-600 font-serif">{error}</div>
           <button
-            onClick={generateChart}
+            onClick={() => {
+              setError(null);
+              setSvgContent(null);
+              setChartData(null);
+              generateChart();
+            }}
             className="mt-4 px-4 py-2 bg-[#E6B13A] text-black font-mono text-sm uppercase tracking-wide hover:bg-[#D4A02A] transition-colors"
           >
             Retry
@@ -553,12 +563,19 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
   return (
     <div className={`natal-chart-container ${className}`}>
-      <div 
-        ref={chartRef} 
-        className="w-full h-full border border-[#E5E1D8] bg-[#FCF6E5] p-4"
-        style={{ minHeight: '400px' }}
-        dangerouslySetInnerHTML={svgContent ? { __html: svgContent } : undefined}
-      />
+      {svgContent ? (
+        <div 
+          className="w-full h-full border border-[#E5E1D8] bg-[#FCF6E5] p-4"
+          style={{ minHeight: '400px' }}
+          dangerouslySetInnerHTML={{ __html: svgContent }}
+        />
+      ) : (
+        <div 
+          ref={chartRef} 
+          className="w-full h-full border border-[#E5E1D8] bg-[#FCF6E5] p-4"
+          style={{ minHeight: '400px' }}
+        />
+      )}
       {chartData && (
         <div className="mt-4 text-center text-sm text-[#666]">
           Chart generated for {birthData.location.city}, {birthData.location.country}
