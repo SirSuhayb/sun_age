@@ -109,7 +109,6 @@ export default function ExpandPaymentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           plan: selectedPlan,
-          amount: plans[selectedPlan].price * 100, // Convert to cents
         }),
       });
 

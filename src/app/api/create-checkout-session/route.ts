@@ -14,36 +14,29 @@ export async function POST(req: NextRequest) {
     }
     
     const stripe = new Stripe(stripeKey);
-    const { plan, amount } = await req.json();
+    const { plan } = await req.json();
 
-    // Price configurations
-    const priceData = {
-      monthly: {
-        unit_amount: 777, // $7.77 in cents
-        recurring: { interval: 'month' as const }
-      },
-      yearly: {
-        unit_amount: 7700, // $77.00 in cents
-        recurring: { interval: 'year' as const }
-      }
+    // Get price IDs from environment variables
+    const priceIds = {
+      monthly: process.env.STRIPE_SOL_CODEX_MONTHLY_PRICE_ID,
+      yearly: process.env.STRIPE_SOL_CODEX_YEARLY_PRICE_ID
     };
+
+    const selectedPriceId = priceIds[plan as keyof typeof priceIds];
+    
+    if (!selectedPriceId) {
+      console.error(`Price ID not configured for plan: ${plan}`);
+      return NextResponse.json(
+        { error: 'Selected plan not configured' },
+        { status: 400 }
+      );
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Sol Codex',
-              description: 'Expand your understanding with complete natal chart analysis',
-              images: [
-                `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/you/solChart.svg`
-              ],
-            },
-            unit_amount: priceData[plan as keyof typeof priceData].unit_amount,
-            recurring: priceData[plan as keyof typeof priceData].recurring,
-          },
+          price: selectedPriceId,
           quantity: 1,
         },
       ],
