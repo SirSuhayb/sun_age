@@ -32,6 +32,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log('Creating checkout session for plan:', plan, 'with price ID:', selectedPriceId);
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -58,6 +60,12 @@ export async function POST(req: NextRequest) {
       billing_address_collection: 'required',
     });
 
+    console.log('Checkout session created:', {
+      id: session.id,
+      url: session.url,
+      status: session.status
+    });
+    
     if (!session.url) {
       console.error('No checkout URL in session:', session);
       return NextResponse.json(

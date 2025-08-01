@@ -113,15 +113,18 @@ export default function ExpandPaymentPage() {
       });
 
       const data = await response.json();
+      console.log('Checkout session response:', data);
       
       if (!response.ok) {
         throw new Error(data.error || 'Failed to create checkout session');
       }
 
       if (!data.url) {
+        console.error('No URL in response:', data);
         throw new Error('No checkout URL received');
       }
 
+      console.log('Redirecting to:', data.url);
       // Redirect to Stripe Checkout
       window.location.href = data.url;
     } catch (error) {
@@ -357,7 +360,6 @@ export default function ExpandPaymentPage() {
             </motion.button>
           ) : (
             <DaimoPayButton.Custom
-              appId="solara-codex" // TODO: Replace with your real App ID
               toAddress={process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}` || '0x11BA1632fd6Cc120D309158298e3a0df3B7ba283'}
               toChain={8453} // Base mainnet
               toToken="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" // USDC on Base
