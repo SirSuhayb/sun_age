@@ -144,53 +144,86 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         parsed: originData
       });
       
-      const origin = new Origin(originData);
+      console.log('Creating Origin with data:', originData);
+      let origin;
+      try {
+        origin = new Origin(originData);
+        console.log('Origin created successfully');
+      } catch (originError) {
+        console.error('Error creating Origin:', originError);
+        throw new Error(`Failed to create Origin: ${originError.message}`);
+      }
 
       // Generate the horoscope
-      const horoscope = new Horoscope({
-        origin: origin,
-        houseSystem: "placidus",
-        zodiac: "tropical",
-        aspectPoints: ['bodies', 'points', 'angles'],
-        aspectWithPoints: ['bodies', 'points', 'angles'],
-        aspectTypes: ["major", "minor"],
-        language: 'en'
-      });
+      console.log('Creating Horoscope...');
+      let horoscope;
+      try {
+        horoscope = new Horoscope({
+          origin: origin,
+          houseSystem: "placidus",
+          zodiac: "tropical",
+          aspectPoints: ['bodies', 'points', 'angles'],
+          aspectWithPoints: ['bodies', 'points', 'angles'],
+          aspectTypes: ["major", "minor"],
+          language: 'en'
+        });
+        console.log('Horoscope created successfully');
+      } catch (horoError) {
+        console.error('Error creating Horoscope:', horoError);
+        throw new Error(`Failed to create Horoscope: ${horoError.message}`);
+      }
       
       // Get calculated positions
+      console.log('Getting celestial positions...');
       const positions = horoscope.CelestialBodies;
       const houses = horoscope.Houses;
       const aspects = horoscope.Aspects;
+      
+      console.log('Positions:', positions);
+      console.log('Houses:', houses);
+      console.log('Aspects:', aspects);
 
       // Transform data into our format
+      console.log('Raw positions object:', JSON.stringify(positions, null, 2));
+      console.log('Position keys:', Object.keys(positions));
+      
+      // Check different possible property names
+      const sunData = positions.sun || positions.Sun || positions.bodies?.sun || {};
+      const moonData = positions.moon || positions.Moon || positions.bodies?.moon || {};
+      const ascData = houses?.[0] || positions.ASC || positions.asc || {};
+      
+      console.log('Sun data found:', sunData);
+      console.log('Moon data found:', moonData);
+      console.log('ASC data found:', ascData);
+      
       const transformedChartData: ChartData = {
         sun: {
-          sign: positions.Sun?.sign || 'Unknown',
-          degree: positions.Sun?.degree || 0,
-          house: positions.Sun?.house || 1
+          sign: sunData.Sign?.label || sunData.sign || 'Unknown',
+          degree: sunData.ChartPosition?.Ecliptic?.DecimalDegrees || sunData.degree || 0,
+          house: sunData.House?.id || sunData.house || 1
         },
         moon: {
-          sign: positions.Moon?.sign || 'Unknown',
-          degree: positions.Moon?.degree || 0,
-          house: positions.Moon?.house || 1
+          sign: moonData.Sign?.label || moonData.sign || 'Unknown',
+          degree: moonData.ChartPosition?.Ecliptic?.DecimalDegrees || moonData.degree || 0,
+          house: moonData.House?.id || moonData.house || 1
         },
         rising: {
-          sign: positions.ASC?.sign || 'Unknown',
-          degree: positions.ASC?.degree || 0
+          sign: ascData.Sign?.label || ascData.sign || 'Unknown',
+          degree: ascData.ChartPosition?.StartPosition?.Ecliptic?.DecimalDegrees || ascData.degree || 0
         },
         planets: Object.entries(positions)
-          .filter(([name]) => !['ASC', 'MC', 'Sun', 'Moon'].includes(name))
+          .filter(([name]) => !['ASC', 'MC', 'Sun', 'Moon', 'sun', 'moon', 'asc', 'mc'].includes(name))
           .map(([name, data]: [string, any]) => ({
             name: name.toLowerCase(),
-            sign: data.sign || 'Unknown',
-            degree: data.degree || 0,
-            house: data.house || 1,
-            retrograde: data.retrograde || false
+            sign: data.Sign?.label || data.sign || 'Unknown',
+            degree: data.ChartPosition?.Ecliptic?.DecimalDegrees || data.degree || 0,
+            house: data.House?.id || data.house || 1,
+            retrograde: data.IsRetrograde || data.retrograde || false
           })),
         houses: houses?.map((house: any, index: number) => ({
           number: index + 1,
-          sign: house.sign || 'Unknown',
-          degree: house.degree || 0
+          sign: house.Sign?.label || house.sign || 'Unknown',
+          degree: house.ChartPosition?.StartPosition?.Ecliptic?.DecimalDegrees || house.degree || 0
         })) || [],
         aspects: aspects?.map((aspect: any) => ({
           planet1: aspect.planet1 || '',
