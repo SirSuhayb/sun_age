@@ -181,6 +181,17 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
       astroData.planets['Sun'] = [getAbsoluteDegree(data.sun.sign, data.sun.degree)];
       astroData.planets['Moon'] = [getAbsoluteDegree(data.moon.sign, data.moon.degree)];
       
+      // Add Ascendant to AstroChart
+      astroData.planets['ASC'] = [getAbsoluteDegree(data.rising.sign, data.rising.degree)];
+      
+      console.log('AstroChart data:', {
+        sun: astroData.planets['Sun'],
+        moon: astroData.planets['Moon'],
+        asc: astroData.planets['ASC'],
+        cusps: astroData.cusps,
+        rising: data.rising
+      });
+      
       // Map planet names to AstroChart format
       const planetNameMap: Record<string, string> = {
         mercury: 'Mercury',
@@ -274,6 +285,14 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
   // Create SVG chart visualization based on calculated data (fallback)
   const createChartSVG = (data: ChartData): string => {
+    console.log('Creating SVG with data:', {
+      sun: data.sun,
+      moon: data.moon,
+      rising: data.rising,
+      firstHouse: data.houses?.[0],
+      eleventhHouse: data.houses?.[10]
+    });
+    
     const size = 400;
     const center = size / 2;
     const outerRadius = 180;
