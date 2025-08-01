@@ -24,34 +24,18 @@ export async function POST(req: NextRequest) {
 
     const selectedPriceId = priceIds[plan as keyof typeof priceIds];
     
-    // Temporary fallback: use dynamic pricing if price IDs not configured
-    const useDynamicPricing = !selectedPriceId;
-    
-    if (!selectedPriceId && process.env.NODE_ENV === 'production') {
+    if (!selectedPriceId) {
       console.error(`Price ID not configured for plan: ${plan}`);
       return NextResponse.json(
-        { error: 'Payment configuration pending. Please try again later.' },
-        { status: 503 }
+        { error: 'Selected plan not configured' },
+        { status: 400 }
       );
     }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
-        useDynamicPricing ? {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Sol Codex',
-              description: 'Expand your understanding with complete natal chart analysis',
-            },
-            unit_amount: plan === 'monthly' ? 777 : 7700,
-            recurring: {
-              interval: plan === 'monthly' ? 'month' : 'year'
-            }
-          },
-          quantity: 1,
-        } : {
+        {
           price: selectedPriceId,
           quantity: 1,
         },
