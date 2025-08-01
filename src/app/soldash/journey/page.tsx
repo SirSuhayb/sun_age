@@ -1,11 +1,25 @@
 'use client';
 
-import { useBookmark } from '~/hooks/useBookmark';
-import { getSolarArchetype } from '~/lib/solarArchetype';
+import { useState, useEffect } from 'react';
+import { getSolarArchetype } from '~/lib/solarIdentity';
 import CosmicCodex from '~/components/Soldash/CosmicCodex';
 
 export default function JourneyPage() {
-  const { bookmark } = useBookmark();
+  const [bookmark, setBookmark] = useState<any>(null);
+  
+  useEffect(() => {
+    // Load bookmark from localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sunCycleBookmark');
+      if (saved) {
+        try {
+          setBookmark(JSON.parse(saved));
+        } catch (error) {
+          console.error('Error parsing bookmark:', error);
+        }
+      }
+    }
+  }, []);
   
   // Calculate user's current age and archetype if bookmark exists
   const userAge = bookmark ? Math.floor((Date.now() - new Date(bookmark.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 25;

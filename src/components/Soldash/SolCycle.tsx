@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { getCosmicEventsForDate, interpretCosmicEventsForArchetype, contextualizeCosmicMoment, analyzeCosmicPatterns } from '~/lib/astrology';
 import { getWorldEventForDate } from '~/lib/worldEvent';
-import { getSolarArchetype } from '~/lib/solarArchetype';
+import { getSolarArchetype } from '~/lib/solarIdentity';
 import { getLifePhase } from '~/lib/solarIdentity';
 import { useFrameSDK } from '~/hooks/useFrameSDK';
 

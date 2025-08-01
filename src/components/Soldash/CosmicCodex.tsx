@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { getCosmicEventsForDate, contextualizeCosmicMoment, analyzeCosmicPatterns } from '~/lib/astrology';
 import { getWorldEventForDate } from '~/lib/worldEvent';
@@ -42,13 +42,7 @@ export default function CosmicCodex({
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
 
-  useEffect(() => {
-    if (birthDate) {
-      loadCosmicContext();
-    }
-  }, [birthDate, archetype]);
-
-  const loadCosmicContext = async () => {
+  const loadCosmicContext = useCallback(async () => {
     if (!birthDate) return;
     
     setLoading(true);
@@ -90,7 +84,13 @@ export default function CosmicCodex({
     } finally {
       setLoading(false);
     }
-  };
+  }, [birthDate, archetype]);
+
+  useEffect(() => {
+    if (birthDate) {
+      loadCosmicContext();
+    }
+  }, [birthDate, loadCosmicContext]);
 
   const renderPatternBadge = () => {
     if (!cosmicContext?.pattern) return null;

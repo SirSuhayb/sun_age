@@ -1,4 +1,6 @@
 import { Horoscope, Origin } from 'circular-natal-horoscope-js';
+import { getLifePhase } from './solarIdentity';
+import { getWorldEventForDate } from './worldEvent';
 
 // List of major aspects
 const MAJOR_ASPECTS = ['conjunction', 'opposition', 'trine', 'square', 'sextile'];
@@ -505,7 +507,7 @@ export function analyzeCosmicPatterns(events: string[], userPhase: string, date:
   const awakening = COSMIC_PATTERNS.AWAKENING_INDICATORS.some(indicator => 
     events.some(event => event.includes(indicator.replace(' ', ' '))));
 
-  let pattern = null;
+  let pattern: string | null = null;
   let interpretation = 'A quiet cosmic moment that offered space for reflection and inner growth.';
   let phenomenaLikelihood = 0.2; // Base likelihood of meaningful phenomena
 
@@ -648,7 +650,7 @@ export async function generateCosmicCodexTimeline(
       const significance = determinePhenomenaSignificance(cosmicEvents, patterns);
       
       // Get world event if requested
-      let worldEvent = undefined;
+      let worldEvent: { text: string; url?: string } | undefined = undefined;
       if (includeWorldEvents) {
         try {
           worldEvent = await getWorldEventForDate(date);
@@ -852,7 +854,7 @@ function analyzeLifePatterns(timeline: CosmicTimelineEvent[]): {
   let cycleLength = 7; // Default 7-year cycle
   
   if (majorEvents.length > 1) {
-    const intervals = [];
+    const intervals: number[] = [];
     for (let i = 1; i < majorEvents.length; i++) {
       const interval = (majorEvents[i].date.getTime() - majorEvents[i-1].date.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
       intervals.push(interval);
@@ -862,7 +864,7 @@ function analyzeLifePatterns(timeline: CosmicTimelineEvent[]): {
   
   // Predict next major event
   const lastMajorEvent = majorEvents[majorEvents.length - 1];
-  let nextMajorEvent = undefined;
+  let nextMajorEvent: Date | undefined = undefined;
   if (lastMajorEvent) {
     nextMajorEvent = new Date(lastMajorEvent.date);
     nextMajorEvent.setFullYear(nextMajorEvent.getFullYear() + cycleLength);
