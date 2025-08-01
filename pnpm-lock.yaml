@@ -74,6 +74,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      ephemeris-moshier:
+        specifier: 0.0.2-dev
+        version: 0.0.2-dev
       ethers:
         specifier: ^6.14.4
         version: 6.14.4(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -3498,6 +3501,9 @@ packages:
   env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
     engines: {node: '>=6'}
+
+  ephemeris-moshier@0.0.2-dev:
+    resolution: {integrity: sha512-k9OFM0CkV8xf+2pALSSU0WLriL2F+MkdGkoAPVRpC5rB6rrcAz6qjO3JvSJVCuSKf3Fkxa/h//G31saoDUI5ww==}
 
   err-code@2.0.3:
     resolution: {integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==}
@@ -11621,6 +11627,8 @@ snapshots:
       strip-ansi: 6.0.1
 
   env-paths@2.2.1: {}
+
+  ephemeris-moshier@0.0.2-dev: {}
 
   err-code@2.0.3: {}
 
