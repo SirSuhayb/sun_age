@@ -202,13 +202,9 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
       setChartData(transformedChartData);
       
-      // Try to render chart using AstroChart first
-      try {
-        await renderWithAstroChart(transformedChartData);
-      } catch (renderError) {
-        console.error('AstroChart rendering failed, using SVG fallback:', renderError);
-        setSvgContent(createChartSVG(transformedChartData));
-      }
+      // Always use SVG for now since AstroChart seems to have issues
+      console.log('Rendering chart with SVG');
+      setSvgContent(createChartSVG(transformedChartData));
       
       if (onChartGenerated) {
         onChartGenerated(transformedChartData);
@@ -496,8 +492,8 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     
     setChartData(mockData);
     
-    // Try to render with AstroChart first
-    await renderWithAstroChart(mockData);
+    // Use SVG rendering
+    setSvgContent(createChartSVG(mockData));
     
     if (onChartGenerated) {
       onChartGenerated(mockData);

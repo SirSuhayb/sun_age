@@ -20,22 +20,73 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-// Mock data - this would come from the chart generation API
-const mockChartData = {
-  sunSign: 'Aquarius',
-  moonSign: 'Pisces',
-  risingSign: 'Gemini',
-  birthInfo: {
-    date: 'February 15, 1990',
-    time: '2:30 PM',
-    location: 'San Francisco, CA, USA'
-  },
-  keyInsights: [
-    'Your Aquarius Sun drives innovation and humanitarian ideals',
-    'Pisces Moon brings deep intuition and emotional sensitivity',
-    'Gemini Rising makes you adaptable and communicative',
-    'Your chart shows strong creative and healing potential'
-  ]
+// Generate key insights based on actual chart data
+const generateKeyInsights = (chartData: any) => {
+  if (!chartData) return [];
+  
+  const insights = [];
+  
+  // Sun sign insight
+  if (chartData.sun) {
+    const sunInsights: Record<string, string> = {
+      'Aries': 'Your Aries Sun brings bold leadership and pioneering spirit',
+      'Taurus': 'Your Taurus Sun provides grounding energy and material wisdom',
+      'Gemini': 'Your Gemini Sun gifts you with versatility and communication skills',
+      'Cancer': 'Your Cancer Sun nurtures deep emotional intelligence and intuition',
+      'Leo': 'Your Leo Sun radiates creative expression and natural magnetism',
+      'Virgo': 'Your Virgo Sun offers analytical precision and healing abilities',
+      'Libra': 'Your Libra Sun seeks harmony and brings diplomatic grace',
+      'Scorpio': 'Your Scorpio Sun penetrates mysteries and transforms deeply',
+      'Sagittarius': 'Your Sagittarius Sun expands horizons and seeks truth',
+      'Capricorn': 'Your Capricorn Sun builds lasting foundations and achieves mastery',
+      'Aquarius': 'Your Aquarius Sun drives innovation and humanitarian ideals',
+      'Pisces': 'Your Pisces Sun connects to universal consciousness and creativity'
+    };
+    insights.push(sunInsights[chartData.sun.sign] || `Your ${chartData.sun.sign} Sun illuminates your core essence`);
+  }
+  
+  // Moon sign insight
+  if (chartData.moon) {
+    const moonInsights: Record<string, string> = {
+      'Aries': 'Aries Moon brings emotional courage and quick instincts',
+      'Taurus': 'Taurus Moon provides emotional stability and sensual comfort',
+      'Gemini': 'Gemini Moon creates emotional versatility and mental agility',
+      'Cancer': 'Cancer Moon deepens emotional receptivity and nurturing',
+      'Leo': 'Leo Moon expresses emotions dramatically and generously',
+      'Virgo': 'Virgo Moon analyzes feelings and seeks emotional perfection',
+      'Libra': 'Libra Moon seeks emotional balance and harmonious connections',
+      'Scorpio': 'Scorpio Moon intensifies emotions and psychological insight',
+      'Sagittarius': 'Sagittarius Moon needs emotional freedom and adventure',
+      'Capricorn': 'Capricorn Moon manages emotions with maturity and discipline',
+      'Aquarius': 'Aquarius Moon brings emotional detachment and humanitarian care',
+      'Pisces': 'Pisces Moon brings deep intuition and emotional sensitivity'
+    };
+    insights.push(moonInsights[chartData.moon.sign] || `Your ${chartData.moon.sign} Moon shapes your emotional nature`);
+  }
+  
+  // Rising sign insight
+  if (chartData.rising) {
+    const risingInsights: Record<string, string> = {
+      'Aries': 'Aries Rising projects confidence and initiates action',
+      'Taurus': 'Taurus Rising emanates calm presence and reliability',
+      'Gemini': 'Gemini Rising makes you adaptable and communicative',
+      'Cancer': 'Cancer Rising creates a nurturing and protective aura',
+      'Leo': 'Leo Rising commands attention with natural charisma',
+      'Virgo': 'Virgo Rising presents refined efficiency and helpfulness',
+      'Libra': 'Libra Rising attracts through charm and social grace',
+      'Scorpio': 'Scorpio Rising projects intensity and magnetic mystery',
+      'Sagittarius': 'Sagittarius Rising radiates optimism and adventure',
+      'Capricorn': 'Capricorn Rising conveys authority and competence',
+      'Aquarius': 'Aquarius Rising appears unique and intellectually engaging',
+      'Pisces': 'Pisces Rising flows with compassion and artistic sensitivity'
+    };
+    insights.push(risingInsights[chartData.rising.sign] || `Your ${chartData.rising.sign} Rising shapes how others see you`);
+  }
+  
+  // Add a general insight about the chart
+  insights.push('Your chart reveals a unique cosmic blueprint for growth and self-discovery');
+  
+  return insights;
 };
 
 export default function ChartPage() {
@@ -263,7 +314,7 @@ export default function ChartPage() {
             <div className="bg-white border border-[#D7D7D7] p-6">
               <h3 className="text-lg font-serif font-semibold mb-4">Key Insights</h3>
               <div className="space-y-3">
-                {mockChartData.keyInsights.map((insight, index) => (
+                {generateKeyInsights(chartData).map((insight, index) => (
                   <div key={index} className="flex items-start">
                     <Sparkles className="w-4 h-4 text-[#E6B13A] mr-2 mt-0.5 flex-shrink-0" />
                     <span className="text-sm text-[#444]">{insight}</span>

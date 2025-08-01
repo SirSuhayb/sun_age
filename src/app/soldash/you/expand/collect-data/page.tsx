@@ -22,8 +22,26 @@ const itemVariants = {
 };
 
 export default function CollectDataPage() {
+  // Get birth date from solar profile if available
+  const getSavedBirthDate = () => {
+    try {
+      const saved = localStorage.getItem('sunCycleBookmark');
+      if (saved) {
+        const data = JSON.parse(saved);
+        // Convert from MM/DD/YYYY to YYYY-MM-DD format
+        if (data.birthDate) {
+          const [month, day, year] = data.birthDate.split('/');
+          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved birth date:', error);
+    }
+    return '';
+  };
+  
   const [formData, setFormData] = useState({
-    birthDate: '',
+    birthDate: getSavedBirthDate(),
     birthTime: '',
     birthLocation: '',
     timezone: 'auto'
