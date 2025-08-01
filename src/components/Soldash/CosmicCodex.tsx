@@ -249,7 +249,7 @@ export default function CosmicCodex({
 
               <div className="mt-8 pt-6 border-t border-gray-300">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-black mb-2">$33</div>
+                  <div className="text-3xl font-bold text-black mb-2">$22</div>
                   <div className="text-sm text-gray-600 mb-4">One-time unlock • Lifetime access</div>
                   <button
                     className="w-full py-3 bg-black text-white font-mono text-sm tracking-wider uppercase hover:bg-gray-800 transition-colors"
