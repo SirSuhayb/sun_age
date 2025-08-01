@@ -10,6 +10,7 @@ import { SOLAR_PLEDGE_ADDRESS, SolarPledgeABI } from '../../lib/contracts';
 import { useConvergenceStats } from '~/hooks/useConvergenceStats';
 import { SpinnerButton } from "~/components/ui/SpinnerButton";
 import { showScreenshotPrompt } from '~/lib/screenshot';
+import { useUnifiedShare } from '~/components/UnifiedShareFlow';
 
 const steps = ["prepare", "inscribe", "empower", "sealed"];
 
@@ -23,6 +24,7 @@ export default function CeremonyStepper() {
   const { address } = useAccount();
   const { approveUSDC, createPledge, isApproved, isLoading, error, hasPledged, debugInfo, allowance, isApprovalPending, isApprovalConfirmed, isPledgeConfirmed } = useSolarPledge();
   const { connect, connectors, isPending: isConnecting } = useConnect();
+  const { triggerShare, ShareFlowComponent } = useUnifiedShare();
   const [uiError, setUiError] = useState<string | null>(null);
   const { numVows, totalPooled, daysRemaining } = useConvergenceStats();
 
@@ -185,10 +187,10 @@ export default function CeremonyStepper() {
       autoBookmark(); // <-- Automatically bookmark after successful pledge
       next(); // Move to next step on success
       
-      // Show screenshot prompt after successful pledge
-      setTimeout(() => {
-        showScreenshotPrompt();
-      }, 1000);
+      // Show screenshot prompt after successful pledge - DISABLED due to false triggers
+      // setTimeout(() => {
+      //   showScreenshotPrompt();
+      // }, 1000);
     } catch (err) {
       console.error('Pledge error:', err);
       setUiError(err instanceof Error ? err.message : "Failed to process transaction");
@@ -535,23 +537,48 @@ export default function CeremonyStepper() {
                   className="w-full py-4 mb-8 bg-white text-black font-mono text-base tracking-widest uppercase border border-gray-400 rounded-none hover:bg-gray-50 transition-colors"
                   onClick={async () => {
                     try {
-                      const { sharePledge } = await import('~/lib/sharing');
                       const userName = context?.user?.displayName || 'TRAVELLER';
                       const fid = context?.user?.fid?.toString() || '';
                       const profilePicUrl = context?.user?.pfpUrl || '';
                       const solAge = urlDays || '';
                       const currentDate = today;
                       
-                      await sharePledge(
-                        signatureMsg,
-                        userName,
-                        fid,
-                        solAge,
-                        currentDate,
-                        profilePicUrl,
-                        sdk,
-                        isInFrame
-                      );
+                      // For Farcaster users, use the existing share flow
+                      if (isInFrame) {
+                        const { sharePledge } = await import('~/lib/sharing');
+                        await sharePledge(
+                          signatureMsg,
+                          userName,
+                          fid,
+                          solAge,
+                          currentDate,
+                          profilePicUrl,
+                          sdk,
+                          isInFrame
+                        );
+                      } else {
+                        // For non-Farcaster users, use the unified share flow
+                        triggerShare({
+                          content: {
+                            type: 'pledge',
+                            title: 'My Solar Vow',
+                            description: 'I have inscribed my commitment into eternity',
+                            data: {
+                              signatureMsg,
+                              userName,
+                              fid,
+                              solAge,
+                              currentDate,
+                              profilePicUrl
+                            }
+                          },
+                          userName,
+                          profilePicUrl,
+                          onShareComplete: (platform, shareId) => {
+                            console.log(`Pledge shared on ${platform} with ID: ${shareId}`);
+                          }
+                        });
+                      }
                     } catch (err) {
                       console.error(err);
                     }
@@ -578,6 +605,9 @@ export default function CeremonyStepper() {
           </div>
         </div>
       </footer>
+      
+      {/* Unified Share Flow Component */}
+      <ShareFlowComponent />
     </div>
   );
 } 

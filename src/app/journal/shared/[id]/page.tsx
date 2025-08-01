@@ -82,6 +82,7 @@ export default function SharedJournalPage({ params }: { params: Promise<{ id: st
         userEntryCount={userEntryCount}
         authorUsername={share.authorUsername}
         authorDisplayName={share.authorDisplayName}
+        shareId={share.id}
       />
     </div>
   );

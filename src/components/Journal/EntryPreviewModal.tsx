@@ -16,6 +16,8 @@ interface EntryPreviewModalProps {
   userEntryCount?: number;
   authorUsername?: string | null;
   authorDisplayName?: string | null;
+  shareId?: string; // Track which share inspired this view
+  onAddReflection?: (parentEntryId: string, parentShareId?: string) => void;
 }
 
 export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
@@ -30,6 +32,8 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
   userEntryCount,
   authorUsername,
   authorDisplayName,
+  shareId,
+  onAddReflection,
 }) => {
   const [showFull, setShowFull] = useState(false);
 
@@ -51,8 +55,33 @@ export const EntryPreviewModal: React.FC<EntryPreviewModalProps> = ({
     displayName = authorDisplayName ?? authorUsername ?? 'Solara User';
   }
 
-  const handleAddReflection = () => {
-    window.location.href = '/soldash?tab=journal';
+  const handleAddReflection = async () => {
+    // Track the view session interaction
+    try {
+      await fetch('/api/journal/track-interaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          entry_id: entry.id,
+          share_id: shareId,
+          interaction_type: 'clicked_add_reflection',
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to track interaction:', error);
+    }
+
+    // If custom handler provided, use it with parent info
+    if (onAddReflection) {
+      onAddReflection(entry.id, shareId);
+    } else {
+      // Default behavior - navigate to journal with parent info in URL
+      const params = new URLSearchParams({
+        inspired_by: entry.id,
+        ...(shareId && { share_id: shareId }),
+      });
+      window.location.href = `/soldash/journal?${params.toString()}`;
+    }
   };
   const handleViewJourney = () => {
     window.location.href = '/soldash';

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useAccount, useConnect } from 'wagmi';
 import { useFrameSDK } from '~/hooks/useFrameSDK';
-import { SurpriseMeFramework } from '~/lib/surpriseMe';
+
 import { SolarEarningsManager } from '~/lib/solarEarnings';
 import { ConfirmationModal, SimpleModal } from '~/components/ui/ConfirmationModal';
 import Image from 'next/image';
@@ -17,6 +17,7 @@ import { surpriseMeFramework, DailyRoll } from '~/lib/surpriseMe';
 import { solarEarningsManager } from '~/lib/solarEarnings';
 import Link from 'next/link';
 import OracleStatusBar from '~/components/ui/OracleStatusBar';
+import { useUnifiedShare } from '~/components/UnifiedShareFlow';
 
 export default function SurpriseMePage() {
   const router = useRouter();
@@ -73,6 +74,7 @@ export default function SurpriseMePage() {
   const { context, isInFrame, sdk } = useFrameSDK();
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
+  const { triggerShare, ShareFlowComponent } = useUnifiedShare();
   const [dailyRolls, setDailyRolls] = useState<number>(3);
   const [hasRolledToday, setHasRolledToday] = useState(false);
   const [isRolling, setIsRolling] = useState(false);
@@ -81,6 +83,9 @@ export default function SurpriseMePage() {
   const [rollHistory, setRollHistory] = useState<DailyRoll[]>([]);
   const [showGameExplanation, setShowGameExplanation] = useState(false);
   const [hasSeenExplanation, setHasSeenExplanation] = useState(false);
+  
+  // Wallet tooltip state
+  const [walletTooltipDismissed, setWalletTooltipDismissed] = useState(false);
   
   // Token distribution state
   const [isDistributingTokens, setIsDistributingTokens] = useState(false);
@@ -138,6 +143,10 @@ export default function SurpriseMePage() {
       const seenExplanation = localStorage.getItem('surpriseMeExplanationSeen');
       setHasSeenExplanation(!!seenExplanation);
       
+      // Check if wallet tooltip has been dismissed
+      const tooltipDismissed = localStorage.getItem('walletTooltipDismissed');
+      setWalletTooltipDismissed(!!tooltipDismissed);
+      
       // Initialize SOLAR earnings
       const earnings = solarEarningsManager.getEarningsSummary();
       setSolarEarnings(earnings);
@@ -156,6 +165,14 @@ export default function SurpriseMePage() {
       setAvailableRolls(3); // default if not found
     }
   }, []);
+
+  // Reset wallet tooltip dismissed state when user connects wallet
+  useEffect(() => {
+    if (isConnected && walletTooltipDismissed) {
+      setWalletTooltipDismissed(false);
+      localStorage.removeItem('walletTooltipDismissed');
+    }
+  }, [isConnected, walletTooltipDismissed]);
 
 
 
@@ -217,7 +234,7 @@ export default function SurpriseMePage() {
       // Add current history to profile
       userProfile.history = rollHistory;
       
-      const roll = surpriseMeFramework.generatePersonalizedRoll(userProfile);
+      const roll = await surpriseMeFramework.generatePersonalizedRoll(userProfile);
       
       // Award SOLAR tokens for this roll with all bonuses (only once per day)
       const rollEarnings = solarEarningsManager.awardSolar(roll.rarity, roll.title);
@@ -337,29 +354,56 @@ export default function SurpriseMePage() {
     const streak = solarEarnings.streakDays;
     
     try {
-      const { shareRoll } = await import('~/lib/sharing');
-      await shareRoll(
-        {
-          title: currentRoll.title,
-          description: currentRoll.description,
-          archetype: currentRoll.archetype,
-          rarity: currentRoll.rarity,
-          icon: currentRoll.icon,
-          type: currentRoll.type,
-        },
-        userName,
-        solarEarned,
-        streak,
-        sdk,
-        isInFrame
-      );
-      
-      // Award social sharing achievement bonus
-      solarEarningsManager.markSocialShare();
-      
-      // Update earnings display
-      const updatedEarnings = solarEarningsManager.getEarningsSummary();
-      setSolarEarnings(updatedEarnings);
+      // For Farcaster users, use the existing share flow
+      if (isInFrame) {
+        const { shareRoll } = await import('~/lib/sharing');
+        await shareRoll(
+          {
+            title: currentRoll.title,
+            description: currentRoll.description,
+            archetype: currentRoll.archetype,
+            rarity: currentRoll.rarity,
+            icon: currentRoll.icon,
+            type: currentRoll.type,
+          },
+          userName,
+          solarEarned,
+          streak,
+          sdk,
+          isInFrame
+        );
+      } else {
+        // For non-Farcaster users, use the unified share flow
+        const rarityEmoji = currentRoll.rarity === 'legendary' ? '🌟' : currentRoll.rarity === 'rare' ? '💎' : '✨';
+        triggerShare({
+          content: {
+            type: 'roll',
+            title: 'My Cosmic Guidance',
+            description: `The cosmos has guided me to ${currentRoll.title}`,
+            data: {
+              title: currentRoll.title,
+              description: currentRoll.description,
+              archetype: currentRoll.archetype,
+              rarity: currentRoll.rarity,
+              icon: currentRoll.icon,
+              type: currentRoll.type,
+              solarEarned,
+              streak
+            }
+          },
+          userName,
+          onShareComplete: (platform, shareId) => {
+            console.log(`Roll shared on ${platform} with ID: ${shareId}`);
+            
+            // Award social sharing achievement bonus
+            solarEarningsManager.markSocialShare();
+            
+            // Update earnings display
+            const updatedEarnings = solarEarningsManager.getEarningsSummary();
+            setSolarEarnings(updatedEarnings);
+          }
+        });
+      }
       
     } catch (err) {
       console.error('Error sharing roll:', err);
@@ -531,9 +575,9 @@ export default function SurpriseMePage() {
         </div>
       )}
 
-      {/* Wallet Connection Prompt */}
-      {!isConnected && (
-        <div className="fixed bottom-4 left-4 right-4 z-50 bg-blue-100 border border-blue-300 p-4 rounded-none shadow-lg">
+      {/* Wallet Connection Prompt - only show for web users who haven't dismissed it */}
+      {!isConnected && !isInFrame && !walletTooltipDismissed && (
+        <div className="fixed bottom-4 left-4 right-4 z-[60] bg-blue-100 border border-blue-300 p-4 rounded-none shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="text-blue-600">🔗</div>
@@ -541,12 +585,24 @@ export default function SurpriseMePage() {
                 CONNECT WALLET TO RECEIVE SOLAR TOKENS
               </div>
             </div>
-            <button
-              onClick={() => connect({ connector: connectors[0] })}
-              className="px-4 py-2 bg-blue-600 text-white font-mono text-xs hover:bg-blue-700 transition-colors"
-            >
-              CONNECT
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => connect({ connector: connectors[0] })}
+                className="px-4 py-2 bg-blue-600 text-white font-mono text-xs hover:bg-blue-700 transition-colors"
+              >
+                CONNECT
+              </button>
+              <button
+                onClick={() => {
+                  setWalletTooltipDismissed(true);
+                  localStorage.setItem('walletTooltipDismissed', 'true');
+                }}
+                className="px-2 py-2 text-blue-600 hover:text-blue-800 font-mono text-xs transition-colors"
+                aria-label="Dismiss wallet connection prompt"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -629,7 +685,8 @@ export default function SurpriseMePage() {
                 angle.set(planetAngles[angleKey]);
               }
               return () => controls && controls.stop();
-            }, [isRolling, planetAngles, angleKey]);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+            }, [angle, angleKey]);
             const left = useTransform(angle, a => `${cx + radius * Math.cos((a * Math.PI) / 180)}px`);
             const top = useTransform(angle, a => `${cy + radius * Math.sin((a * Math.PI) / 180)}px`);
             return (
@@ -807,6 +864,9 @@ export default function SurpriseMePage() {
           </div>
         )}
       </SimpleModal>
+      
+      {/* Unified Share Flow Component */}
+      <ShareFlowComponent />
     </div>
   );
 }

@@ -6,17 +6,7 @@ import SolEvolution from '~/components/Soldash/SolEvolution';
 import ExpandUnderstanding from '~/components/Soldash/ExpandUnderstanding';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-
-// Mock data for now; replace with real logic as needed
-const sunSign = 'Aquarius';
-const archetype = 'Sol Innovator';
-const foundation = 'Builder Foundation';
-const depth = 'Alchemist Depth';
-const affirmation = 'I incubate revolutionary ideas in the depths of transformative solitude.';
-const description = `You're a visionary architect of the future, combining Aquarian innovation with deep transformational wisdom. Your Builder foundation gives you the practical skills to manifest your visions, while your Alchemist depth allows you to transmute complex ideas into revolutionary breakthroughs that benefit humanity.`;
-const currentPhase = 'Current Phase (Ages 28–35)';
-const keyThemes = 'Balancing solitary creation with community building. Your ideas are ready to reach wider audiences.';
-const nextMilestone = 'A significant breakthrough in how you share your innovations with the world awaits in 47 days.';
+import { getCompleteSolarProfile } from '~/lib/solarIdentity';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -36,14 +26,33 @@ const itemVariants = {
 
 export default function YouPage() {
   const [bookmark, setBookmark] = useState<any>(null);
+  const [solarProfile, setSolarProfile] = useState<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('sunCycleBookmark');
       if (saved) {
         try {
-          setBookmark(JSON.parse(saved));
-        } catch {}
+          const parsedBookmark = JSON.parse(saved);
+          setBookmark(parsedBookmark);
+          
+          // Generate enhanced solar profile if we have a birth date
+          if (parsedBookmark.birthDate) {
+            const profile = getCompleteSolarProfile(parsedBookmark.birthDate);
+            setSolarProfile(profile);
+            
+            // Update bookmark with new foundation/depth data
+            const enhancedBookmark = {
+              ...parsedBookmark,
+              foundation: profile.foundation,
+              depth: profile.depth,
+              agePhase: profile.agePhase
+            };
+            setBookmark(enhancedBookmark);
+          }
+        } catch {
+          // Handle parse error gracefully
+        }
       }
     }
   }, []);
@@ -59,7 +68,7 @@ export default function YouPage() {
       <motion.div className="mt-10" variants={itemVariants}>
         <Tooltip
           title="DISCOVER YOUR INNER SOL"
-          body={"Go deeper into your Sol Innovator identity. In time, you'll unlock the layers of your cosmic signature."}
+          body={`Go deeper into your ${solarProfile?.archetype || 'Solar'} identity. In time, you'll unlock the layers of your cosmic signature.`}
           bgColor="#FFF8ED"
           borderColor="#F5C16C"
           textColor="#D4A02A"

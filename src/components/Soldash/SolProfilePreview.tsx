@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { getSunSign, getSolPhase, getSolarArchetype, solarArchetypeCoreQuotes, generateSolarIdentityDescription } from '../../lib/solarIdentity';
+import { getSunSign, getSolPhase, getSolarArchetype, solarArchetypeCoreQuotes, generateSolarIdentityDescription, getCompleteSolarProfile } from '../../lib/solarIdentity';
 
 interface Bookmark {
   birthDate: string;
@@ -8,6 +8,7 @@ interface Bookmark {
   solArchetype?: string;
   foundation?: string;
   depth?: string;
+  agePhase?: string;
 }
 
 interface SolProfilePreviewProps {
@@ -15,31 +16,34 @@ interface SolProfilePreviewProps {
 }
 
 const SolProfilePreview: React.FC<SolProfilePreviewProps> = ({ bookmark }) => {
-  const sunSign = bookmark?.birthDate ? getSunSign(bookmark.birthDate) : '';
-  // Fallback: derive solArchetype from birthDate if not present
-  const solArchetype = bookmark?.solArchetype || (bookmark.birthDate ? getSolarArchetype(bookmark.birthDate) : '');
+  // Generate complete solar profile from birth date
+  const solarProfile = bookmark?.birthDate ? getCompleteSolarProfile(bookmark.birthDate) : null;
+  
+  const sunSign = solarProfile?.sunSign || (bookmark?.birthDate ? getSunSign(bookmark.birthDate) : '');
+  const solArchetype = solarProfile?.archetype || bookmark?.solArchetype || '';
+  const foundation = solarProfile?.foundation || bookmark?.foundation || 'Seeker Foundation';
+  const depth = solarProfile?.depth || bookmark?.depth || 'Explorer Depth';
+  const agePhase = solarProfile?.agePhase || bookmark?.agePhase || '';
+  const coreQuote = solarProfile?.coreQuote || (solArchetype ? solarArchetypeCoreQuotes[solArchetype] : '') || '';
+
+  // Get phase info for compatibility with existing evolution display
   const phaseInfo = solArchetype && bookmark?.solAge !== undefined ? getSolPhase(solArchetype, bookmark.solAge) : null;
-  const coreQuote = solArchetype ? solarArchetypeCoreQuotes[solArchetype] || '' : '';
 
   // SVG paths
   const sunSignSvg = sunSign ? `/astrology/signs/${sunSign.toLowerCase()}.svg` : '';
   const radiantSunSvg = '/astrology/radiant_sun.svg';
 
-  // Use foundation and depth from bookmark if available, otherwise use placeholders
-  const foundation = bookmark.foundation || 'Builder Foundation';
-  const depth = bookmark.depth || 'Alchemist Depth';
-
-  // Generate the full value proposition description
-  const description = (sunSign && solArchetype && foundation && depth)
-    ? generateSolarIdentityDescription(sunSign, solArchetype, foundation, depth)
+  // Generate the enhanced value proposition description
+  const description = solarProfile
+    ? generateSolarIdentityDescription(sunSign, solArchetype, foundation, depth, agePhase)
     : 'Your Solar Identity description will appear here.';
 
   // Debug logging for missing data
-  if (!coreQuote) {
+  if (!coreQuote && solArchetype) {
     // eslint-disable-next-line no-console
     console.warn('No coreQuote found for archetype:', solArchetype);
   }
-  if (!description) {
+  if (!description && solarProfile) {
     // eslint-disable-next-line no-console
     console.warn('No description generated for:', { sunSign, solArchetype, foundation, depth });
   }
@@ -76,16 +80,18 @@ const SolProfilePreview: React.FC<SolProfilePreviewProps> = ({ bookmark }) => {
       </div>
 
       {/* Subheader: Foundation & Depth */}
-      <div className="text-center text-base font-mono tracking-tight leading-tightest text-[#888] uppercase">
-        {foundation.toUpperCase()} & {depth.toUpperCase()}
+      <div className="text-center">
+        <div className="text-base font-mono tracking-tight leading-tightest text-[#888] uppercase">
+          {foundation.toUpperCase()} & {depth.toUpperCase()}
+        </div>
       </div>
 
       {/* Power Phrase */}
       <div className="bg-white border border-[#E5E1D8] p-4 text-center italic text-2xl leading-tight tracking-tightest font-serif" style={{ borderRadius: 0 }}>
-        {coreQuote ? `“${coreQuote}”` : '“Your power phrase will appear here.”'}
+        {coreQuote ? `"${coreQuote}"` : '"Your power phrase will appear here."'}
       </div>
 
-      {/* Description */}
+      {/* Enhanced Description */}
       <div className="text-[#5F5F5F] text-lg font-serif text-left leading-tight mb-4">
         {description}
       </div>

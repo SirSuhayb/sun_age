@@ -8,10 +8,11 @@ import React from 'react';
 import { PulsingStarSpinner } from "~/components/ui/PulsingStarSpinner";
 import { shareJournalEntry, composeAndShareEntry } from '~/lib/journal';
 import { createPortal } from 'react-dom';
+import { useUnifiedShare } from '~/components/UnifiedShareFlow';
 
 interface JournalEntryEditorProps {
   entry: JournalEntry;
-  onSave: (entryToSave: { id?: string, content: string }) => Promise<void>;
+  onSave: (entryToSave: { id?: string, content: string, parent_entry_id?: string, parent_share_id?: string }) => Promise<void>;
   onAutoSave: (entryToSave: { id?: string, content: string }) => Promise<void>;
   onFinish: () => void;
   onEdit?: () => void;
@@ -81,6 +82,7 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
   const [showDailyPrompt, setShowDailyPrompt] = useState(true);
   const { sdk, isInFrame } = useFrameSDK();
   const { content: dailyContent, isLoading: dailyContentLoading } = useDailyContent();
+  const { triggerShare, ShareFlowComponent } = useUnifiedShare();
 
   // Auto-save functionality
   const debouncedAutoSave = useMemo(
@@ -108,7 +110,12 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
     try {
       // Add a small delay to show the spinner animation
       await new Promise(resolve => setTimeout(resolve, 800));
-      await onSave({ id: entry.id, content });
+      await onSave({ 
+        id: entry.id, 
+        content,
+        parent_entry_id: entry.parent_entry_id,
+        parent_share_id: entry.parent_share_id
+      });
       setLastSaved(new Date());
     } catch (e: any) {
       setError(e.message || "Failed to save entry");
@@ -122,7 +129,7 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
     setError(null);
     try {
       if (onShare) {
-        // Use custom share handler if provided
+        // Use custom share handler if provided (for guidance entries)
         await onShare();
       } else {
         // For guidance entries, ensure they're saved first
@@ -134,10 +141,32 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
           await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        // Use default share logic
-        await composeAndShareEntry(entry, sdk, isInFrame, entry.user_fid);
-        // Optional: Show success feedback
-        console.log('Entry shared successfully');
+        // For Farcaster users, use the existing share flow
+        if (isInFrame) {
+          await composeAndShareEntry(entry, sdk, isInFrame, entry.user_fid);
+          console.log('Entry shared successfully via Farcaster');
+        } else {
+          // For non-Farcaster users, use the unified share flow
+          const preview = content.slice(0, 200);
+          const shareUrl = window.location.origin + `/journal/shared?preview=${encodeURIComponent(preview)}`;
+          
+          triggerShare({
+            content: {
+              type: 'journal_entry',
+              title: 'My Cosmic Reflection',
+              description: 'A moment of inner wisdom from my solar journey',
+              data: {
+                preview,
+                shareUrl,
+                entryId: entry.id
+              }
+            },
+            onShareComplete: (platform, shareId) => {
+              console.log(`Journal entry shared on ${platform} with ID: ${shareId}`);
+            }
+          });
+        }
+      }
       }
     } catch (e: any) {
       setError(e.message || "Failed to share entry");
@@ -397,6 +426,9 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
               {error && <div className="text-red-500 mt-2 text-center">{error}</div>}
           </div>
       </div>
+      
+      {/* Unified Share Flow Component */}
+      <ShareFlowComponent />
     </div>,
     document.body
   );
