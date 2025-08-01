@@ -1,8 +1,10 @@
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { getCosmicEventsForDate, interpretCosmicEventsForArchetype } from '~/lib/astrology';
+import React, { useState, useEffect } from 'react';
+import { useAccount } from 'wagmi';
+import { getCosmicEventsForDate, interpretCosmicEventsForArchetype, contextualizeCosmicMoment, analyzeCosmicPatterns } from '~/lib/astrology';
 import { getWorldEventForDate } from '~/lib/worldEvent';
-import { getSolarArchetype } from '~/lib/solarIdentity';
+import { getSolarArchetype } from '~/lib/solarArchetype';
+import { getLifePhase } from '~/lib/solarIdentity';
 import { useFrameSDK } from '~/hooks/useFrameSDK';
 
 function getRandomSolDay(solAge: number) {
@@ -28,7 +30,13 @@ export default function SolCycle() {
   const [prevSolDay, setPrevSolDay] = useState<number | null>(null);
   const [prevSolDate, setPrevSolDate] = useState<Date | null>(null);
   const [cosmicAspect, setCosmicAspect] = useState<string | null>(null);
-  const [cosmicInterpretation, setCosmicInterpretation] = useState<string | null>(null);
+  const [cosmicInterpretation, setCosmicInterpretation] = useState<string>('');
+  const [cosmicPattern, setCosmicPattern] = useState<{
+    pattern: string | null;
+    interpretation: string;
+    phenomenaLikelihood: number;
+  } | null>(null);
+  const [dynamicAwakeningText, setDynamicAwakeningText] = useState<string>('A day of profound creative breakthroughs');
   const [worldEvent, setWorldEvent] = useState<{ text: string, url?: string } | null>(null);
   const [worldEventLoading, setWorldEventLoading] = useState(false);
 
@@ -71,17 +79,33 @@ export default function SolCycle() {
       const archetype = getSolarArchetype(bookmark.birthDate);
       console.log('[SolCycle] User archetype:', archetype);
       
+      // Get user's life phase at that time
+      const ageAtEvent = Math.floor((prevSolDate.getTime() - new Date(bookmark.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      const lifePhase = getLifePhase(ageAtEvent);
+      
       // Get the cosmic event and its interpretation
       const firstEvent = events[0] || null;
       const interpretation = interpretCosmicEventsForArchetype(events, archetype);
       
+      // Analyze cosmic patterns for enhanced understanding
+      const patterns = analyzeCosmicPatterns(events, lifePhase.name, prevSolDate);
+      const cosmicContext = contextualizeCosmicMoment(events, lifePhase.name, archetype, prevSolDate);
+      
       setCosmicAspect(firstEvent);
       setCosmicInterpretation(interpretation);
+      setCosmicPattern(patterns);
       
-      console.log('[SolCycle] Cosmic interpretation:', {
+      // Generate dynamic awakening text based on cosmic context
+      const awakeningText = generateDynamicAwakeningText(patterns, cosmicContext, lifePhase.name, archetype);
+      setDynamicAwakeningText(awakeningText);
+      
+      console.log('[SolCycle] Enhanced cosmic interpretation:', {
         event: firstEvent,
         archetype,
-        interpretation
+        interpretation,
+        patterns,
+        cosmicContext,
+        awakeningText
       });
     }
   }, [prevSolDate, bookmark]);
@@ -114,6 +138,37 @@ export default function SolCycle() {
       console.log('[SolCycle] Using fallback window.open');
       window.open(url, '_blank', 'noopener,noreferrer');
     }
+  };
+
+  const generateDynamicAwakeningText = (
+    patterns: { pattern: string | null; interpretation: string; phenomenaLikelihood: number },
+    cosmicContext: { cosmicMoment: string; personalContext: string; trajectory: string },
+    lifePhase: string,
+    archetype: string
+  ): string => {
+    const baseAwakenings = {
+      'BREAKTHROUGH': `A day of cosmic breakthrough where ${archetype.toLowerCase()} insights flowed freely`,
+      'SERENDIPITY': `A harmonious day when meaningful coincidences aligned with your ${archetype.toLowerCase()} path`,
+      'TRANSFORMATION': `A powerful day of personal transformation during your ${lifePhase.toLowerCase()}`,
+      'AWAKENING': `An electric day of heightened awareness and ${archetype.toLowerCase()} activation`,
+    };
+
+    if (patterns.pattern && baseAwakenings[patterns.pattern]) {
+      return baseAwakenings[patterns.pattern];
+    }
+
+    // Fallback based on cosmic moment
+    if (cosmicContext.cosmicMoment.includes('Jupiter')) {
+      return `A day of expansion and wisdom during your ${lifePhase.toLowerCase()}`;
+    } else if (cosmicContext.cosmicMoment.includes('Pluto')) {
+      return `A day of deep transformation and personal power`;
+    } else if (cosmicContext.cosmicMoment.includes('Uranus')) {
+      return `A day of innovation and sudden insights`;
+    } else if (cosmicContext.cosmicMoment.includes('Venus')) {
+      return `A day of beauty, connection, and creative flow`;
+    }
+
+    return `A day of profound ${archetype.toLowerCase()} expression and growth`;
   };
 
   if (!bookmark || !prevSolDay || !prevSolDate) return null;
@@ -222,11 +277,18 @@ export default function SolCycle() {
           </div>
           {/* Milestone Info */}
           <div className="text-base font-mono text-[#3730A3] font-medium uppercase text-center" style={{ letterSpacing: '-0.02em', marginBottom: 2}}>
-            SOLAR AWAKENING
+            {cosmicPattern?.pattern ? `${cosmicPattern.pattern} SOLAR AWAKENING` : 'SOLAR AWAKENING'}
           </div>
           <div className="text-lg font-serif text-black text-center" style={{ letterSpacing: '-0.02em', marginBottom: 18 }}>
-            A day of profound creative breakthroughs
+            {dynamicAwakeningText}
           </div>
+          
+          {/* Pattern Recognition Indicator */}
+          {cosmicPattern && cosmicPattern.phenomenaLikelihood > 0.5 && (
+            <div className="text-sm font-mono text-[#3730A3] text-center mb-4" style={{ letterSpacing: '-0.01em' }}>
+              {Math.round(cosmicPattern.phenomenaLikelihood * 100)}% cosmic alignment for meaningful experiences
+            </div>
+          )}
           {/* Event Boxes */}
           <div className="flex w-full gap-4" style={{ marginBottom: 24 }}>
             {/* Cosmic Event */}

@@ -1,65 +1,72 @@
 'use client';
-import { Tooltip } from '~/components/Soldash/Tooltip';
-import SolAge from '~/components/Soldash/SolAge';
-import MilestoneHighlight from '~/components/Soldash/MilestoneHighlight';
-import SolCycle from '~/components/Soldash/SolCycle';
+
+import { useBookmark } from '~/hooks/useBookmark';
+import { getSolarArchetype } from '~/lib/solarArchetype';
 import CosmicCodex from '~/components/Soldash/CosmicCodex';
-import { motion } from 'framer-motion';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
-};
 
 export default function JourneyPage() {
+  const { bookmark } = useBookmark();
+  
+  // Calculate user's current age and archetype if bookmark exists
+  const userAge = bookmark ? Math.floor((Date.now() - new Date(bookmark.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 25;
+  const userArchetype = bookmark ? getSolarArchetype(bookmark.birthDate) : 'Sol Traveler';
+
   return (
-    <motion.div 
-      className="space-y-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div className="mt-10" variants={itemVariants}>
-        <Tooltip
-          title="YOUR COSMIC TIMELINE"
-          body={"Track your journey through space and time.\nYour Solar Innovator energy builds with each rotation."}
-          bgColor="#F6F3FF"
-          borderColor="#C0AAFF"
-          textColor="#7E22CE"
-          storageKey="soldash-journey-tooltip"
-        />
-      </motion.div>
+    <div className="min-h-screen" style={{ background: '#FFFEF7' }}>
+      <div className="container mx-auto px-4 py-8">
+        
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-serif text-black mb-4" style={{ letterSpacing: '-0.02em' }}>
+            Your Cosmic Journey
+          </h1>
+          <p className="text-lg text-gray-600 font-serif max-w-2xl mx-auto leading-relaxed">
+            Explore the intersection of cosmic events and your personal timeline. 
+            Discover the patterns that have shaped your path and insights for your future trajectory.
+          </p>
+        </div>
 
-      {/* Sol Age Component */}
-      <motion.div variants={itemVariants}>
-        <SolAge />
-      </motion.div>
+        {/* Cosmic Codex Component */}
+        <div className="max-w-4xl mx-auto">
+          <CosmicCodex 
+            birthDate={bookmark?.birthDate}
+            archetype={userArchetype}
+            currentAge={userAge}
+          />
+        </div>
 
-      {/* Milestone Component */}
-      <motion.div variants={itemVariants}>
-        <MilestoneHighlight />
-      </motion.div>
+        {/* Additional Journey Content */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8">
+            
+            {/* Future Vision Section */}
+            <div className="p-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+              <h3 className="text-2xl font-serif text-black mb-4">Future Cosmic Moments</h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Your cosmic codex will reveal upcoming astrological events that align with your personal 
+                journey, helping you prepare for windows of opportunity and transformation.
+              </p>
+              <div className="text-sm font-mono text-gray-500 uppercase tracking-wider">
+                Coming in Full Cosmic Codex
+              </div>
+            </div>
 
-      {/* Sol Cycle Component */}
-      <motion.div variants={itemVariants}>
-        <SolCycle />
-      </motion.div>
+            {/* Pattern Analysis Section */}
+            <div className="p-8 bg-white border border-gray-200 rounded-lg shadow-sm">
+              <h3 className="text-2xl font-serif text-black mb-4">Pattern Recognition</h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                By analyzing the intersection of cosmic events with your life milestones, we identify 
+                patterns of breakthrough, serendipity, and transformation unique to your journey.
+              </p>
+              <div className="text-sm font-mono text-gray-500 uppercase tracking-wider">
+                Advanced Analytics Available
+              </div>
+            </div>
 
-      {/* Cosmic Codex Component */}
-      <motion.div variants={itemVariants}>
-        <CosmicCodex />
-      </motion.div>
-    </motion.div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   );
 } 
