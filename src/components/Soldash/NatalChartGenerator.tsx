@@ -65,7 +65,7 @@ interface BirthData {
   };
 }
 
-interface ChartData {
+export interface ChartData {
   sun: { sign: string; degree: number; house: number };
   moon: { sign: string; degree: number; house: number };
   rising: { sign: string; degree: number };
