@@ -104,26 +104,12 @@ export class NotificationManager {
 
   // Send notification for guidance reminder
   async sendGuidanceReminder(reminder: GuidanceReminder): Promise<void> {
-    // Try Farcaster notification first if userFid is available
-    if (reminder.userFid) {
-      try {
-        const { sendFarcasterNotification } = await import('~/lib/notifs');
-        const success = await sendFarcasterNotification(reminder.userFid, {
-          title: '🌞 Sol Oracle Guidance Reminder',
-          body: `Time to complete your guidance: "${reminder.title}"`,
-          targetUrl: `${window.location.origin}/surprise-me/guidance/${reminder.id}`
-        });
-        
-        if (success) {
-          console.log(`[NotificationManager] Farcaster notification sent successfully for guidance ${reminder.id}`);
-          return;
-        }
-      } catch (error) {
-        console.error(`[NotificationManager] Failed to send Farcaster notification for guidance ${reminder.id}:`, error);
-      }
+    // Client-side only: only use browser notifications
+    if (typeof window === 'undefined') {
+      console.log(`[NotificationManager] Server-side context, skipping notification for guidance ${reminder.id}`);
+      return;
     }
 
-    // Fallback to browser notification
     if (!this.isNotificationEnabled()) {
       console.log(`[NotificationManager] Browser notifications not enabled, skipping reminder for guidance ${reminder.id}`);
       return;
@@ -134,28 +120,11 @@ export class NotificationManager {
       icon: '/icon.png',
       badge: '/icon.png',
       tag: `guidance-${reminder.id}`,
-      requireInteraction: true,
-      actions: [
-        {
-          action: 'complete',
-          title: 'Complete Now'
-        },
-        {
-          action: 'dismiss',
-          title: 'Dismiss'
-        }
-      ]
+      requireInteraction: true
     });
 
     notification.onclick = () => {
       window.open(`/surprise-me/guidance/${reminder.id}`, '_blank');
-      notification.close();
-    };
-
-    notification.onaction = (event) => {
-      if (event.action === 'complete') {
-        window.open(`/surprise-me/guidance/${reminder.id}`, '_blank');
-      }
       notification.close();
     };
   }

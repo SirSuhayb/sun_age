@@ -168,15 +168,12 @@ export function useJournal() {
         word_count: data.content.trim().split(/\s+/).length,
         preservation_status: 'local',
         created_at: new Date().toISOString(),
-<<<<<<< HEAD
         // Add guidance metadata if provided
         guidance_id: data.guidance_id,
         guidance_title: data.guidance_title,
-        guidance_prompt: data.guidance_prompt
-=======
+        guidance_prompt: data.guidance_prompt,
         parent_entry_id: data.parent_entry_id,
         parent_share_id: data.parent_share_id
->>>>>>> origin/main
       };
 
       setEntries(prev => {

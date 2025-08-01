@@ -14,23 +14,17 @@ export function FarcasterNotificationHandler() {
       try {
         console.log('[FarcasterNotificationHandler] Setting up Farcaster notifications for user:', context.user.fid);
         
-        // Check if user has notification permissions in Farcaster
-        const hasNotifications = await sdk.actions.requestNotifications();
-        console.log('[FarcasterNotificationHandler] Notification permission result:', hasNotifications);
+        // Update existing guidance reminders with userFid
+        const notificationManager = NotificationManager.getInstance();
+        const reminders = notificationManager.getReminders();
         
-        if (hasNotifications) {
-          // Update existing guidance reminders with userFid
-          const notificationManager = NotificationManager.getInstance();
-          const reminders = notificationManager.getReminders();
-          
-          const updatedReminders = reminders.map(reminder => 
-            !reminder.userFid ? { ...reminder, userFid: context.user.fid } : reminder
-          );
-          
-          if (JSON.stringify(reminders) !== JSON.stringify(updatedReminders)) {
-            localStorage.setItem('guidanceReminders', JSON.stringify(updatedReminders));
-            console.log(`[FarcasterNotificationHandler] Updated ${updatedReminders.length} reminders with userFid: ${context.user.fid}`);
-          }
+        const updatedReminders = reminders.map(reminder => 
+          !reminder.userFid ? { ...reminder, userFid: context.user.fid } : reminder
+        );
+        
+        if (JSON.stringify(reminders) !== JSON.stringify(updatedReminders)) {
+          localStorage.setItem('guidanceReminders', JSON.stringify(updatedReminders));
+          console.log(`[FarcasterNotificationHandler] Updated ${updatedReminders.length} reminders with userFid: ${context.user.fid}`);
         }
       } catch (error) {
         console.error('[FarcasterNotificationHandler] Error setting up Farcaster notifications:', error);

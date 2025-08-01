@@ -43,7 +43,6 @@ export interface CreateUserAccountRequest {
   archetype?: string;
   farcaster_fid?: number;
   anon_id?: string;
->>>>>>> origin/main
 }
 
 export interface WisdomExtract {
@@ -178,5 +177,4 @@ export interface JournalViewSession {
   referrer_source?: string;
   device_type?: string;
   created_at: string;
->>>>>>> origin/main
 } 

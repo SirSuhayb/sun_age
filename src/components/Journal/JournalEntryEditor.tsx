@@ -167,7 +167,6 @@ export function JournalEntryEditor({ entry, onSave, onAutoSave, onFinish, onEdit
           });
         }
       }
-      }
     } catch (e: any) {
       setError(e.message || "Failed to share entry");
     } finally {
