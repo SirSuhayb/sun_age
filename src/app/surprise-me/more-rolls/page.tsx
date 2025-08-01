@@ -279,7 +279,7 @@ export default function MoreRollsPage() {
                 toAddress={process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`}
                 toChain={8453} // Base mainnet
                 toToken="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" // USDC on Base
-                toUnits={(selectedPackage.price * 100).toString()}
+                toUnits={(selectedPackage.price * 1000000).toString()}
                 intent="Purchase"
                 externalId={selectedPackage.id}
                 onPaymentCompleted={(e) => {
