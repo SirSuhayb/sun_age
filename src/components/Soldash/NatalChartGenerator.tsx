@@ -119,6 +119,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
   const generateChart = async () => {
     if (!birthData || !chartRef.current) return;
 
+    console.log('NatalChartGenerator: Starting chart generation');
     setIsGenerating(true);
     setError(null);
 
@@ -602,39 +603,50 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     );
   }
 
+  console.log('NatalChartGenerator render:', { 
+    hasChartData: !!chartData, 
+    hasSvgContent: !!svgContent,
+    isGenerating,
+    error,
+    houseSystem 
+  });
+
   return (
     <div className={`natal-chart-container ${className}`}>
-      {/* House System Toggle */}
-      <div className="flex justify-center mb-4">
-        <div className="inline-flex bg-[#FCF6E5] border border-[#E5E1D8] rounded-md p-1">
-          <button
-            onClick={() => {
-              setHouseSystem('equal');
-              if (chartData) setSvgContent(createChartSVG(chartData, false));
-            }}
-            className={`px-4 py-2 text-sm font-mono transition-colors ${
-              houseSystem === 'equal' 
-                ? 'bg-[#E6B13A] text-black' 
-                : 'text-[#666] hover:text-black'
-            }`}
-          >
-            Equal Houses
-          </button>
-          <button
-            onClick={() => {
-              setHouseSystem('whole');
-              if (chartData) setSvgContent(createChartSVG(chartData, true));
-            }}
-            className={`px-4 py-2 text-sm font-mono transition-colors ${
-              houseSystem === 'whole' 
-                ? 'bg-[#E6B13A] text-black' 
-                : 'text-[#666] hover:text-black'
-            }`}
-          >
-            Whole Sign
-          </button>
+      {/* House System Toggle - Only show when chart is rendered */}
+      {(svgContent || chartData) && (
+        <div className="flex flex-col items-center mb-4">
+          <div className="text-xs font-mono text-[#666] mb-2 uppercase tracking-wide">House System</div>
+          <div className="inline-flex bg-[#FCF6E5] border-2 border-[#E5E1D8] rounded-md p-1 shadow-sm">
+            <button
+              onClick={() => {
+                setHouseSystem('equal');
+                if (chartData) setSvgContent(createChartSVG(chartData, false));
+              }}
+              className={`px-4 py-2 text-sm font-mono transition-colors rounded ${
+                houseSystem === 'equal' 
+                  ? 'bg-[#E6B13A] text-black shadow-sm' 
+                  : 'text-[#666] hover:text-black hover:bg-[#F5F1E8]'
+              }`}
+            >
+              Equal Houses
+            </button>
+            <button
+              onClick={() => {
+                setHouseSystem('whole');
+                if (chartData) setSvgContent(createChartSVG(chartData, true));
+              }}
+              className={`px-4 py-2 text-sm font-mono transition-colors rounded ${
+                houseSystem === 'whole' 
+                  ? 'bg-[#E6B13A] text-black shadow-sm' 
+                  : 'text-[#666] hover:text-black hover:bg-[#F5F1E8]'
+              }`}
+            >
+              Whole Sign
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       
       {svgContent ? (
         <div 
