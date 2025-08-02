@@ -28,10 +28,30 @@ export default function CollectDataPage() {
       const saved = localStorage.getItem('sunCycleBookmark');
       if (saved) {
         const data = JSON.parse(saved);
-        // Convert from MM/DD/YYYY to YYYY-MM-DD format
-        if (data.birthDate) {
-          const [month, day, year] = data.birthDate.split('/');
-          return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        console.log('Loaded sunCycleBookmark data:', data);
+        if (data.birthDate && typeof data.birthDate === 'string') {
+          console.log('Birth date format:', data.birthDate);
+          // Check if it's already in YYYY-MM-DD format
+          if (data.birthDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return data.birthDate;
+          }
+          // Convert from MM/DD/YYYY to YYYY-MM-DD format
+          const parts = data.birthDate.split('/');
+          if (parts.length === 3) {
+            const [month, day, year] = parts;
+            // Ensure all parts exist and are strings
+            if (month && day && year) {
+              return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            }
+          }
+          // Try MM-DD-YYYY format
+          const hyphenParts = data.birthDate.split('-');
+          if (hyphenParts.length === 3 && hyphenParts[0].length === 2) {
+            const [month, day, year] = hyphenParts;
+            if (month && day && year) {
+              return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+            }
+          }
         }
       }
     } catch (error) {
