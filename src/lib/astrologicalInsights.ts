@@ -4,6 +4,12 @@ interface ChartData {
   sun: { sign: string; degree: number; house: number };
   moon: { sign: string; degree: number; house: number };
   rising: { sign: string; degree: number };
+  planets?: Array<{
+    name: string;
+    sign: string;
+    degree: number;
+    house: number;
+  }>;
   houses: Array<{ number: number; sign: string; degree: number }>;
 }
 
@@ -45,79 +51,115 @@ const getMode = (sign: string): string => {
   return 'Cardinal';
 };
 
-// Deep sign interpretations
+// Deep sign interpretations with placement-specific wisdom
 const SIGN_ESSENCE = {
   Aries: {
     core: "pioneering spirit and initiatory force",
     gift: "courage to begin new cycles",
     shadow: "impatience with process",
-    evolution: "from raw instinct to conscious leadership"
+    evolution: "from raw instinct to conscious leadership",
+    sun: "Identity through courageous action - You are here to lead humanity into new territories of possibility",
+    moon: "Emotional warrior - Your inner self needs independence and the thrill of new beginnings to feel alive",
+    rising: "Perceived as the initiator - Others see you as the one who dares to go first"
   },
   Taurus: {
     core: "grounding presence and sensual wisdom",
     gift: "manifestation through patience",
     shadow: "resistance to necessary change",
-    evolution: "from material attachment to spiritual abundance"
+    evolution: "from material attachment to spiritual abundance",
+    sun: "Identity through creating lasting value - You build foundations that sustain generations",
+    moon: "Emotional security through beauty and comfort - Your inner self craves stability and sensual pleasure",
+    rising: "Perceived as the stabilizer - Others trust your grounded presence and practical wisdom"
   },
   Gemini: {
     core: "mental agility and communicative bridge",
     gift: "connecting diverse perspectives",
     shadow: "scattered focus",
-    evolution: "from information gathering to wisdom synthesis"
+    evolution: "from information gathering to wisdom synthesis",
+    sun: "Identity through idea pollination - You weave connections between worlds of thought",
+    moon: "Emotional curiosity - Your inner self needs mental stimulation and variety to feel nourished",
+    rising: "Perceived as the messenger - Others see you as the bridge between different realities"
   },
   Cancer: {
     core: "emotional intelligence and nurturing wisdom",
     gift: "intuitive understanding of needs",
     shadow: "defensive withdrawal",
-    evolution: "from personal protection to universal care"
+    evolution: "from personal protection to universal care",
+    sun: "Identity through emotional leadership - You create sanctuary for the human family",
+    moon: "Deep feeling nature - Your inner self is the ocean of collective emotion",
+    rising: "Perceived as the nurturer - Others instinctively trust you with their vulnerabilities"
   },
   Leo: {
     core: "creative self-expression and heart radiance",
     gift: "inspiring others through authenticity",
     shadow: "ego-driven validation needs",
-    evolution: "from personal glory to collective empowerment"
+    evolution: "from personal glory to collective empowerment",
+    sun: "Identity through creative sovereignty - You embody the divine right to shine",
+    moon: "Heart-centered emotions - Your inner self needs to create and be celebrated",
+    rising: "Perceived as the star - Others are drawn to your natural radiance and confidence"
   },
   Virgo: {
     core: "sacred service and analytical precision",
     gift: "healing through practical wisdom",
     shadow: "paralysis through perfectionism",
-    evolution: "from criticism to compassionate refinement"
+    evolution: "from criticism to compassionate refinement",
+    sun: "Identity through sacred service - You perfect the art of practical mysticism",
+    moon: "Emotional refinement - Your inner self seeks purity and meaningful contribution",
+    rising: "Perceived as the healer - Others sense your capacity for precise, caring attention"
   },
   Libra: {
     core: "harmonizing intelligence and relational wisdom",
     gift: "creating beauty and balance",
     shadow: "indecision through over-consideration",
-    evolution: "from external harmony to inner equilibrium"
+    evolution: "from external harmony to inner equilibrium",
+    sun: "Identity through conscious relationship - You are the artist of human connection",
+    moon: "Emotional harmony - Your inner self needs beauty, balance, and partnership",
+    rising: "Perceived as the diplomat - Others see you as the embodiment of grace and fairness"
   },
   Scorpio: {
     core: "transformational power and depth perception",
     gift: "alchemical transformation of shadow",
     shadow: "destructive intensity",
-    evolution: "from control to surrender and rebirth"
+    evolution: "from control to surrender and rebirth",
+    sun: "Identity through transformation - You are the phoenix, showing humanity how to rise from ashes",
+    moon: "Emotional intensity - Your inner self navigates the deepest waters of human experience",
+    rising: "Perceived as the transformer - Others sense your power to see and change what's hidden"
   },
   Sagittarius: {
     core: "philosophical vision and expansive faith",
     gift: "inspiring through higher meaning",
     shadow: "dogmatic righteousness",
-    evolution: "from belief to direct knowing"
+    evolution: "from belief to direct knowing",
+    sun: "Identity through truth-seeking - You are the cosmic explorer expanding humanity's horizons",
+    moon: "Emotional freedom - Your inner self needs adventure and philosophical understanding",
+    rising: "Perceived as the visionary - Others see you as the bearer of optimism and wisdom"
   },
   Capricorn: {
     core: "masterful structure and timeless wisdom",
     gift: "manifesting lasting legacy",
     shadow: "cold ambition",
-    evolution: "from worldly success to spiritual authority"
+    evolution: "from worldly success to spiritual authority",
+    sun: "Identity through mastery - You architect structures that elevate collective consciousness",
+    moon: "Emotional responsibility - Your inner self finds security in achievement and respect",
+    rising: "Perceived as the authority - Others recognize your natural command and integrity"
   },
   Aquarius: {
     core: "revolutionary vision and collective consciousness",
     gift: "innovative solutions for humanity",
     shadow: "detached superiority",
-    evolution: "from rebellion to conscious revolution"
+    evolution: "from rebellion to conscious revolution",
+    sun: "Identity through innovation - You channel future frequencies to liberate humanity",
+    moon: "Emotional liberation - Your inner self needs freedom from limitation and space to innovate",
+    rising: "Perceived as the revolutionary - Others see you as the harbinger of progressive change"
   },
   Pisces: {
     core: "mystical unity and compassionate dissolution",
     gift: "healing through unconditional love",
     shadow: "escapist tendencies",
-    evolution: "from victim to mystic healer"
+    evolution: "from victim to mystic healer",
+    sun: "Identity through divine union - You dissolve the boundaries that separate humanity from source",
+    moon: "Emotional boundlessness - Your inner self swims in the ocean of collective consciousness",
+    rising: "Perceived as the mystic - Others sense your connection to invisible realms"
   }
 };
 
@@ -146,7 +188,7 @@ export const getSunInterpretation = (sun: ChartData['sun'], archetype: string) =
   
   return {
     title: `${sun.sign} Sun in ${sun.house}th House`,
-    core: `Your ${sun.sign} Sun represents ${essence.core}, expressing through the realm of ${house}. As a ${archetype}, this placement gives you ${essence.gift}, particularly in areas related to ${house}.`,
+    core: essence.sun,
     element: `The ${element} element of your Sun infuses your ${archetype} nature with ${
       element === 'Fire' ? 'inspirational enthusiasm and pioneering spirit' :
       element === 'Earth' ? 'practical wisdom and manifestation abilities' :
@@ -158,8 +200,9 @@ export const getSunInterpretation = (sun: ChartData['sun'], archetype: string) =
       mode === 'Fixed' ? 'sustain and deepen your commitments with unwavering focus' :
       'adapt and integrate diverse perspectives with flexibility'
     }.`,
-    evolution: `Your soul's journey involves ${essence.evolution}, using your ${archetype} gifts to illuminate the ${house} area of life.`,
-    integration: `To fully embody your ${sun.sign} Sun, embrace ${essence.gift} while being mindful of ${essence.shadow}. Your ${archetype} path offers unique opportunities to transform these shadow aspects into wisdom.`
+    house: `Expressing through the ${sun.house}th house of ${house}, your identity manifests most powerfully in this life area. Your ${archetype} mission is channeled through ${house}, making this the stage where your soul's purpose unfolds.`,
+    evolution: `Your highest evolution: ${essence.evolution}. This is the journey from ${essence.shadow} to ${essence.gift}, transforming personal identity into universal service.`,
+    integration: `As a ${archetype}, your ${sun.sign} Sun asks you to embody ${essence.core} in service to collective evolution. The shadow of ${essence.shadow} becomes your greatest teacher.`
   };
 };
 
@@ -171,20 +214,21 @@ export const getMoonInterpretation = (moon: ChartData['moon'], foundation: strin
   
   return {
     title: `${moon.sign} Moon in ${moon.house}th House`,
-    core: `Your ${moon.sign} Moon reveals ${essence.core} in your emotional nature, finding comfort through ${house}. Your ${foundation} provides the container for these deep emotional currents.`,
+    core: essence.moon,
     emotional: `You process feelings through the ${element} element, which means ${
       element === 'Fire' ? 'quick, passionate responses that seek immediate expression' :
       element === 'Earth' ? 'slow, steady processing that seeks practical outcomes' :
       element === 'Air' ? 'mental analysis and communication of feelings' :
       'deep, intuitive absorption that transforms over time'
     }.`,
-    needs: `Your soul needs ${essence.gift} to feel emotionally secure, particularly in matters of ${house}. Your ${foundation} supports these needs through practical structures.`,
-    cycles: `Your emotional cycles follow the ${moon.sign} rhythm, ${
-      getMode(moon.sign) === 'Cardinal' ? 'initiating new emotional experiences regularly' :
-      getMode(moon.sign) === 'Fixed' ? 'building deep emotional consistency over time' :
-      'flowing between different emotional states with natural ease'
-    }.`,
-    healing: `Emotional healing comes through embracing ${essence.gift} while releasing ${essence.shadow}. Your ${foundation} provides the stability needed for this deep work.`
+    house: `Your emotional home is in the ${moon.house}th house of ${house}. This is where your soul feels most nourished and where your ${foundation} finds its emotional grounding.`,
+    needs: `Core emotional needs: ${essence.gift}. When these needs are met, you become a channel for ${essence.core}, offering emotional wisdom to the collective.`,
+    cycles: `Your ${moon.sign} Moon creates ${
+      getMode(moon.sign) === 'Cardinal' ? 'waves of new emotional beginnings' :
+      getMode(moon.sign) === 'Fixed' ? 'deep emotional consistency and loyalty' :
+      'fluid emotional adaptability'
+    }, teaching you ${essence.evolution}.`,
+    healing: `Your emotional mastery comes through transforming ${essence.shadow} into ${essence.gift}. Your ${foundation} serves as the alchemical container for this transformation.`
   };
 };
 
@@ -196,35 +240,52 @@ export const getRisingInterpretation = (rising: ChartData['rising'], depth: stri
   
   return {
     title: `${rising.sign} Rising`,
-    core: `Your ${rising.sign} Ascendant creates a persona of ${essence.core}, the mask through which your ${depth} expresses itself to the world.`,
+    core: essence.rising,
     approach: `You approach life with ${element} energy, ${
       element === 'Fire' ? 'meeting each moment with enthusiasm and direct action' :
       element === 'Earth' ? 'grounding each experience in practical reality' :
       element === 'Air' ? 'engaging through ideas and social connection' :
       'feeling your way through intuitive perception'
     }.`,
-    firstImpression: `Others first perceive you as embodying ${essence.gift}, though your ${depth} adds layers of complexity beneath this initial impression.`,
-    lifeApproach: `Your ${mode} Rising means you ${
-      mode === 'Cardinal' ? 'constantly initiate new beginnings and fresh starts' :
-      mode === 'Fixed' ? 'maintain steady presence and consistent approach' :
-      'adapt your approach based on circumstances'
+    mask: `Your ${rising.sign} Ascendant is the sacred mask through which your ${depth} interfaces with the world. This is not deception but divine theater - you play the role of ${essence.core} to serve your higher purpose.`,
+    lifeApproach: `Your ${mode} Rising creates ${
+      mode === 'Cardinal' ? 'constant initiations - you are always at the beginning of something' :
+      mode === 'Fixed' ? 'unwavering presence - you are the rock others orient around' :
+      'fluid adaptability - you shapeshift to meet what life presents'
     }.`,
-    integration: `The journey involves ${essence.evolution}, using your ${depth} to transform the ${rising.sign} mask into authentic self-expression.`
+    integration: `Mastery comes through ${essence.evolution}. Your ${depth} transforms what begins as ${essence.shadow} into the gift of ${essence.gift}.`,
+    perception: `The world needs to see you as ${essence.core} because this is how you deliver your medicine. Your ${rising.sign} Rising is the delivery system for your soul's work.`
   };
 };
 
-// Generate synthesis interpretation
+// Generate synthesis interpretation with special configurations
 export const getSynthesisInterpretation = (
   sun: ChartData['sun'],
   moon: ChartData['moon'],
   rising: ChartData['rising'],
   archetype: string,
   foundation: string,
-  depth: string
+  depth: string,
+  planets?: ChartData['planets']
 ) => {
   const sunElement = getElement(sun.sign);
   const moonElement = getElement(moon.sign);
   const risingElement = getElement(rising.sign);
+  
+  // Check for special configurations
+  const hasDoubleSigns = sun.sign === moon.sign || sun.sign === rising.sign || moon.sign === rising.sign;
+  const hasTripleSigns = sun.sign === moon.sign && sun.sign === rising.sign;
+  
+  // Check for stelliums (3+ planets in same sign)
+  const signCounts: Record<string, number> = {};
+  signCounts[sun.sign] = (signCounts[sun.sign] || 0) + 1;
+  signCounts[moon.sign] = (signCounts[moon.sign] || 0) + 1;
+  if (planets) {
+    planets.forEach(planet => {
+      signCounts[planet.sign] = (signCounts[planet.sign] || 0) + 1;
+    });
+  }
+  const stelliums = Object.entries(signCounts).filter(([_, count]) => count >= 3);
   
   // Element balance analysis
   const elements = [sunElement, moonElement, risingElement];
@@ -236,27 +297,54 @@ export const getSynthesisInterpretation = (
   const dominantElement = Object.entries(elementCounts)
     .sort(([,a], [,b]) => b - a)[0][0];
   
+  let specialConfiguration = '';
+  
+  if (hasTripleSigns) {
+    const sign = sun.sign;
+    const essence = SIGN_ESSENCE[sign as keyof typeof SIGN_ESSENCE];
+    specialConfiguration = `TRIPLE ${sign.toUpperCase()} MASTERY: You are a pure channel of ${essence.core}. This rare configuration makes you a living embodiment of ${sign} energy. Your identity (Sun), emotions (Moon), and persona (Rising) are unified in service to ${essence.evolution}. You are here to show humanity the highest expression of ${essence.gift}.`;
+  } else if (hasDoubleSigns) {
+    if (sun.sign === moon.sign) {
+      const sign = sun.sign;
+      const essence = SIGN_ESSENCE[sign as keyof typeof SIGN_ESSENCE];
+      specialConfiguration = `SUN-MOON ${sign.toUpperCase()} CONJUNCTION: Your conscious will and unconscious needs are unified in ${essence.core}. This creates exceptional focus and clarity of purpose. You have no internal conflict between what you want (Sun) and what you need (Moon) - both seek ${essence.gift}.`;
+    } else if (sun.sign === rising.sign) {
+      const sign = sun.sign;
+      const essence = SIGN_ESSENCE[sign as keyof typeof SIGN_ESSENCE];
+      specialConfiguration = `SUN-RISING ${sign.toUpperCase()} ALIGNMENT: What you are (Sun) is exactly how you appear (Rising). This creates powerful authenticity - there's no mask, only truth. You embody ${essence.core} so completely that others immediately recognize your ${essence.gift}.`;
+    } else if (moon.sign === rising.sign) {
+      const sign = moon.sign;
+      const essence = SIGN_ESSENCE[sign as keyof typeof SIGN_ESSENCE];
+      specialConfiguration = `MOON-RISING ${sign.toUpperCase()} HARMONY: Your emotional nature (Moon) flows seamlessly through your persona (Rising). This creates magnetic presence - people instinctively trust you because your feelings and appearance are congruent. You offer ${essence.gift} through emotional authenticity.`;
+    }
+  }
+  
+  if (stelliums.length > 0) {
+    const [stelliumSign, count] = stelliums[0];
+    const essence = SIGN_ESSENCE[stelliumSign as keyof typeof SIGN_ESSENCE];
+    specialConfiguration += `\n\nSTELLIUM IN ${stelliumSign.toUpperCase()}: With ${count} planets in ${stelliumSign}, you carry concentrated ${essence.core}. This stellium makes you a specialist in ${essence.gift}, here to advance humanity's understanding of ${stelliumSign} wisdom.`;
+  }
+  
   return {
     title: "Cosmic Trinity Integration",
-    core: `Your ${sun.sign} Sun (conscious will), ${moon.sign} Moon (emotional needs), and ${rising.sign} Rising (life approach) create a unique cosmic signature that perfectly supports your ${archetype} path.`,
+    specialConfiguration,
+    core: `Your ${sun.sign} Sun (${SIGN_ESSENCE[sun.sign as keyof typeof SIGN_ESSENCE].sun}), ${moon.sign} Moon (${SIGN_ESSENCE[moon.sign as keyof typeof SIGN_ESSENCE].moon}), and ${rising.sign} Rising (${SIGN_ESSENCE[rising.sign as keyof typeof SIGN_ESSENCE].rising}) create a unique cosmic signature.`,
     elementBalance: `With ${dominantElement} as your dominant element, you naturally ${
       dominantElement === 'Fire' ? 'inspire and initiate transformational action' :
       dominantElement === 'Earth' ? 'manifest and ground spiritual visions into reality' :
       dominantElement === 'Air' ? 'communicate and bridge different realms of understanding' :
       'feel and intuit the deeper currents of existence'
     }.`,
-    soulPurpose: `Your soul chose this specific combination to ${
-      sun.sign === moon.sign ? `deeply master the lessons of ${sun.sign} through unified expression` :
-      getElement(sun.sign) === getElement(moon.sign) ? 
-        `harmonize your inner and outer life through ${getElement(sun.sign)} wisdom` :
-        'integrate diverse energies into a unique synthesis'
+    soulPurpose: `Your soul chose this specific combination to master the interplay between ${sun.sign} consciousness, ${moon.sign} emotion, and ${rising.sign} expression. This trinity teaches you to integrate ${
+      hasTripleSigns ? 'absolute mastery of one energy' :
+      hasDoubleSigns ? 'focused power through repetition' :
+      'diverse energies into wholeness'
     }.`,
-    lifeTheme: `The interplay between your ${archetype} (soul mission), ${foundation} (practical tools), and ${depth} (transformational gifts) is perfectly supported by your astrological configuration.`,
-    evolution: `Your highest evolution involves integrating:\n` +
-      `- ${SIGN_ESSENCE[sun.sign as keyof typeof SIGN_ESSENCE].gift} (Sun)\n` +
-      `- ${SIGN_ESSENCE[moon.sign as keyof typeof SIGN_ESSENCE].gift} (Moon)\n` +
-      `- ${SIGN_ESSENCE[rising.sign as keyof typeof SIGN_ESSENCE].gift} (Rising)\n` +
-      `Into a unified expression of your ${archetype} nature.`
+    lifeTheme: `The interplay between your ${archetype} (soul mission), ${foundation} (practical tools), and ${depth} (transformational gifts) is divinely orchestrated through your cosmic trinity.`,
+    evolution: `Your highest evolution path:\n` +
+      `- Sun: ${SIGN_ESSENCE[sun.sign as keyof typeof SIGN_ESSENCE].evolution}\n` +
+      `- Moon: ${SIGN_ESSENCE[moon.sign as keyof typeof SIGN_ESSENCE].evolution}\n` +
+      `- Rising: ${SIGN_ESSENCE[rising.sign as keyof typeof SIGN_ESSENCE].evolution}`
   };
 };
 

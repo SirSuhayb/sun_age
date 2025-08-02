@@ -46,7 +46,8 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
     chartData.rising,
     archetype,
     foundation,
-    depth
+    depth,
+    chartData.planets
   );
   const lifePhases = getLifePhases(chartData, solAge);
   const practices = getIntegrationPractices(chartData, solData);
@@ -59,6 +60,7 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
       keyPoints: [
         sunInsights.element,
         sunInsights.mode,
+        sunInsights.house,
         sunInsights.evolution,
         sunInsights.integration
       ]
@@ -69,6 +71,7 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
       content: moonInsights.core,
       keyPoints: [
         moonInsights.emotional,
+        moonInsights.house,
         moonInsights.needs,
         moonInsights.cycles,
         moonInsights.healing
@@ -80,15 +83,17 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
       content: risingInsights.core,
       keyPoints: [
         risingInsights.approach,
-        risingInsights.firstImpression,
+        risingInsights.mask,
         risingInsights.lifeApproach,
-        risingInsights.integration
+        risingInsights.integration,
+        risingInsights.perception
       ]
     },
     cosmicSynthesis: {
       title: synthesis.title,
       icon: Target,
       content: synthesis.core,
+      specialConfiguration: synthesis.specialConfiguration,
       keyPoints: [
         synthesis.elementBalance,
         synthesis.soulPurpose,
@@ -183,6 +188,12 @@ const ExpandableSection = ({ section, isExpanded, onToggle }: any) => {
           transition={{ duration: 0.3 }}
         >
           <p className="text-[#444] mb-4 leading-relaxed">{section.content}</p>
+          
+          {section.specialConfiguration && (
+            <div className="mb-6 p-4 bg-[#FCF6E5] border-2 border-[#E6B13A] rounded-lg">
+              <p className="text-[#444] font-serif whitespace-pre-line">{section.specialConfiguration}</p>
+            </div>
+          )}
           
           {section.keyPoints && (
             <div className="mb-4">
