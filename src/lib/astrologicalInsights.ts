@@ -60,7 +60,10 @@ const SIGN_ESSENCE = {
     evolution: "from raw instinct to conscious leadership",
     sun: "Identity through courageous action - You are here to lead humanity into new territories of possibility",
     moon: "Emotional warrior - Your inner self needs independence and the thrill of new beginnings to feel alive",
-    rising: "Perceived as the initiator - Others see you as the one who dares to go first"
+    rising: "Perceived as the initiator - Others see you as the one who dares to go first",
+    sunPhrase: "I ignite new beginnings with fearless action",
+    moonPhrase: "I need the freedom to pioneer and explore",
+    risingPhrase: "I lead by daring to go first"
   },
   Taurus: {
     core: "grounding presence and sensual wisdom",
@@ -69,7 +72,10 @@ const SIGN_ESSENCE = {
     evolution: "from material attachment to spiritual abundance",
     sun: "Identity through creating lasting value - You build foundations that sustain generations",
     moon: "Emotional security through beauty and comfort - Your inner self craves stability and sensual pleasure",
-    rising: "Perceived as the stabilizer - Others trust your grounded presence and practical wisdom"
+    rising: "Perceived as the stabilizer - Others trust your grounded presence and practical wisdom",
+    sunPhrase: "I build lasting foundations that sustain generations",
+    moonPhrase: "I find peace in beauty, comfort, and earthly pleasures",
+    risingPhrase: "I ground others with my steady presence"
   },
   Gemini: {
     core: "mental agility and communicative bridge",
@@ -78,7 +84,10 @@ const SIGN_ESSENCE = {
     evolution: "from information gathering to wisdom synthesis",
     sun: "Identity through idea pollination - You weave connections between worlds of thought",
     moon: "Emotional curiosity - Your inner self needs mental stimulation and variety to feel nourished",
-    rising: "Perceived as the messenger - Others see you as the bridge between different realities"
+    rising: "Perceived as the messenger - Others see you as the bridge between different realities",
+    sunPhrase: "I weave connections between worlds of thought",
+    moonPhrase: "I need mental stimulation and variety to thrive",
+    risingPhrase: "I bridge different realities with my words"
   },
   Cancer: {
     core: "emotional intelligence and nurturing wisdom",
@@ -87,7 +96,10 @@ const SIGN_ESSENCE = {
     evolution: "from personal protection to universal care",
     sun: "Identity through emotional leadership - You create sanctuary for the human family",
     moon: "Deep feeling nature - Your inner self is the ocean of collective emotion",
-    rising: "Perceived as the nurturer - Others instinctively trust you with their vulnerabilities"
+    rising: "Perceived as the nurturer - Others instinctively trust you with their vulnerabilities",
+    sunPhrase: "I create sanctuary for the human family",
+    moonPhrase: "I am the ocean of collective emotion",
+    risingPhrase: "I hold space for others' vulnerabilities"
   },
   Leo: {
     core: "creative self-expression and heart radiance",
@@ -96,7 +108,10 @@ const SIGN_ESSENCE = {
     evolution: "from personal glory to collective empowerment",
     sun: "Identity through creative sovereignty - You embody the divine right to shine",
     moon: "Heart-centered emotions - Your inner self needs to create and be celebrated",
-    rising: "Perceived as the star - Others are drawn to your natural radiance and confidence"
+    rising: "Perceived as the star - Others are drawn to your natural radiance and confidence",
+    sunPhrase: "I embody the divine right to shine",
+    moonPhrase: "I need to create and be celebrated",
+    risingPhrase: "I radiate confidence that inspires others"
   },
   Virgo: {
     core: "sacred service and analytical precision",
@@ -105,7 +120,10 @@ const SIGN_ESSENCE = {
     evolution: "from criticism to compassionate refinement",
     sun: "Identity through sacred service - You perfect the art of practical mysticism",
     moon: "Emotional refinement - Your inner self seeks purity and meaningful contribution",
-    rising: "Perceived as the healer - Others sense your capacity for precise, caring attention"
+    rising: "Perceived as the healer - Others sense your capacity for precise, caring attention",
+    sunPhrase: "I perfect the art of practical mysticism",
+    moonPhrase: "I seek purity and meaningful contribution",
+    risingPhrase: "I offer precise, caring attention to what matters"
   },
   Libra: {
     core: "harmonizing intelligence and relational wisdom",
@@ -114,7 +132,10 @@ const SIGN_ESSENCE = {
     evolution: "from external harmony to inner equilibrium",
     sun: "Identity through conscious relationship - You are the artist of human connection",
     moon: "Emotional harmony - Your inner self needs beauty, balance, and partnership",
-    rising: "Perceived as the diplomat - Others see you as the embodiment of grace and fairness"
+    rising: "Perceived as the diplomat - Others see you as the embodiment of grace and fairness",
+    sunPhrase: "I am the artist of human connection",
+    moonPhrase: "I need beauty, balance, and partnership",
+    risingPhrase: "I embody grace and fairness in all interactions"
   },
   Scorpio: {
     core: "transformational power and depth perception",
@@ -123,7 +144,10 @@ const SIGN_ESSENCE = {
     evolution: "from control to surrender and rebirth",
     sun: "Identity through transformation - You are the phoenix, showing humanity how to rise from ashes",
     moon: "Emotional intensity - Your inner self navigates the deepest waters of human experience",
-    rising: "Perceived as the transformer - Others sense your power to see and change what's hidden"
+    rising: "Perceived as the transformer - Others sense your power to see and change what's hidden",
+    sunPhrase: "I am the phoenix, rising and transforming",
+    moonPhrase: "I navigate the deepest waters of human experience",
+    risingPhrase: "I perceive and transform what's hidden"
   },
   Sagittarius: {
     core: "philosophical vision and expansive faith",
@@ -132,7 +156,10 @@ const SIGN_ESSENCE = {
     evolution: "from belief to direct knowing",
     sun: "Identity through truth-seeking - You are the cosmic explorer expanding humanity's horizons",
     moon: "Emotional freedom - Your inner self needs adventure and philosophical understanding",
-    rising: "Perceived as the visionary - Others see you as the bearer of optimism and wisdom"
+    rising: "Perceived as the visionary - Others see you as the bearer of optimism and wisdom",
+    sunPhrase: "I expand humanity's horizons through truth",
+    moonPhrase: "I need adventure and philosophical understanding",
+    risingPhrase: "I carry optimism and wisdom wherever I go"
   },
   Capricorn: {
     core: "masterful structure and timeless wisdom",
@@ -141,7 +168,10 @@ const SIGN_ESSENCE = {
     evolution: "from worldly success to spiritual authority",
     sun: "Identity through mastery - You architect structures that elevate collective consciousness",
     moon: "Emotional responsibility - Your inner self finds security in achievement and respect",
-    rising: "Perceived as the authority - Others recognize your natural command and integrity"
+    rising: "Perceived as the authority - Others recognize your natural command and integrity",
+    sunPhrase: "I architect structures that elevate consciousness",
+    moonPhrase: "I find security in achievement and respect",
+    risingPhrase: "I command respect through natural authority"
   },
   Aquarius: {
     core: "revolutionary vision and collective consciousness",
@@ -150,7 +180,10 @@ const SIGN_ESSENCE = {
     evolution: "from rebellion to conscious revolution",
     sun: "Identity through innovation - You channel future frequencies to liberate humanity",
     moon: "Emotional liberation - Your inner self needs freedom from limitation and space to innovate",
-    rising: "Perceived as the revolutionary - Others see you as the harbinger of progressive change"
+    rising: "Perceived as the revolutionary - Others see you as the harbinger of progressive change",
+    sunPhrase: "I channel future frequencies to liberate humanity",
+    moonPhrase: "I desire freedom from limitations and space to innovate",
+    risingPhrase: "I walk as a harbinger of progressive change"
   },
   Pisces: {
     core: "mystical unity and compassionate dissolution",
@@ -159,7 +192,10 @@ const SIGN_ESSENCE = {
     evolution: "from victim to mystic healer",
     sun: "Identity through divine union - You dissolve the boundaries that separate humanity from source",
     moon: "Emotional boundlessness - Your inner self swims in the ocean of collective consciousness",
-    rising: "Perceived as the mystic - Others sense your connection to invisible realms"
+    rising: "Perceived as the mystic - Others sense your connection to invisible realms",
+    sunPhrase: "I dissolve boundaries between humanity and source",
+    moonPhrase: "I swim in the ocean of collective consciousness",
+    risingPhrase: "I bridge the visible and invisible realms"
   }
 };
 
@@ -189,6 +225,7 @@ export const getSunInterpretation = (sun: ChartData['sun'], archetype: string) =
   return {
     title: `${sun.sign} Sun in ${sun.house}th House`,
     core: essence.sun,
+    powerPhrase: essence.sunPhrase,
     element: `The ${element} element of your Sun infuses your ${archetype} nature with ${
       element === 'Fire' ? 'inspirational enthusiasm and pioneering spirit' :
       element === 'Earth' ? 'practical wisdom and manifestation abilities' :
@@ -215,6 +252,7 @@ export const getMoonInterpretation = (moon: ChartData['moon'], foundation: strin
   return {
     title: `${moon.sign} Moon in ${moon.house}th House`,
     core: essence.moon,
+    powerPhrase: essence.moonPhrase,
     emotional: `You process feelings through the ${element} element, which means ${
       element === 'Fire' ? 'quick, passionate responses that seek immediate expression' :
       element === 'Earth' ? 'slow, steady processing that seeks practical outcomes' :
@@ -241,6 +279,7 @@ export const getRisingInterpretation = (rising: ChartData['rising'], depth: stri
   return {
     title: `${rising.sign} Rising`,
     core: essence.rising,
+    powerPhrase: essence.risingPhrase,
     approach: `You approach life with ${element} energy, ${
       element === 'Fire' ? 'meeting each moment with enthusiasm and direct action' :
       element === 'Earth' ? 'grounding each experience in practical reality' :

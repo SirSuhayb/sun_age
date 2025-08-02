@@ -57,6 +57,7 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
       title: sunInsights.title,
       icon: Star,
       content: sunInsights.core,
+      powerPhrase: sunInsights.powerPhrase,
       keyPoints: [
         sunInsights.element,
         sunInsights.mode,
@@ -69,6 +70,7 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
       title: moonInsights.title,
       icon: Heart,
       content: moonInsights.core,
+      powerPhrase: moonInsights.powerPhrase,
       keyPoints: [
         moonInsights.emotional,
         moonInsights.house,
@@ -81,6 +83,7 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
       title: risingInsights.title,
       icon: Zap,
       content: risingInsights.core,
+      powerPhrase: risingInsights.powerPhrase,
       keyPoints: [
         risingInsights.approach,
         risingInsights.mask,
@@ -188,6 +191,12 @@ const ExpandableSection = ({ section, isExpanded, onToggle }: any) => {
           transition={{ duration: 0.3 }}
         >
           <p className="text-[#444] mb-4 leading-relaxed">{section.content}</p>
+          
+          {section.powerPhrase && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-[#E6B13A]/10 to-[#FCF6E5] border-l-4 border-[#E6B13A]">
+              <p className="text-lg font-serif italic text-[#444] text-center">&ldquo;{section.powerPhrase}&rdquo;</p>
+            </div>
+          )}
           
           {section.specialConfiguration && (
             <div className="mb-6 p-4 bg-[#FCF6E5] border-2 border-[#E6B13A] rounded-lg">
