@@ -218,7 +218,13 @@ export async function calculateNatalChart(birthData: {
     
     // Check for EST/EDT timezone or Philadelphia coordinates
     const isPhiladelphia = lat && lon && Math.abs(lat - 39.9526) < 0.5 && Math.abs(lon - (-75.1652)) < 0.5;
-    const isEasternTime = tz && (tz === 'America/New_York' || tz.includes('EST') || tz.includes('EDT'));
+    const isEasternTime = tz && (
+      tz === 'America/New_York' || 
+      tz.includes('EST') || 
+      tz.includes('EDT') ||
+      tz === 'Etc/GMT+5' || // Etc/GMT+5 is UTC-5 (inverted sign convention)
+      tz === 'US/Eastern'
+    );
     
     if (isEasternTime || isPhiladelphia) {
       // EST is UTC-5 (add 5 hours to local time to get UTC)
@@ -241,6 +247,48 @@ export async function calculateNatalChart(birthData: {
           if (utcMonth > 12) {
             utcMonth = 1;
             utcYear += 1;
+          }
+        }
+      }
+        } else if (tz && tz.startsWith('Etc/GMT')) {
+      // Handle Etc/GMT timezones (note: signs are inverted)
+      // Etc/GMT+5 means UTC-5, Etc/GMT-5 means UTC+5
+      const match = tz.match(/Etc\/GMT([+-]\d+)/);
+      if (match) {
+        const offset = -parseInt(match[1]); // Invert the sign
+        utcHour = hour - offset; // Subtract offset to get UTC
+        console.log('Applying Etc/GMT timezone adjustment:', -offset, 'hours (timezone:', tz, ')');
+        
+        // Handle day rollover
+        if (utcHour >= 24) {
+          utcHour -= 24;
+          utcDay += 1;
+          
+          // Handle month rollover
+          const daysInMonth = new Date(year, month, 0).getDate();
+          if (utcDay > daysInMonth) {
+            utcDay = 1;
+            utcMonth += 1;
+            
+            // Handle year rollover
+            if (utcMonth > 12) {
+              utcMonth = 1;
+              utcYear += 1;
+            }
+          }
+        } else if (utcHour < 0) {
+          utcHour += 24;
+          utcDay -= 1;
+          
+          // Handle month rollback
+          if (utcDay < 1) {
+            utcMonth -= 1;
+            if (utcMonth < 1) {
+              utcMonth = 12;
+              utcYear -= 1;
+            }
+            const daysInPrevMonth = new Date(utcYear, utcMonth, 0).getDate();
+            utcDay = daysInPrevMonth;
           }
         }
       }
