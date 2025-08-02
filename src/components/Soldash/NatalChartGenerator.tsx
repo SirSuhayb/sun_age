@@ -306,14 +306,30 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     
     // Helper function to convert sign + degree to absolute degree
     const getAbsoluteDegree = (sign: string, degree: number): number => {
-      const signIndex = Object.keys(zodiacSymbols).indexOf(sign.toLowerCase());
+      const signs = [
+        'Aries', 'Taurus', 'Gemini', 'Cancer',
+        'Leo', 'Virgo', 'Libra', 'Scorpio',
+        'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+      ];
+      const signIndex = signs.findIndex(s => s.toLowerCase() === sign.toLowerCase());
+      if (signIndex === -1) {
+        console.error(`Unknown sign: ${sign}`);
+        return degree; // Fallback
+      }
       return signIndex * 30 + degree;
     };
     
-    // Calculate planet positions
-    const planetPositions = data.planets?.map(planet => {
+    // Calculate planet positions (including Sun and Moon)
+    const allPlanets = [
+      { name: 'sun', ...data.sun },
+      { name: 'moon', ...data.moon },
+      ...(data.planets || [])
+    ];
+    
+    const planetPositions = allPlanets.map(planet => {
       const absoluteDegree = getAbsoluteDegree(planet.sign, planet.degree);
-      const angle = (absoluteDegree - 90) * Math.PI / 180;
+      // Rotate -90 degrees to put Aries at the left (9 o'clock position)
+      const angle = (absoluteDegree - 180) * Math.PI / 180;
       return {
         ...planet,
         absoluteDegree,
@@ -321,7 +337,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         x: center + planetRadius * Math.cos(angle),
         y: center + planetRadius * Math.sin(angle)
       };
-    }) || [];
+    });
 
     return `
       <svg viewBox="0 0 ${size} ${size}" style="width: 100%; height: 100%; max-width: 400px; max-height: 400px;">
@@ -348,7 +364,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         
         <!-- Zodiac divisions -->
         ${Array.from({ length: 12 }).map((_, i) => {
-          const angle = (i * 30 - 90) * Math.PI / 180;
+          const angle = (i * 30 - 180) * Math.PI / 180;
           const x1 = center + innerRadius * Math.cos(angle);
           const y1 = center + innerRadius * Math.sin(angle);
           const x2 = center + outerRadius * Math.cos(angle);
@@ -359,7 +375,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         <!-- House divisions -->
         ${data.houses?.map((house) => {
           const absoluteDegree = getAbsoluteDegree(house.sign, house.degree);
-          const angle = (absoluteDegree - 90) * Math.PI / 180;
+          const angle = (absoluteDegree - 180) * Math.PI / 180;
           const x1 = center;
           const y1 = center;
           const x2 = center + innerRadius * Math.cos(angle);
@@ -369,7 +385,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         
         <!-- Zodiac signs -->
         ${Object.entries(zodiacSymbols).map(([sign, symbol], i) => {
-          const angle = ((i * 30 + 15) - 90) * Math.PI / 180;
+          const angle = ((i * 30 + 15) - 180) * Math.PI / 180;
           const x = center + (outerRadius + innerRadius) / 2 * Math.cos(angle);
           const y = center + (outerRadius + innerRadius) / 2 * Math.sin(angle) + 5;
           return `<text x="${x}" y="${y}" text-anchor="middle" class="zodiac-text">${symbol}</text>`;
@@ -381,7 +397,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
           const nextHouse = data.houses?.[i + 1] || data.houses?.[0];
           const houseAngle = house ? getAbsoluteDegree(house.sign, house.degree) : (i * 30);
           const nextHouseAngle = nextHouse ? getAbsoluteDegree(nextHouse.sign, nextHouse.degree) : ((i + 1) * 30);
-          const midAngle = ((houseAngle + nextHouseAngle) / 2 - 90) * Math.PI / 180;
+          const midAngle = ((houseAngle + nextHouseAngle) / 2 - 180) * Math.PI / 180;
           const x = center + (innerRadius * 0.7) * Math.cos(midAngle);
           const y = center + (innerRadius * 0.7) * Math.sin(midAngle) + 3;
           return `<text x="${x}" y="${y}" text-anchor="middle" class="degree-text">${i + 1}</text>`;
@@ -390,7 +406,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         <!-- Sun -->
         ${(() => {
           const sunAbsoluteDegree = getAbsoluteDegree(data.sun.sign, data.sun.degree);
-          const sunAngle = (sunAbsoluteDegree - 90) * Math.PI / 180;
+          const sunAngle = (sunAbsoluteDegree - 180) * Math.PI / 180;
           const sunX = center + planetRadius * Math.cos(sunAngle);
           const sunY = center + planetRadius * Math.sin(sunAngle);
           return `
@@ -404,7 +420,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         <!-- Moon -->
         ${(() => {
           const moonAbsoluteDegree = getAbsoluteDegree(data.moon.sign, data.moon.degree);
-          const moonAngle = (moonAbsoluteDegree - 90) * Math.PI / 180;
+          const moonAngle = (moonAbsoluteDegree - 180) * Math.PI / 180;
           const moonX = center + planetRadius * Math.cos(moonAngle);
           const moonY = center + planetRadius * Math.sin(moonAngle);
           return `
@@ -427,7 +443,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         <!-- Ascendant marker -->
         ${(() => {
           const ascAbsoluteDegree = getAbsoluteDegree(data.rising.sign, data.rising.degree);
-          const ascAngle = (ascAbsoluteDegree - 90) * Math.PI / 180;
+          const ascAngle = (ascAbsoluteDegree - 180) * Math.PI / 180;
           const x1 = center + (innerRadius - 10) * Math.cos(ascAngle);
           const y1 = center + (innerRadius - 10) * Math.sin(ascAngle);
           const x2 = center + (outerRadius + 10) * Math.cos(ascAngle);

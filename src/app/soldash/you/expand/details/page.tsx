@@ -1,8 +1,16 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronDown, ChevronUp, Calendar, Target, Zap, TrendingUp, Heart, Star } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Calendar, Target, Zap, TrendingUp, Heart, Star, Compass } from 'lucide-react';
 import Link from 'next/link';
+import { 
+  getSunInterpretation, 
+  getMoonInterpretation, 
+  getRisingInterpretation,
+  getSynthesisInterpretation,
+  getLifePhases,
+  getIntegrationPractices
+} from '~/lib/astrologicalInsights';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -21,62 +29,107 @@ const itemVariants = {
 
 // Generate detailed analysis based on chart and Sol data
 const generateDetailedAnalysis = (chartData: any, solData: any) => {
-  const sunSign = chartData?.sun?.sign || 'Aquarius';
-  const moonSign = chartData?.moon?.sign || 'Pisces';
-  const risingSign = chartData?.rising?.sign || 'Gemini';
+  if (!chartData || !solData) return {};
+  
   const archetype = solData?.archetype || 'Sol Innovator';
   const foundation = solData?.foundation || 'Builder Foundation';
   const depth = solData?.depth || 'Alchemist Depth';
-  const phase = solData?.phase || 'Current Phase (Ages 28–35)';
+  const solAge = solData?.age || 30;
+  
+  // Get deep astrological insights
+  const sunInsights = getSunInterpretation(chartData.sun, archetype);
+  const moonInsights = getMoonInterpretation(chartData.moon, foundation);
+  const risingInsights = getRisingInterpretation(chartData.rising, depth);
+  const synthesis = getSynthesisInterpretation(
+    chartData.sun, 
+    chartData.moon, 
+    chartData.rising,
+    archetype,
+    foundation,
+    depth
+  );
+  const lifePhases = getLifePhases(chartData, solAge);
+  const practices = getIntegrationPractices(chartData, solData);
 
   return {
-    lifeFocus: {
-      title: "Life Focus & Purpose",
-      icon: Target,
-      content: `Your ${sunSign} Sun combined with ${moonSign} Moon creates a unique blend that aligns with your ${archetype} identity. Your ${foundation} provides the practical framework for manifesting your vision, while your ${depth} adds transformational wisdom. This cosmic signature points to a life purpose centered around bridging innovation with intuitive understanding.`,
-      keyPoints: [
-        `${archetype} energy drives your core mission`,
-        `${foundation} provides practical manifestation skills`,
-        `${depth} offers transformational insights`,
-        `${sunSign}-${moonSign} combination enhances spiritual innovation`
-      ]
-    },
-    energyRhythms: {
-      title: "Energy Rhythms & Cycles",
-      icon: Zap,
-      content: `Your energy operates in distinct cycles influenced by your ${risingSign} Rising and ${phase}. The interplay between your ${archetype} nature and current life phase creates unique rhythms that optimize when you take action versus when you integrate insights.`,
-      keyPoints: [
-        `${moonSign} Moon creates emotional cycles every 28 days`,
-        `${risingSign} Rising influences daily energy patterns`,
-        `${phase} brings specific developmental focus`,
-        `${archetype} energy peaks during innovation periods`
-      ]
-    },
-    naturalStrengths: {
-      title: "Natural Strengths & Talents",
+    sunPath: {
+      title: sunInsights.title,
       icon: Star,
-      content: `Your ${archetype} nature combined with ${depth} reveals exceptional abilities that are enhanced by your ${sunSign}-${moonSign}-${risingSign} configuration. Your ${foundation} provides the practical skills to ground your visionary insights into reality.`,
+      content: sunInsights.core,
       keyPoints: [
-        `${archetype} brings innovative leadership abilities`,
-        `${foundation} provides practical manifestation skills`,
-        `${depth} offers transformational healing gifts`,
-        `${risingSign} enhances communication and adaptability`
+        sunInsights.element,
+        sunInsights.mode,
+        sunInsights.evolution,
+        sunInsights.integration
       ]
     },
-    annualResets: {
-      title: "Annual Reset Periods",
-      icon: Calendar,
-      content: `Your ${archetype} nature experiences powerful reset periods that align with both astrological transits and your personal Sol cycle. These periods are optimal for major life changes and breakthrough innovations.`,
-      periods: [
-        { name: "Sol Birthday Reset", date: "Personal Birthday", description: `${archetype} renewal and vision setting` },
-        { name: "Mid-Year Recalibration", date: "6 months after birthday", description: "Course correction and manifestation check-in" },
-        { name: "Seasonal Alignment", date: "Solstices & Equinoxes", description: "Natural rhythm synchronization" }
+    moonWisdom: {
+      title: moonInsights.title,
+      icon: Heart,
+      content: moonInsights.core,
+      keyPoints: [
+        moonInsights.emotional,
+        moonInsights.needs,
+        moonInsights.cycles,
+        moonInsights.healing
       ]
+    },
+    risingPath: {
+      title: risingInsights.title,
+      icon: Zap,
+      content: risingInsights.core,
+      keyPoints: [
+        risingInsights.approach,
+        risingInsights.firstImpression,
+        risingInsights.lifeApproach,
+        risingInsights.integration
+      ]
+    },
+    cosmicSynthesis: {
+      title: synthesis.title,
+      icon: Target,
+      content: synthesis.core,
+      keyPoints: [
+        synthesis.elementBalance,
+        synthesis.soulPurpose,
+        synthesis.lifeTheme,
+        synthesis.evolution
+      ]
+    },
+    currentPhases: {
+      title: "Your Current Life Phases",
+      icon: Calendar,
+      content: "You are navigating multiple astrological cycles that influence your growth and evolution:",
+      phases: lifePhases
+    },
+    dailyPractices: {
+      title: "Daily Integration Practices",
+      icon: Compass,
+      content: "Align your daily rhythm with your cosmic blueprint:",
+      keyPoints: [
+        practices.daily.morning,
+        practices.daily.midday,
+        practices.daily.evening,
+        `Weekly: Follow planetary days for optimal energy flow`
+      ],
+      practices: practices.weekly
+    },
+    monthlyRhythms: {
+      title: "Monthly & Seasonal Cycles",
+      icon: TrendingUp,
+      content: "Work with lunar and seasonal rhythms for maximum alignment:",
+      keyPoints: [
+        `New Moon: ${practices.monthly.newMoon}`,
+        `First Quarter: ${practices.monthly.firstQuarter}`,
+        `Full Moon: ${practices.monthly.fullMoon}`,
+        `Last Quarter: ${practices.monthly.lastQuarter}`
+      ],
+      seasonal: practices.seasonal
     },
     growthPhases: {
       title: "Life Growth Phases",
       icon: TrendingUp,
-      content: `Your ${phase} is part of a larger developmental cycle that integrates your ${archetype} evolution with traditional astrological timing. Each phase builds upon your ${foundation} while deepening your ${depth}.`,
+      content: `Your current phase is part of a larger developmental cycle that integrates your ${archetype} evolution with traditional astrological timing. Each phase builds upon your ${foundation} while deepening your ${depth}.`,
       phases: [
         { age: "21-28", title: "Foundation Activation", description: `Establishing ${foundation} in the world` },
         { age: "28-35", title: `${archetype} Emergence`, description: "Manifesting unique gifts and innovations" },
@@ -87,11 +140,11 @@ const generateDetailedAnalysis = (chartData: any, solData: any) => {
     relationships: {
       title: "Relationship Patterns",
       icon: Heart,
-      content: `Your relationship style reflects both your ${moonSign} Moon emotional needs and your ${archetype} mission. You attract partners who can support your ${foundation} work while appreciating your ${depth} insights.`,
+      content: `Your relationship style reflects both your ${chartData.moon.sign} Moon emotional needs and your ${archetype} mission. You attract partners who can support your ${foundation} work while appreciating your ${depth} insights.`,
       keyPoints: [
         `${archetype} attracts fellow innovators and visionaries`,
-        `${moonSign} Moon needs emotional depth and understanding`,
-        `${risingSign} Rising creates adaptable communication style`,
+        `${chartData.moon.sign} Moon needs emotional depth and understanding`,
+        `${chartData.rising.sign} Rising creates adaptable communication style`,
         `${depth} draws those seeking transformation`
       ]
     }
