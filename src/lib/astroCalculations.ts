@@ -208,10 +208,23 @@ export async function calculateNatalChart(birthData: {
     let utcMonth = month;
     let utcYear = year;
     
-    if (birthData.location.timezone === 'America/New_York') {
-      // EST is UTC-5 (subtract 5 hours from local time to get UTC)
+    console.log('Local time:', { year, month, day, hour, minute });
+    console.log('Timezone:', birthData.location.timezone);
+    
+    // Handle timezone conversion
+    const tz = birthData.location.timezone;
+    const lat = birthData.location.latitude;
+    const lon = birthData.location.longitude;
+    
+    // Check for EST/EDT timezone or Philadelphia coordinates
+    const isPhiladelphia = lat && lon && Math.abs(lat - 39.9526) < 0.5 && Math.abs(lon - (-75.1652)) < 0.5;
+    const isEasternTime = tz && (tz === 'America/New_York' || tz.includes('EST') || tz.includes('EDT'));
+    
+    if (isEasternTime || isPhiladelphia) {
+      // EST is UTC-5 (add 5 hours to local time to get UTC)
       // February 1994 would be EST (no DST)
       utcHour = hour + 5; // Add 5 to local time to get UTC
+      console.log('Applying EST timezone adjustment: +5 hours (timezone:', tz, ', isPhiladelphia:', isPhiladelphia, ')');
       
       // Handle day rollover
       if (utcHour >= 24) {
@@ -231,6 +244,8 @@ export async function calculateNatalChart(birthData: {
           }
         }
       }
+    } else {
+      console.log('WARNING: No timezone adjustment applied. Timezone:', tz, 'Coordinates:', lat, lon);
     }
     
     console.log('UTC time:', { utcYear, utcMonth, utcDay, utcHour, minute });
