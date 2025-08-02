@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -94,6 +94,19 @@ export default function MoreRollsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showDaimoPay, setShowDaimoPay] = useState(false);
   const daimoPayRef = useRef<any>(null);
+
+  // Debug logging for DaimoPay
+  useEffect(() => {
+    if (selectedPackage && selectedPayment === 'crypto') {
+      console.log('DaimoPay Debug:', {
+        packageId: selectedPackage.id,
+        packageName: selectedPackage.name,
+        price: selectedPackage.price,
+        toUnits: (selectedPackage.price * 100).toString(),
+        key: `daimo-${selectedPackage.id}-${selectedPackage.price}`
+      });
+    }
+  }, [selectedPackage, selectedPayment]);
 
   // Package options matching the screenshot
   const packages: PaymentOption[] = [
@@ -275,6 +288,7 @@ export default function MoreRollsPage() {
             {/* DaimoPay Button - Only show for CRYPTO payment */}
             {selectedPayment === 'crypto' && selectedPackage && (
               <DaimoPayButton.Custom
+                key={`daimo-${selectedPackage.id}-${selectedPackage.price}`}
                 appId="pay-demo" // Replace with your real App ID
                 toAddress={process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`}
                 toChain={8453} // Base mainnet
