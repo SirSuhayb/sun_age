@@ -14,6 +14,24 @@ const MAJOR_CITIES: Record<string, GeocodingResult> = {
     timezone: 'America/New_York',
     formattedAddress: 'Philadelphia, PA, USA'
   },
+  'philadelphia': {
+    latitude: 39.9526,
+    longitude: -75.1652,
+    timezone: 'America/New_York',
+    formattedAddress: 'Philadelphia, PA, USA'
+  },
+  'philly': {
+    latitude: 39.9526,
+    longitude: -75.1652,
+    timezone: 'America/New_York',
+    formattedAddress: 'Philadelphia, PA, USA'
+  },
+  'phila': {
+    latitude: 39.9526,
+    longitude: -75.1652,
+    timezone: 'America/New_York',
+    formattedAddress: 'Philadelphia, PA, USA'
+  },
   'new york, ny': {
     latitude: 40.7128,
     longitude: -74.0060,

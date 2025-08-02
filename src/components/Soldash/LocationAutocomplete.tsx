@@ -36,17 +36,61 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
   // Popular cities for quick access
   const popularCities = [
+    { display_name: "Philadelphia, PA, USA", lat: "39.9526", lon: "-75.1652" },
     { display_name: "New York, NY, USA", lat: "40.7128", lon: "-74.0060" },
     { display_name: "Los Angeles, CA, USA", lat: "34.0522", lon: "-118.2437" },
     { display_name: "Chicago, IL, USA", lat: "41.8781", lon: "-87.6298" },
-    { display_name: "Philadelphia, PA, USA", lat: "39.9526", lon: "-75.1652" },
+    { display_name: "Houston, TX, USA", lat: "29.7604", lon: "-95.3698" },
+    { display_name: "Phoenix, AZ, USA", lat: "33.4484", lon: "-112.0740" },
+    { display_name: "San Antonio, TX, USA", lat: "29.4241", lon: "-98.4936" },
+    { display_name: "San Diego, CA, USA", lat: "32.7157", lon: "-117.1611" },
+    { display_name: "Dallas, TX, USA", lat: "32.7767", lon: "-96.7970" },
+    { display_name: "Boston, MA, USA", lat: "42.3601", lon: "-71.0589" },
     { display_name: "London, United Kingdom", lat: "51.5074", lon: "-0.1278" },
     { display_name: "Paris, France", lat: "48.8566", lon: "2.3522" },
-    { display_name: "Tokyo, Japan", lat: "35.6762", lon: "139.6503" }
+    { display_name: "Tokyo, Japan", lat: "35.6762", lon: "139.6503" },
+    { display_name: "Toronto, Canada", lat: "43.6532", lon: "-79.3832" },
+    { display_name: "Sydney, Australia", lat: "-33.8688", lon: "151.2093" }
   ];
 
   // Search for locations using Nominatim API
   const searchLocations = async (query: string) => {
+    // First, filter popular cities based on query
+    if (query.length > 0) {
+      const lowerQuery = query.toLowerCase();
+      
+      // Check for common abbreviations
+      const expandedQueries = [lowerQuery];
+      if (lowerQuery === 'phila' || lowerQuery === 'philly') {
+        expandedQueries.push('philadelphia');
+      } else if (lowerQuery === 'nyc' || lowerQuery === 'ny') {
+        expandedQueries.push('new york');
+      } else if (lowerQuery === 'la') {
+        expandedQueries.push('los angeles');
+      } else if (lowerQuery === 'sf') {
+        expandedQueries.push('san francisco');
+      }
+      
+      const filteredPopular = popularCities.filter(city => {
+        const cityLower = city.display_name.toLowerCase();
+        return expandedQueries.some(q => cityLower.includes(q)) ||
+               cityLower.includes(lowerQuery);
+      });
+      
+      // If we have matches in popular cities, show them immediately
+      if (filteredPopular.length > 0) {
+        setSuggestions(filteredPopular.map(city => ({
+          ...city,
+          importance: 1 // High importance for popular cities
+        })));
+        
+        // For short queries or if we have good matches, don't search API
+        if (query.length < 3 || filteredPopular.length >= 3) {
+          return;
+        }
+      }
+    }
+    
     if (query.length < 3) {
       setSuggestions([]);
       return;
@@ -125,8 +169,12 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         searchLocations(newValue);
       }, 300);
     } else {
-      setSuggestions([]);
-      setShowDropdown(false);
+      // Show popular cities when empty but focused
+      setShowDropdown(true);
+      setSuggestions(popularCities.map(city => ({
+        ...city,
+        importance: 1
+      })));
     }
   };
 
