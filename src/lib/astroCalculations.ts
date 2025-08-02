@@ -183,6 +183,58 @@ function calculateMoonPosition(T: number): number {
   return moonLon;
 }
 
+// Calculate planetary positions (simplified Keplerian elements)
+function calculatePlanetaryPositions(T: number, sunLon: number): Record<string, number> {
+  const planets: Record<string, number> = {};
+  
+  // Mercury - closest to Sun, max elongation ~28°
+  const mercuryM = (102.27938 + 149472.51529 * T) % 360;
+  const mercuryMRad = mercuryM * Math.PI / 180;
+  const mercuryElong = 23.5 * Math.sin(mercuryMRad) + 2.8 * Math.sin(2 * mercuryMRad);
+  planets.mercury = (sunLon + mercuryElong + 360) % 360;
+  
+  // Venus - max elongation ~47°
+  const venusM = (212.60322 + 58517.80387 * T) % 360;
+  const venusMRad = venusM * Math.PI / 180;
+  const venusElong = 46.3 * Math.sin(venusMRad) + 0.8 * Math.sin(2 * venusMRad);
+  planets.venus = (sunLon + venusElong + 360) % 360;
+  
+  // Mars
+  const marsL = (355.45332 + 19140.29934 * T) % 360;
+  const marsM = (319.51913 + 19139.85475 * T) % 360;
+  const marsMRad = marsM * Math.PI / 180;
+  const marsC = 10.691 * Math.sin(marsMRad) + 0.623 * Math.sin(2 * marsMRad);
+  planets.mars = (marsL + marsC + 360) % 360;
+  
+  // Jupiter
+  const jupiterL = (34.35519 + 3034.90567 * T) % 360;
+  const jupiterM = (225.32833 + 3034.69202 * T) % 360;
+  const jupiterMRad = jupiterM * Math.PI / 180;
+  const jupiterC = 5.31 * Math.sin(jupiterMRad) + 0.148 * Math.sin(2 * jupiterMRad);
+  planets.jupiter = (jupiterL + jupiterC + 360) % 360;
+  
+  // Saturn
+  const saturnL = (50.07744 + 1222.11381 * T) % 360;
+  const saturnM = (142.59889 + 1221.55147 * T) % 360;
+  const saturnMRad = saturnM * Math.PI / 180;
+  const saturnC = 6.40 * Math.sin(saturnMRad) + 0.212 * Math.sin(2 * saturnMRad);
+  planets.saturn = (saturnL + saturnC + 360) % 360;
+  
+  // Outer planets (very simplified - these move slowly)
+  planets.uranus = (314.05500 + 428.46699 * T) % 360;
+  planets.neptune = (304.34866 + 218.48620 * T) % 360;
+  planets.pluto = (238.92881 + 145.20444 * T) % 360;
+  
+  // North Node (Mean Node)
+  planets.northNode = (125.04452 - 1934.13618 * T + 0.00207 * T * T) % 360;
+  if (planets.northNode < 0) planets.northNode += 360;
+  
+  // South Node is always opposite North Node
+  planets.southNode = (planets.northNode + 180) % 360;
+  
+  return planets;
+}
+
 export async function calculateNatalChart(birthData: {
   date: string;
   time: string;
@@ -326,72 +378,81 @@ export async function calculateNatalChart(birthData: {
     const moonLon = calculateMoonPosition(T);
     console.log('Moon longitude:', moonLon, 'degrees =', getZodiacSign(moonLon), getDegreeInSign(moonLon));
     
-    // Calculate houses (Equal House system)
-    const houses: number[] = [];
+    // Calculate all planetary positions
+    const planetPositions = calculatePlanetaryPositions(T, sunLon);
+    console.log('Planetary positions:', planetPositions);
     
-    // HOUSE SYSTEM CONFIGURATION
-    // Currently using Equal House system where each house is exactly 30 degrees
-    // starting from the Ascendant degree.
-    // 
-    // To switch to Whole Sign houses, uncomment the following section:
-    /*
-    // Whole Sign House System
-    const ascSign = Math.floor(ascendant / 30);
-    for (let i = 0; i < 12; i++) {
-      const houseSign = (ascSign + i) % 12;
-      houses.push(houseSign * 30);
-    }
-    */
+    // Calculate BOTH house systems
+    const equalHouses: number[] = [];
+    const wholeSignHouses: number[] = [];
     
-    // Equal House System (current implementation)
+    // Equal House System - each house is exactly 30 degrees from Ascendant
     for (let i = 0; i < 12; i++) {
       let cusp = ascendant + (i * 30);
       if (cusp >= 360) cusp -= 360;
-      houses.push(cusp);
+      equalHouses.push(cusp);
+    }
+    
+    // Whole Sign House System - each house is an entire sign
+    const ascSign = Math.floor(ascendant / 30);
+    for (let i = 0; i < 12; i++) {
+      const houseSign = (ascSign + i) % 12;
+      wholeSignHouses.push(houseSign * 30);
     }
     
     // Calculate house positions
     function getHousePosition(longitude: number, houses: number[]): number {
       const normLon = ((longitude % 360) + 360) % 360;
       for (let i = 0; i < 12; i++) {
-        const currentHouse = houses[i];
+        const house = houses[i];
         const nextHouse = houses[(i + 1) % 12];
         
-        if (nextHouse > currentHouse) {
-          if (normLon >= currentHouse && normLon < nextHouse) {
-            return i + 1;
-          }
+        if (nextHouse > house) {
+          if (normLon >= house && normLon < nextHouse) return i + 1;
         } else {
-          if (normLon >= currentHouse || normLon < nextHouse) {
-            return i + 1;
-          }
+          if (normLon >= house || normLon < nextHouse) return i + 1;
         }
       }
       return 1;
     }
     
-    // Build chart data
+    // Build the chart data with BOTH house systems
     const transformedData: ChartData = {
       sun: {
         sign: getZodiacSign(sunLon),
         degree: getDegreeInSign(sunLon),
-        house: getHousePosition(sunLon, houses)
+        house: getHousePosition(sunLon, equalHouses),
+        houseWS: getHousePosition(sunLon, wholeSignHouses)
       },
       moon: {
         sign: getZodiacSign(moonLon),
         degree: getDegreeInSign(moonLon),
-        house: getHousePosition(moonLon, houses)
+        house: getHousePosition(moonLon, equalHouses),
+        houseWS: getHousePosition(moonLon, wholeSignHouses)
       },
       rising: {
         sign: getZodiacSign(ascendant),
         degree: getDegreeInSign(ascendant)
       },
-      planets: [], // Simplified - no other planets for now
-      houses: houses.map((cusp, i) => ({
+      planets: Object.entries(planetPositions).map(([name, longitude]) => ({
+        name,
+        sign: getZodiacSign(longitude),
+        degree: getDegreeInSign(longitude),
+        house: getHousePosition(longitude, equalHouses),
+        houseWS: getHousePosition(longitude, wholeSignHouses),
+        retrograde: false // Would need ephemeris for accurate retrograde detection
+      })),
+      houses: equalHouses.map((cusp, i) => ({
         number: i + 1,
         sign: getZodiacSign(cusp),
         degree: getDegreeInSign(cusp)
       })),
+      housesWS: wholeSignHouses.map((cusp, i) => ({
+        number: i + 1,
+        sign: getZodiacSign(cusp),
+        degree: getDegreeInSign(cusp)
+      })),
+      houseSystem: 'both',
       aspects: []
     };
     

@@ -307,6 +307,25 @@ export default function ChartPage() {
                 </div>
               </div>
             )}
+            
+            {/* All Planets Display */}
+            {chartData?.planets && chartData.planets.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-sm font-serif font-semibold mb-3 text-center">All Planetary Positions</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {chartData.planets.map((planet) => (
+                    <div key={planet.name} className="p-2 bg-[#FCF6E5] border border-[#E5E1D8] text-center">
+                      <div className="text-xs font-mono uppercase">{planet.name}</div>
+                      <div className="text-xs text-[#666]">{planet.sign} {Math.round(planet.degree)}°</div>
+                      <div className="text-xs text-[#888]">
+                        H{planet.house}
+                        {planet.houseWS && planet.houseWS !== planet.house && ` (WS: H${planet.houseWS})`}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Key Insights */}

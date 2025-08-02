@@ -66,14 +66,15 @@ interface BirthData {
 }
 
 export interface ChartData {
-  sun: { sign: string; degree: number; house: number };
-  moon: { sign: string; degree: number; house: number };
+  sun: { sign: string; degree: number; house: number; houseWS?: number };
+  moon: { sign: string; degree: number; house: number; houseWS?: number };
   rising: { sign: string; degree: number };
   planets: Array<{
     name: string;
     sign: string;
     degree: number;
     house: number;
+    houseWS?: number; // Whole Sign house
     retrograde?: boolean;
   }>;
   houses: Array<{
@@ -81,6 +82,12 @@ export interface ChartData {
     sign: string;
     degree: number;
   }>;
+  housesWS?: Array<{  // Whole Sign houses
+    number: number;
+    sign: string;
+    degree: number;
+  }>;
+  houseSystem?: 'equal' | 'whole' | 'both';
   aspects: Array<{
     planet1: string;
     planet2: string;
@@ -107,6 +114,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [astroChart, setAstroChart] = useState<AstroChart | null>(null);
   const [svgContent, setSvgContent] = useState<string | null>(null);
+  const [houseSystem, setHouseSystem] = useState<'equal' | 'whole'>('equal');
 
   const generateChart = async () => {
     if (!birthData || !chartRef.current) return;
@@ -284,12 +292,12 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     } catch (err) {
       console.error('Error rendering with AstroChart, falling back to custom SVG:', err);
       // Fallback to our custom SVG if AstroChart fails
-      setSvgContent(createChartSVG(data));
+      setSvgContent(createChartSVG(data, houseSystem === 'whole'));
     }
   };
 
   // Create SVG chart visualization based on calculated data (fallback)
-  const createChartSVG = (data: ChartData): string => {
+  const createChartSVG = (data: ChartData, useWholeSign: boolean = false): string => {
     console.log('Creating SVG with data:', {
       sun: data.sun,
       moon: data.moon,
@@ -373,7 +381,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
         }).join('')}
         
         <!-- House divisions -->
-        ${data.houses?.map((house) => {
+        ${(useWholeSign ? data.housesWS : data.houses)?.map((house) => {
           const absoluteDegree = getAbsoluteDegree(house.sign, house.degree);
           const angle = (absoluteDegree - 180) * Math.PI / 180;
           const x1 = center;
@@ -530,7 +538,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
     setChartData(mockData);
     
     // Use SVG rendering
-    setSvgContent(createChartSVG(mockData));
+    setSvgContent(createChartSVG(mockData, houseSystem === 'whole'));
     
     if (onChartGenerated) {
       onChartGenerated(mockData);
@@ -596,6 +604,38 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
   return (
     <div className={`natal-chart-container ${className}`}>
+      {/* House System Toggle */}
+      <div className="flex justify-center mb-4">
+        <div className="inline-flex bg-[#FCF6E5] border border-[#E5E1D8] rounded-md p-1">
+          <button
+            onClick={() => {
+              setHouseSystem('equal');
+              if (chartData) setSvgContent(createChartSVG(chartData, false));
+            }}
+            className={`px-4 py-2 text-sm font-mono transition-colors ${
+              houseSystem === 'equal' 
+                ? 'bg-[#E6B13A] text-black' 
+                : 'text-[#666] hover:text-black'
+            }`}
+          >
+            Equal Houses
+          </button>
+          <button
+            onClick={() => {
+              setHouseSystem('whole');
+              if (chartData) setSvgContent(createChartSVG(chartData, true));
+            }}
+            className={`px-4 py-2 text-sm font-mono transition-colors ${
+              houseSystem === 'whole' 
+                ? 'bg-[#E6B13A] text-black' 
+                : 'text-[#666] hover:text-black'
+            }`}
+          >
+            Whole Sign
+          </button>
+        </div>
+      </div>
+      
       {svgContent ? (
         <div 
           className="w-full h-full border border-[#E5E1D8] bg-[#FCF6E5] p-4"
