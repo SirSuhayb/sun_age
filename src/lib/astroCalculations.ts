@@ -328,6 +328,22 @@ export async function calculateNatalChart(birthData: {
     
     // Calculate houses (Equal House system)
     const houses: number[] = [];
+    
+    // HOUSE SYSTEM CONFIGURATION
+    // Currently using Equal House system where each house is exactly 30 degrees
+    // starting from the Ascendant degree.
+    // 
+    // To switch to Whole Sign houses, uncomment the following section:
+    /*
+    // Whole Sign House System
+    const ascSign = Math.floor(ascendant / 30);
+    for (let i = 0; i < 12; i++) {
+      const houseSign = (ascSign + i) % 12;
+      houses.push(houseSign * 30);
+    }
+    */
+    
+    // Equal House System (current implementation)
     for (let i = 0; i < 12; i++) {
       let cusp = ascendant + (i * 30);
       if (cusp >= 360) cusp -= 360;
