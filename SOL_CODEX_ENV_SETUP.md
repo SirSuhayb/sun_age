@@ -71,4 +71,4 @@ The 7-day free trial is configured in the code (`trial_period_days: 7`). Stripe 
 
 ## SOLAR Token Free Access
 
-Users with 500M+ SOLAR tokens get 1 year free access. This bypasses Stripe entirely and redirects directly to the data collection page.
+Users with 150M+ SOLAR tokens get 1 year free access (equivalent to $77/year value). This bypasses Stripe entirely and redirects directly to the data collection page.

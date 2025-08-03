@@ -71,7 +71,7 @@ export function saveSubscriptionData(type: 'monthly' | 'yearly' | 'solar') {
   const expiresAt = new Date();
   
   if (type === 'solar') {
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 1 year for SOLAR holders
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 1 year for SOLAR holders (150M+ tokens)
     localStorage.setItem('solCodexSolarAccess', JSON.stringify({
       type: 'solar',
       grantedAt: new Date(),

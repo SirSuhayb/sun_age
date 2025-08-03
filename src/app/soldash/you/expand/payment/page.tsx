@@ -26,7 +26,7 @@ const SOLAR_TOKEN_ABI = [
     type: 'function'
   }
 ] as const;
-const REQUIRED_SOLAR_AMOUNT = 500_000_000; // 500M tokens
+const REQUIRED_SOLAR_AMOUNT = 150_000_000; // 150M tokens (~$77 USD)
 
 const features = [
   { icon: '✨', text: 'Personal power phrases for your cosmic trinity' },
@@ -293,7 +293,7 @@ export default function PaymentPage() {
                   variants={itemVariants}
                 >
                   <p className="text-xs text-[#666] mb-2">
-                    Have 500M+ SOLAR tokens?
+                    Have 150M+ SOLAR tokens?
                   </p>
                   <button
                     onClick={() => {
@@ -324,7 +324,7 @@ export default function PaymentPage() {
                 You have {Math.floor(Number(formatUnits(solarBalance as bigint, 18)) / 1_000_000)}M SOLAR tokens
               </p>
               <p className="text-xs text-[#666] mb-3">
-                Need 500M+ for free access (currently ~$183 USD)
+                Need 150M+ for free access (yearly value ~$77 USD)
               </p>
               <a
                 href="https://app.uniswap.org/swap?outputCurrency=0x746042147240304098C837563aAEc0F671881B07&chain=base"
