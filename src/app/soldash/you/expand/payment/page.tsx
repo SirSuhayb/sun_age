@@ -26,7 +26,7 @@ const SOLAR_TOKEN_ABI = [
     type: 'function'
   }
 ] as const;
-const REQUIRED_SOLAR_AMOUNT = 500_000_000;
+const REQUIRED_SOLAR_AMOUNT = 500_000_000; // 500M tokens
 
 const features = [
   { icon: '✨', text: 'Personal power phrases for your cosmic trinity' },
@@ -296,7 +296,15 @@ export default function PaymentPage() {
                     Have 500M+ SOLAR tokens?
                   </p>
                   <button
-                    onClick={() => connectors[0] && connect({ connector: connectors[0] })}
+                    onClick={() => {
+                      if (connectors && connectors.length > 0) {
+                        const connector = connectors.find(c => c.ready) || connectors[0];
+                        connect({ connector });
+                      } else {
+                        // Fallback to manual wallet connection
+                        window.open('https://app.uniswap.org/swap?outputCurrency=0x746042147240304098C837563aAEc0F671881B07&chain=base', '_blank');
+                      }
+                    }}
                     className="text-sm text-[#E6B13A] hover:text-[#D4A02A] font-mono"
                   >
                     Connect Wallet for Free Access
@@ -304,6 +312,29 @@ export default function PaymentPage() {
                 </motion.div>
               )}
             </>
+          )}
+
+          {/* SOLAR token info for connected users without enough tokens */}
+          {isConnected && !isCheckingTokens && !hasFreeTier && solarBalance !== undefined && (
+            <motion.div 
+              className="mt-4 p-3 bg-[#FCF6E5] border border-[#E5E1D8] text-center"
+              variants={itemVariants}
+            >
+              <p className="text-xs text-[#666] mb-2">
+                You have {Math.floor(Number(formatUnits(solarBalance as bigint, 18)) / 1_000_000)}M SOLAR tokens
+              </p>
+              <p className="text-xs text-[#666] mb-3">
+                Need 500M+ for free access (currently ~$183 USD)
+              </p>
+              <a
+                href="https://app.uniswap.org/swap?outputCurrency=0x746042147240304098C837563aAEc0F671881B07&chain=base"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center text-sm text-[#E6B13A] hover:text-[#D4A02A] font-mono"
+              >
+                Swap for SOLAR on Uniswap →
+              </a>
+            </motion.div>
           )}
         </motion.div>
 
