@@ -93,13 +93,16 @@ export default function PaymentPage() {
       price: 7.77,
       period: 'month',
       total: '$7.77/month',
-      description: 'Monthly access to Sol Codex Pro'
+      description: 'Monthly access to Sol Codex Pro',
+      // Daimo requires $10 minimum, so we'll only show yearly for crypto
+      daimoPrice: 10
     },
     yearly: {
       price: 77,
       period: 'year', 
       total: '$77/year',
-      description: 'Save $16.24 with annual access'
+      description: 'Save $16.24 with annual access',
+      daimoPrice: 77
     }
   };
 
@@ -239,6 +242,18 @@ export default function PaymentPage() {
                 </div>
               </motion.div>
 
+              {/* Daimo minimum warning */}
+              {paymentMethod === 'daimo' && selectedPlan === 'monthly' && (
+                <motion.div 
+                  className="mb-4 p-3 bg-amber-50 border border-amber-200 text-xs"
+                  variants={itemVariants}
+                >
+                  <p className="text-amber-800">
+                    <strong>Note:</strong> Due to Daimo&apos;s $10 minimum, monthly crypto payments are charged at $10 (you get the extra $2.23 as credit).
+                  </p>
+                </motion.div>
+              )}
+
               {/* Payment Form */}
               <motion.div variants={itemVariants}>
                 {paymentMethod === 'stripe' ? (
@@ -255,7 +270,7 @@ export default function PaymentPage() {
                     toAddress={process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}` || '0x11BA1632fd6Cc120D309158298e3a0df3B7ba283'}
                     toChain={8453}
                     toToken="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
-                    toUnits={plans[selectedPlan].price.toString()}
+                    toUnits={plans[selectedPlan].daimoPrice.toString()}
                     intent={`Sol Codex ${selectedPlan} subscription`}
                     onPaymentCompleted={handlePaymentSuccess}
                   >

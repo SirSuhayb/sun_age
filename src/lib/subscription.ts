@@ -7,6 +7,23 @@ interface SubscriptionData {
 
 // Check if user has active subscription
 export function checkSubscriptionStatus(): SubscriptionData {
+  // Testing override - check URL params or localStorage
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const testAccess = urlParams.get('test_access') === 'true';
+    const testOverride = localStorage.getItem('solCodexTestAccess') === 'true';
+    
+    if (testAccess || testOverride) {
+      const chartData = localStorage.getItem('chartData');
+      return {
+        hasAccess: true,
+        type: 'solar', // Pretend it's SOLAR access for testing
+        expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+        chartData: chartData ? JSON.parse(chartData) : null
+      };
+    }
+  }
+  
   // Check localStorage for subscription data
   const subscriptionData = localStorage.getItem('solCodexSubscription');
   const solarAccess = localStorage.getItem('solCodexSolarAccess');
@@ -83,4 +100,16 @@ export function clearSubscriptionData() {
   localStorage.removeItem('solCodexSolarAccess');
   localStorage.removeItem('chartData');
   localStorage.removeItem('birthData');
+  localStorage.removeItem('solCodexTestAccess');
+}
+
+// Testing helpers
+export function enableTestAccess() {
+  localStorage.setItem('solCodexTestAccess', 'true');
+  window.location.reload();
+}
+
+export function disableTestAccess() {
+  localStorage.removeItem('solCodexTestAccess');
+  window.location.reload();
 }
