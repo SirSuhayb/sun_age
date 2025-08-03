@@ -5,7 +5,6 @@ import { ArrowLeft, Download, Share2, Eye, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import NatalChartGenerator from '~/components/Soldash/NatalChartGenerator';
 import { checkSubscriptionStatus } from '~/lib/subscription';
-import PaymentModal from '~/components/Soldash/PaymentModal';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -139,15 +138,13 @@ export default function ChartPage() {
     }
   }, []);
 
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-
   const handleViewAdvancedDetails = () => {
     // Check if user has access
     const subscription = checkSubscriptionStatus();
     if (subscription.hasAccess) {
       window.location.href = '/soldash/you/expand/details';
     } else {
-      setShowPaymentModal(true);
+      window.location.href = '/soldash/you/expand/payment';
     }
   };
 
@@ -228,22 +225,12 @@ export default function ChartPage() {
   }
 
   return (
-    <>
-      <PaymentModal 
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        onSuccess={() => {
-          setShowPaymentModal(false);
-          window.location.href = '/soldash/you/expand/details';
-        }}
-      />
-      
-      <motion.div 
-        className="min-h-screen bg-[#FEFDF8] p-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
+    <motion.div 
+      className="min-h-screen bg-[#FEFDF8] p-4"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div className="flex items-center justify-between mb-8" variants={itemVariants}>
@@ -452,6 +439,5 @@ export default function ChartPage() {
         </motion.div>
       </div>
     </motion.div>
-    </>
   );
 }

@@ -5,7 +5,6 @@ import { ArrowLeft, ChevronDown, ChevronUp, Calendar, Target, Zap, TrendingUp, H
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { checkSubscriptionStatus } from '~/lib/subscription';
-import PaymentModal from '~/components/Soldash/PaymentModal';
 import { 
   getSunInterpretation, 
   getMoonInterpretation, 
@@ -258,8 +257,6 @@ export default function DetailsPage() {
   });
   const [chartData, setChartData] = useState<any>(null);
   const [solData, setSolData] = useState<any>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [hasAccess, setHasAccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -267,10 +264,9 @@ export default function DetailsPage() {
     const subscription = checkSubscriptionStatus();
     
     if (!subscription.hasAccess) {
-      // Show payment modal if no access
-      setShowPaymentModal(true);
-    } else {
-      setHasAccess(true);
+      // Redirect to payment page if no access
+      router.push('/soldash/you/expand/payment');
+      return;
     }
 
     // Get chart data and Sol profile data
@@ -284,7 +280,7 @@ export default function DetailsPage() {
     if (savedSolData) {
       setSolData(JSON.parse(savedSolData));
     }
-  }, []);
+  }, [router]);
 
   const toggleSection = (sectionKey: string) => {
     setExpandedSections(prev => ({
@@ -293,32 +289,13 @@ export default function DetailsPage() {
     }));
   };
 
-  const handlePaymentSuccess = () => {
-    setHasAccess(true);
-    setShowPaymentModal(false);
-  };
-
   return (
-    <>
-      <PaymentModal 
-        isOpen={showPaymentModal}
-        onClose={() => {
-          if (!hasAccess) {
-            // If no access, redirect back to chart
-            router.push('/soldash/you/expand/chart');
-          } else {
-            setShowPaymentModal(false);
-          }
-        }}
-        onSuccess={handlePaymentSuccess}
-      />
-      
-      <motion.div 
-        className="min-h-screen bg-[#FEFDF8] p-4"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
+    <motion.div 
+      className="min-h-screen bg-[#FEFDF8] p-4"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
         <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div className="flex items-center mb-8" variants={itemVariants}>
@@ -417,6 +394,5 @@ export default function DetailsPage() {
         </motion.div>
       </div>
     </motion.div>
-    </>
   );
 }
