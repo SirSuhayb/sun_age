@@ -114,7 +114,7 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [astroChart, setAstroChart] = useState<AstroChart | null>(null);
   const [svgContent, setSvgContent] = useState<string | null>(null);
-  const [houseSystem, setHouseSystem] = useState<'equal' | 'whole'>('equal');
+  const [houseSystem, setHouseSystem] = useState<'equal' | 'whole'>('whole');
 
   const generateChart = async () => {
     if (!birthData || !chartRef.current) return;
@@ -613,8 +613,8 @@ export const NatalChartGenerator: React.FC<NatalChartGeneratorProps> = ({
 
   return (
     <div className={`natal-chart-container ${className}`}>
-      {/* House System Toggle - Only show when chart is rendered */}
-      {(svgContent || chartData) && (
+      {/* House System Toggle - Only show for premium users */}
+      {false && (svgContent || chartData) && (
         <div className="flex flex-col items-center mb-4">
           <div className="text-xs font-mono text-[#666] mb-2 uppercase tracking-wide">House System</div>
           <div className="inline-flex bg-[#FCF6E5] border-2 border-[#E5E1D8] rounded-md p-1 shadow-sm">

@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Download, Share2, Eye, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import NatalChartGenerator from '~/components/Soldash/NatalChartGenerator';
+import { checkSubscriptionStatus } from '~/lib/subscription';
+import PaymentModal from '~/components/Soldash/PaymentModal';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -137,8 +139,16 @@ export default function ChartPage() {
     }
   }, []);
 
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
   const handleViewAdvancedDetails = () => {
-    window.location.href = '/soldash/you/expand/details';
+    // Check if user has access
+    const subscription = checkSubscriptionStatus();
+    if (subscription.hasAccess) {
+      window.location.href = '/soldash/you/expand/details';
+    } else {
+      setShowPaymentModal(true);
+    }
   };
 
   const handleDownloadChart = () => {
@@ -218,12 +228,22 @@ export default function ChartPage() {
   }
 
   return (
-    <motion.div 
-      className="min-h-screen bg-[#FEFDF8] p-4"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <>
+      <PaymentModal 
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onSuccess={() => {
+          setShowPaymentModal(false);
+          window.location.href = '/soldash/you/expand/details';
+        }}
+      />
+      
+      <motion.div 
+        className="min-h-screen bg-[#FEFDF8] p-4"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div className="flex items-center justify-between mb-8" variants={itemVariants}>
@@ -342,20 +362,75 @@ export default function ChartPage() {
               </div>
             </div>
 
+            {/* Email Capture */}
+            <motion.div 
+              className="bg-[#FCF6E5] border border-[#E5E1D8] p-6 mb-6"
+              variants={itemVariants}
+            >
+              <h3 className="text-lg font-serif font-semibold text-[#444] mb-3">
+                Stay Connected
+              </h3>
+              <p className="text-sm text-[#666] mb-4">
+                Get cosmic insights and Sol Codex updates delivered to your inbox.
+              </p>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const email = (e.target as any).email.value;
+                if (email) {
+                  localStorage.setItem('solCodexEmail', email);
+                  alert('Thank you for subscribing!');
+                  (e.target as any).reset();
+                }
+              }}>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-2 border border-[#E5E1D8] bg-white text-[#444] placeholder-[#999] mb-3 focus:outline-none focus:border-[#E6B13A]"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-[#444] hover:bg-[#333] text-white font-mono text-sm uppercase tracking-wide transition-colors"
+                >
+                  Subscribe to Updates
+                </button>
+              </form>
+            </motion.div>
+
             {/* CTA for Advanced Details */}
             <motion.div 
-              className="bg-gradient-to-br from-[#FCF6E5] to-[#F5F5F5] border border-[#E5E1D8] p-6"
+              className="bg-gradient-to-br from-[#FCF6E5] to-[#F5F5F5] border-2 border-[#E6B13A] p-6"
               variants={itemVariants}
             >
               <div className="text-center mb-4">
                 <Eye className="w-8 h-8 text-[#E6B13A] mx-auto mb-2" />
                 <h3 className="text-lg font-serif font-semibold text-[#444] mb-2">
-                  Unlock Advanced Details
+                  Unlock Sol Codex Pro
                 </h3>
                 <p className="text-sm text-[#666] mb-4">
-                  Dive deeper into your cosmic signature with detailed interpretations, timing insights, and personalized guidance.
+                  Go beyond the basics with deep cosmic insights tailored to your unique blueprint.
                 </p>
               </div>
+              
+              <ul className="text-sm space-y-2 mb-6">
+                <li className="flex items-start">
+                  <span className="text-[#E6B13A] mr-2">✦</span>
+                  <span>Personal power phrases for Sun, Moon & Rising</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-[#E6B13A] mr-2">✦</span>
+                  <span>Life phase timing and breakthrough predictions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-[#E6B13A] mr-2">✦</span>
+                  <span>Deep cosmic synthesis of your trinity</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-[#E6B13A] mr-2">✦</span>
+                  <span>Integration practices for daily alignment</span>
+                </li>
+              </ul>
               
               <motion.button
                 onClick={handleViewAdvancedDetails}
@@ -363,7 +438,7 @@ export default function ChartPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                View Advanced Details
+                Unlock Advanced Analysis →
               </motion.button>
             </motion.div>
           </motion.div>
@@ -377,5 +452,6 @@ export default function ChartPage() {
         </motion.div>
       </div>
     </motion.div>
+    </>
   );
 }

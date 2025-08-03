@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronDown, ChevronUp, Calendar, Target, Zap, TrendingUp, Heart, Star, Compass } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { checkSubscriptionStatus } from '~/lib/subscription';
+import PaymentModal from '~/components/Soldash/PaymentModal';
 import { 
   getSunInterpretation, 
   getMoonInterpretation, 
@@ -255,8 +258,21 @@ export default function DetailsPage() {
   });
   const [chartData, setChartData] = useState<any>(null);
   const [solData, setSolData] = useState<any>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
+    // Check subscription status
+    const subscription = checkSubscriptionStatus();
+    
+    if (!subscription.hasAccess) {
+      // Show payment modal if no access
+      setShowPaymentModal(true);
+    } else {
+      setHasAccess(true);
+    }
+
     // Get chart data and Sol profile data
     const savedChartData = localStorage.getItem('chartData');
     const savedSolData = localStorage.getItem('sunCycleBookmark');
@@ -277,14 +293,33 @@ export default function DetailsPage() {
     }));
   };
 
+  const handlePaymentSuccess = () => {
+    setHasAccess(true);
+    setShowPaymentModal(false);
+  };
+
   return (
-    <motion.div 
-      className="min-h-screen bg-[#FEFDF8] p-4"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <div className="max-w-4xl mx-auto">
+    <>
+      <PaymentModal 
+        isOpen={showPaymentModal}
+        onClose={() => {
+          if (!hasAccess) {
+            // If no access, redirect back to chart
+            router.push('/soldash/you/expand/chart');
+          } else {
+            setShowPaymentModal(false);
+          }
+        }}
+        onSuccess={handlePaymentSuccess}
+      />
+      
+      <motion.div 
+        className="min-h-screen bg-[#FEFDF8] p-4"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div className="flex items-center mb-8" variants={itemVariants}>
           <Link href="/soldash/you/expand/chart" className="mr-4">
@@ -382,5 +417,6 @@ export default function DetailsPage() {
         </motion.div>
       </div>
     </motion.div>
+    </>
   );
 }
