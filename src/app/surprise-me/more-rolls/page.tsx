@@ -95,6 +95,7 @@ export default function MoreRollsPage() {
   const [showDaimoPay, setShowDaimoPay] = useState(false);
   const daimoPayRef = useRef<any>(null);
   const [daimoKey, setDaimoKey] = useState(0);
+  const [showDaimoComponent, setShowDaimoComponent] = useState(true);
 
   // Debug logging for DaimoPay
   useEffect(() => {
@@ -106,8 +107,13 @@ export default function MoreRollsPage() {
         toUnits: selectedPackage.price.toString(),
         key: `daimo-${selectedPackage.id}-${selectedPackage.price}-${daimoKey}`
       });
-      // Force DaimoPay to re-render by updating the key
-      setDaimoKey(prev => prev + 1);
+      
+      // Force DaimoPay to completely re-render by unmounting and remounting
+      setShowDaimoComponent(false);
+      setTimeout(() => {
+        setShowDaimoComponent(true);
+        setDaimoKey(prev => prev + 1);
+      }, 100);
     }
   }, [selectedPackage, selectedPayment]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -289,7 +295,7 @@ export default function MoreRollsPage() {
             )}
             
             {/* DaimoPay Button - Only show for CRYPTO payment */}
-            {selectedPayment === 'crypto' && selectedPackage && (
+            {selectedPayment === 'crypto' && selectedPackage && showDaimoComponent && (
               <DaimoPayButton.Custom
                 key={`daimo-${selectedPackage.id}-${selectedPackage.price}-${daimoKey}`}
                 appId="pay-demo" // Replace with your real App ID
