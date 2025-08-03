@@ -54,8 +54,9 @@ If the "Connect Wallet" button doesn't work:
 - If no connectors are available, it will open Uniswap to swap for SOLAR
 
 ## SOLAR Token Info
-- **Required Amount**: 150M SOLAR tokens
-- **Current Value**: ~$77 USD (equivalent to yearly subscription)
+- **Required Amount**: 150M SOLAR tokens  
+- **Token Value**: ~$63 USD (at current prices)
+- **Access Value**: $77/year subscription (holder discount!)
 - **Swap Link**: [Uniswap SOLAR/USDC](https://app.uniswap.org/swap?outputCurrency=0x746042147240304098C837563aAEc0F671881B07&chain=base)
 - Users with some SOLAR but not enough will see their balance and a swap link
 
