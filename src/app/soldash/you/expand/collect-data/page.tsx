@@ -191,18 +191,13 @@ export default function CollectDataPage() {
         <motion.div className="mb-8" variants={itemVariants}>
           <div className="flex items-center justify-center space-x-4">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-[#E6B13A] rounded-full flex items-center justify-center text-white text-sm font-bold">✓</div>
-              <span className="ml-2 text-sm text-[#444]">Payment</span>
-            </div>
-            <div className="w-12 h-0.5 bg-[#E6B13A]"></div>
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-[#E6B13A] rounded-full flex items-center justify-center text-white text-sm font-bold">2</div>
+              <div className="w-8 h-8 bg-[#E6B13A] rounded-full flex items-center justify-center text-white text-sm font-bold">1</div>
               <span className="ml-2 text-sm text-[#444] font-semibold">Birth Details</span>
             </div>
             <div className="w-12 h-0.5 bg-[#D7D7D7]"></div>
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-[#D7D7D7] rounded-full flex items-center justify-center text-[#888] text-sm font-bold">3</div>
-              <span className="ml-2 text-sm text-[#888]">Chart</span>
+              <div className="w-8 h-8 bg-[#D7D7D7] rounded-full flex items-center justify-center text-[#888] text-sm font-bold">2</div>
+              <span className="ml-2 text-sm text-[#888]">Your Chart</span>
             </div>
           </div>
         </motion.div>
@@ -304,8 +299,8 @@ export default function CollectDataPage() {
 
         {/* Back Link */}
         <motion.div className="text-center" variants={itemVariants}>
-          <Link href="/soldash/you/expand" className="text-[#888] font-mono text-sm hover:text-[#666]">
-            ← Back to Payment
+          <Link href="/soldash/you" className="text-[#888] font-mono text-sm hover:text-[#666]">
+            ← Back to Your Profile
           </Link>
         </motion.div>
       </div>
