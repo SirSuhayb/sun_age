@@ -66,7 +66,7 @@ const ExpandUnderstanding: React.FC = () => {
             <div className="flex items-start mb-2">
               <Calendar className="w-5 h-5 text-[#E6B13A] mr-2 mt-0.5" />
               <div>
-                <h4 className="font-serif font-semibold text-[#444] text-sm mb-1">Today's Planetary Influence</h4>
+                <h4 className="font-serif font-semibold text-[#444] text-sm mb-1">Today&apos;s Planetary Influence</h4>
                 <p className="text-xs text-[#666]">
                   The Moon in {['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo'][new Date().getDate() % 6]} activates your {chartData.moon?.house || '4th'} house of {
                     chartData.moon?.house === 4 ? 'home and emotions' : 
@@ -94,9 +94,9 @@ const ExpandUnderstanding: React.FC = () => {
           
           {/* Integration Practice */}
           <div className="p-4 bg-gradient-to-r from-[#E6B13A]/10 to-[#FCF6E5] border-l-4 border-[#E6B13A]">
-            <h4 className="font-serif font-semibold text-[#444] text-sm mb-2">Today's Integration Practice</h4>
+            <h4 className="font-serif font-semibold text-[#444] text-sm mb-2">Today&apos;s Integration Practice</h4>
             <p className="text-xs text-[#666] italic">
-              "I honor my {chartData.sun?.sign} Sun's need for {
+              &ldquo;I honor my {chartData.sun?.sign} Sun&apos;s need for {
                 chartData.sun?.sign === 'Aries' ? 'bold action' :
                 chartData.sun?.sign === 'Taurus' ? 'grounded presence' :
                 chartData.sun?.sign === 'Gemini' ? 'intellectual exploration' :
@@ -109,7 +109,7 @@ const ExpandUnderstanding: React.FC = () => {
                 chartData.sun?.sign === 'Capricorn' ? 'structured achievement' :
                 chartData.sun?.sign === 'Aquarius' ? 'innovative vision' :
                 'intuitive flow'
-              } while nurturing my {chartData.moon?.sign} Moon's emotional wisdom."
+              } while nurturing my {chartData.moon?.sign} Moon&apos;s emotional wisdom.&rdquo;
             </p>
           </div>
         </div>

@@ -6,7 +6,6 @@ import SolEvolution from '~/components/Soldash/SolEvolution';
 import ExpandUnderstanding from '~/components/Soldash/ExpandUnderstanding';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { getCompleteSolarProfile } from '~/lib/solarIdentity';
 import { checkSubscriptionStatus } from '~/lib/subscription';
 import NatalChartGenerator from '~/components/Soldash/NatalChartGenerator';
 import Link from 'next/link';
@@ -44,19 +43,14 @@ export default function YouPage() {
           const parsedBookmark = JSON.parse(saved);
           setBookmark(parsedBookmark);
           
-          // Generate enhanced solar profile if we have a birth date
+          // Extract solar profile data from bookmark
           if (parsedBookmark.birthDate) {
-            const profile = getCompleteSolarProfile(parsedBookmark.birthDate);
-            setSolarProfile(profile);
-            
-            // Update bookmark with new foundation/depth data
-            const enhancedBookmark = {
-              ...parsedBookmark,
-              foundation: profile.foundation,
-              depth: profile.depth,
-              agePhase: profile.agePhase
-            };
-            setBookmark(enhancedBookmark);
+            setSolarProfile({
+              archetype: parsedBookmark.archetype || 'Solar',
+              foundation: parsedBookmark.foundation,
+              depth: parsedBookmark.depth,
+              agePhase: parsedBookmark.agePhase
+            });
           }
         } catch {
           // Handle parse error gracefully
@@ -225,15 +219,15 @@ export default function YouPage() {
                     </div>
                     <div className="space-y-3 mb-6">
                       <div className="p-3 bg-white/50 border border-[#E5E1D8]">
-                        <h4 className="font-serif font-semibold text-sm text-[#444] mb-1">Today's Focus</h4>
+                        <h4 className="font-serif font-semibold text-sm text-[#444] mb-1">Today&apos;s Focus</h4>
                         <p className="text-xs text-[#666]">
-                          With your {chartData.moon?.sign} Moon, today's energy supports deep emotional work and intuitive breakthroughs.
+                          With your {chartData.moon?.sign} Moon, today&apos;s energy supports deep emotional work and intuitive breakthroughs.
                         </p>
                       </div>
                       <div className="p-3 bg-white/50 border border-[#E5E1D8]">
                         <h4 className="font-serif font-semibold text-sm text-[#444] mb-1">Power Phase</h4>
                         <p className="text-xs text-[#666]">
-                          You're in a {solarProfile?.agePhase || 'Growth'} phase, amplifying your {chartData.sun?.sign} Sun's natural leadership abilities.
+                          You&apos;re in a {solarProfile?.agePhase || 'Growth'} phase, amplifying your {chartData.sun?.sign} Sun&apos;s natural leadership abilities.
                         </p>
                       </div>
                     </div>

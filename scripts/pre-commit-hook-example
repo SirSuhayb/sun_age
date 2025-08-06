@@ -1,0 +1,21 @@
+#!/bin/sh
+# Git pre-commit hook to check for unescaped quotes in JSX/TSX files
+# 
+# To use this hook:
+# 1. Copy this file to .git/hooks/pre-commit
+# 2. Make it executable: chmod +x .git/hooks/pre-commit
+
+# Run the check script
+node scripts/check-unescaped-quotes.js
+
+# If the script exits with non-zero status, prevent the commit
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "Commit aborted due to unescaped quotes. Please fix the issues above and try again."
+  exit 1
+fi
+
+# Run other checks (e.g., linting)
+# npm run lint:fix
+
+exit 0

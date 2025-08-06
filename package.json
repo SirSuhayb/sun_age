@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit --project .",
     "type-check:watch": "tsc --noEmit --project . --watch",
     "lint:fix": "next lint --fix",
+    "check-quotes": "node scripts/check-unescaped-quotes.js",
     "clean": "rm -rf .next && rm -rf node_modules && rm -rf .turbo",
     "setup": "./scripts/dev-setup.sh",
     "test:build": "npm run type-check && npm run lint && npm run build",
