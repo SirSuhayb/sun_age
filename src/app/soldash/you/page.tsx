@@ -407,7 +407,7 @@ export default function YouPage() {
                   className="bg-gradient-to-b from-[#FFFCF2] to-[#FFF8E6] border-2 border-[#E6B13A] p-12 text-center"
                 >
                   <Image 
-                    src="/you/little_light.svg" 
+                    src="/sunsun.png" 
                     alt="Solara Plus" 
                     width={120} 
                     height={120} 
