@@ -406,13 +406,19 @@ export default function YouPage() {
                   variants={itemVariants}
                   className="bg-gradient-to-b from-[#FFFCF2] to-[#FFF8E6] border-2 border-[#E6B13A] p-12 text-center"
                 >
-                  <Image 
-                    src="/sunsun.png" 
-                    alt="Solara Plus" 
-                    width={120} 
-                    height={120} 
-                    className="mx-auto mb-6"
-                  />
+                  <div className="relative flex items-center justify-center mb-6">
+                    <div className="absolute inset-0 flex items-center justify-center z-0">
+                      <div className="pulsing-blur" />
+                    </div>
+                    <Image 
+                      src="/sunsun.png" 
+                      alt="Solara Plus" 
+                      width={120} 
+                      height={120} 
+                      className="object-contain z-10"
+                      style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }}
+                    />
+                  </div>
                   <h3 className="font-serif text-2xl text-[#444] mb-3">Unlock Solara Plus</h3>
                   <p className="text-xs font-mono uppercase tracking-widest text-[#888] mb-6">
                     GO BEYOND THE BASICS WITH DEEP COSMIC<br />
@@ -469,6 +475,24 @@ export default function YouPage() {
           </motion.div>
         )}
       </div>
+      
+      {/* Pulsing blur style */}
+      <style jsx>{`
+        .pulsing-blur {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          background: #ffe066;
+          filter: blur(32px);
+          opacity: 0.7;
+          animation: pulse-blur 2.2s infinite cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes pulse-blur {
+          0% { transform: scale(1); opacity: 0.7; filter: blur(32px);}
+          50% { transform: scale(1.18); opacity: 1; filter: blur(48px);}
+          100% { transform: scale(1); opacity: 0.7; filter: blur(32px);}
+        }
+      `}</style>
     </div>
   );
 } 
