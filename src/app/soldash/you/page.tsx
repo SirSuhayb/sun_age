@@ -416,7 +416,6 @@ export default function YouPage() {
                       width={120} 
                       height={120} 
                       className="object-contain z-10"
-                      style={{ filter: 'drop-shadow(0 0 40px #FFD700cc) drop-shadow(0 0 16px #FFB30099)' }}
                     />
                   </div>
                   <h3 className="font-serif text-2xl text-[#444] mb-3">Unlock Solara Plus</h3>
