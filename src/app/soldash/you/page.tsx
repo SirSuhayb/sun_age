@@ -227,18 +227,16 @@ export default function YouPage() {
               <>
                 {/* Natal Chart */}
                 <motion.div 
-                  className="bg-white border border-[#E5E1D8] p-8"
+                  className="flex justify-center"
                   variants={itemVariants}
                 >
-                  <div className="flex justify-center">
-                    <Image 
-                      src="/astrology/codex/natalChart.svg" 
-                      alt="Natal Chart" 
-                      width={400} 
-                      height={400}
-                      className="w-full max-w-[400px]"
-                    />
-                  </div>
+                  <Image 
+                    src="/astrology/codex/natalChart.svg" 
+                    alt="Natal Chart" 
+                    width={400} 
+                    height={400}
+                    className="w-full max-w-[400px]"
+                  />
                 </motion.div>
 
                 {/* Cosmic Trinity */}
