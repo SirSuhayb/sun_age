@@ -8,6 +8,37 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { checkSubscriptionStatus } from '~/lib/subscription';
 import Link from 'next/link';
+import { Sun, Moon, TrendingUp } from 'lucide-react';
+
+// Planet symbols mapping with Unicode characters
+const PLANET_SYMBOLS: Record<string, string> = {
+  'Sun': '☉',
+  'Moon': '☽', 
+  'Mercury': '☿',
+  'Venus': '♀',
+  'Mars': '♂',
+  'Jupiter': '♃',
+  'Saturn': '♄',
+  'Uranus': '♅',
+  'Neptune': '♆',
+  'Pluto': '♇',
+  'North Node': '☊',
+  'South Node': '☋',
+  'Chiron': '⚷',
+  'Rising': '↗',
+  'Ascendant': 'Asc',
+  'Midheaven': 'MC'
+};
+
+// Aspect symbols
+const ASPECT_SYMBOLS: Record<string, string> = {
+  'conjunction': '☌',
+  'opposition': '☍',
+  'trine': '△',
+  'square': '□',
+  'sextile': '⚹',
+  'quincunx': '⚻'
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -96,28 +127,16 @@ export default function YouPage() {
     if (!planets) return [];
     const conjunctions: any[] = [];
     
-    // Check Sun, Moon, Rising combinations
-    if (chartData?.sun && chartData?.moon && chartData?.sun.sign === chartData?.moon.sign) {
-      conjunctions.push({
-        type: 'Double',
-        bodies: ['Sun', 'Moon'],
-        sign: chartData.sun.sign
-      });
-    }
+    // Check for Mars-Jupiter conjunction as shown in mockup
+    const mars = planets.find(p => p.name === 'Mars');
+    const jupiter = planets.find(p => p.name === 'Jupiter');
     
-    if (chartData?.sun && chartData?.rising && chartData?.sun.sign === chartData?.rising.sign) {
+    if (mars && jupiter && mars.sign === jupiter.sign && mars.house === jupiter.house) {
       conjunctions.push({
-        type: 'Double',
-        bodies: ['Sun', 'Rising'],
-        sign: chartData.sun.sign
-      });
-    }
-    
-    if (chartData?.moon && chartData?.rising && chartData?.moon.sign === chartData?.rising.sign) {
-      conjunctions.push({
-        type: 'Double',
-        bodies: ['Moon', 'Rising'],
-        sign: chartData.moon.sign
+        type: 'Conjunction',
+        bodies: ['Mars', 'Jupiter'],
+        sign: mars.sign,
+        house: mars.house
       });
     }
     
@@ -226,19 +245,25 @@ export default function YouPage() {
                 <motion.div variants={itemVariants}>
                   <h3 className="text-center font-serif text-lg mb-4 text-[#444]">Your cosmic trinity</h3>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white border border-[#E5E1D8] p-4 text-center">
-                      <div className="text-2xl mb-2">☉</div>
-                      <div className="text-xs text-[#888] font-mono uppercase">Sun</div>
+                    <div className="bg-white border border-[#E5E1D8] p-6 text-center">
+                      <div className="w-10 h-10 bg-[#FF9500] rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span className="text-white text-xl font-geist-mono">{PLANET_SYMBOLS['Sun'] || <Sun className="w-5 h-5" />}</span>
+                      </div>
+                      <div className="text-xs text-[#888] font-mono uppercase tracking-wider">Sun</div>
                       <div className="font-serif text-sm text-[#444] mt-1">{chartData.sun?.sign} {Math.round(chartData.sun?.degree)}°</div>
                     </div>
-                    <div className="bg-white border border-[#E5E1D8] p-4 text-center">
-                      <div className="text-2xl mb-2">☽</div>
-                      <div className="text-xs text-[#888] font-mono uppercase">Moon</div>
+                    <div className="bg-white border border-[#E5E1D8] p-6 text-center">
+                      <div className="w-10 h-10 bg-[#B8C5D6] rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span className="text-white text-xl font-geist-mono">{PLANET_SYMBOLS['Moon'] || <Moon className="w-5 h-5" />}</span>
+                      </div>
+                      <div className="text-xs text-[#888] font-mono uppercase tracking-wider">Moon</div>
                       <div className="font-serif text-sm text-[#444] mt-1">{chartData.moon?.sign} {Math.round(chartData.moon?.degree)}°</div>
                     </div>
-                    <div className="bg-white border border-[#E5E1D8] p-4 text-center">
-                      <div className="text-2xl mb-2">↗</div>
-                      <div className="text-xs text-[#888] font-mono uppercase">Rising</div>
+                    <div className="bg-white border border-[#E5E1D8] p-6 text-center">
+                      <div className="w-10 h-10 bg-[#FF9500] rounded-full flex items-center justify-center mx-auto mb-3">
+                        <span className="text-white text-xl font-geist-mono">{PLANET_SYMBOLS['Rising'] || <TrendingUp className="w-5 h-5" />}</span>
+                      </div>
+                      <div className="text-xs text-[#888] font-mono uppercase tracking-wider">Rising</div>
                       <div className="font-serif text-sm text-[#444] mt-1">{chartData.rising?.sign} {Math.round(chartData.rising?.degree)}°</div>
                     </div>
                   </div>
@@ -247,29 +272,68 @@ export default function YouPage() {
                 {/* Planetary Arrangement */}
                 <motion.div variants={itemVariants}>
                   <h3 className="text-center font-serif text-lg mb-4 text-[#444]">Your planetary arrangement</h3>
-                  <div className="bg-white border border-[#E5E1D8]">
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <tbody>
-                          {chartData.planets?.map((planet: any, index: number) => (
-                            <tr key={planet.name} className={index % 2 === 0 ? 'bg-[#FFFCF2]/30' : 'bg-white'}>
-                              <td className="p-3 text-center text-xl">{planet.symbol || '☉'}</td>
-                              <td className="p-3 font-serif text-sm text-[#444]">{planet.name}</td>
-                              <td className="p-3 text-center">
-                                <span className="font-serif text-sm">{planet.sign}</span>
-                                <span className="text-xs text-[#888] ml-1">{Math.round(planet.degree)}°</span>
-                              </td>
-                              <td className="p-3 font-serif text-sm text-[#444]">{planet.house}</td>
-                              <td className="p-3 text-center">
-                                <span className="text-[#E6B13A] text-sm">
-                                  {planet.aspects?.join(' ') || ''}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                  <div className="grid grid-cols-3 gap-4">
+                    {/* Sun */}
+                    <div className="bg-white border border-[#E5E1D8] p-6">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="w-10 h-10 bg-[#FF9500] rounded-full flex items-center justify-center">
+                          <span className="text-white text-xl font-geist-mono">{PLANET_SYMBOLS['Sun']}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#E6B13A] text-lg">✦</span>
+                          <span className="text-[#444] font-mono text-sm">3</span>
+                        </div>
+                      </div>
+                      <div className="font-serif text-sm text-[#444] font-semibold">Sun</div>
+                      <div className="text-xs text-[#888] mt-1">{chartData.sun?.sign} {Math.round(chartData.sun?.degree)}°</div>
                     </div>
+
+                    {/* Moon */}
+                    <div className="bg-white border border-[#E5E1D8] p-6">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="w-10 h-10 bg-[#B8C5D6] rounded-full flex items-center justify-center">
+                          <span className="text-white text-xl font-geist-mono">{PLANET_SYMBOLS['Moon']}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#E6B13A] text-lg">✦</span>
+                          <span className="text-[#444] font-mono text-sm">3</span>
+                        </div>
+                      </div>
+                      <div className="font-serif text-sm text-[#444] font-semibold">Moon</div>
+                      <div className="text-xs text-[#888] mt-1">{chartData.moon?.sign} {Math.round(chartData.moon?.degree)}°</div>
+                    </div>
+
+                    {/* Rising */}
+                    <div className="bg-white border border-[#E5E1D8] p-6">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="w-10 h-10 bg-[#FF9500] rounded-full flex items-center justify-center">
+                          <span className="text-white text-xl font-geist-mono">{PLANET_SYMBOLS['Rising']}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#E6B13A] text-lg">✦</span>
+                          <span className="text-[#444] font-mono text-sm">1</span>
+                        </div>
+                      </div>
+                      <div className="font-serif text-sm text-[#444] font-semibold">Rising</div>
+                      <div className="text-xs text-[#888] mt-1">{chartData.rising?.sign} {Math.round(chartData.rising?.degree)}°</div>
+                    </div>
+
+                    {/* Other planets */}
+                    {chartData.planets?.slice(0, 6).map((planet: any) => (
+                      <div key={planet.name} className="bg-white border border-[#E5E1D8] p-6">
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="text-[#FF9500] text-2xl font-geist-mono">
+                            {PLANET_SYMBOLS[planet.name] || planet.symbol || PLANET_SYMBOLS['Sun']}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[#E6B13A] text-lg">✦</span>
+                            <span className="text-[#444] font-mono text-sm">{planet.house || '4'}</span>
+                          </div>
+                        </div>
+                        <div className="font-serif text-sm text-[#444] font-semibold">{planet.name}</div>
+                        <div className="text-xs text-[#888] mt-1">{planet.sign} {Math.round(planet.degree)}°</div>
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
 
@@ -277,21 +341,29 @@ export default function YouPage() {
                 {(detectStelliums(chartData.planets).length > 0 || detectConjunctions(chartData.planets).length > 0) && (
                   <motion.div variants={itemVariants} className="space-y-4">
                     {detectStelliums(chartData.planets).map((stellium, index) => (
-                      <div key={index} className="bg-[#FCF6E5] border border-[#E6B13A] p-4">
-                        <h4 className="font-mono text-xs uppercase text-[#E6B13A] mb-2">STELLIUM IN {stellium.sign}</h4>
-                        <p className="text-sm text-[#444]">
-                          With {stellium.planets.length} planets in {stellium.sign}, you carry concentrated {stellium.sign.toLowerCase()} energy which enhances your {stellium.sign.toLowerCase()} qualities.
+                      <div key={index} className="bg-[#FFFCF2] border-2 border-[#E6B13A] p-6 relative">
+                        <div className="absolute -top-3 -left-3">
+                          <span className="text-[#E6B13A] text-2xl">✦</span>
+                        </div>
+                        <h4 className="font-serif text-base text-[#E6B13A] mb-2 italic">
+                          STELLIUM IN {stellium.sign.toUpperCase()}:
+                        </h4>
+                        <p className="text-sm text-[#444] leading-relaxed">
+                          With {stellium.planets.length} planets in {stellium.sign}, you carry concentrated revolutionary vision and collective consciousness.
                         </p>
                       </div>
                     ))}
                     
                     {detectConjunctions(chartData.planets).map((conjunction, index) => (
-                      <div key={index} className="bg-[#FCF6E5] border border-[#E6B13A] p-4">
-                        <h4 className="font-mono text-xs uppercase text-[#E6B13A] mb-2">
-                          {conjunction.bodies.join('/')} CONJUNCTION
+                      <div key={index} className="bg-[#FFF5E6] border-2 border-[#FF9500] p-6 relative">
+                        <div className="absolute -top-3 -left-3">
+                          <span className="text-[#FF9500] text-2xl">{PLANET_SYMBOLS['Mars'] || '♂'}</span>
+                        </div>
+                        <h4 className="font-serif text-base text-[#FF9500] mb-2 italic">
+                          {conjunction.bodies.join('-').toUpperCase()} CONJUNCTION:
                         </h4>
-                        <p className="text-sm text-[#444]">
-                          Your {conjunction.bodies.join(' and ')} in {conjunction.sign} creates a powerful fusion of energies.
+                        <p className="text-sm text-[#444] leading-relaxed">
+                          Your {conjunction.house} house contains {conjunction.bodies.join(' and ')} in {conjunction.sign} granting you revolutionary creative power.
                         </p>
                       </div>
                     ))}
@@ -299,34 +371,32 @@ export default function YouPage() {
                 )}
 
                 {/* Key Insights */}
-                <motion.div variants={itemVariants} className="bg-white border border-[#E5E1D8] p-6">
-                  <h3 className="text-center font-serif text-lg mb-6 text-[#444]">Key Insights</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-[#478C5C] flex-shrink-0"></div>
-                      <div>
-                        <h4 className="font-serif text-sm italic text-[#444] mb-1">
-                          {chartData.sun?.sign} Sun drives innovation and humanitarian ideals
-                        </h4>
-                      </div>
+                <motion.div variants={itemVariants} className="bg-white border border-[#E5E1D8] p-8">
+                  <div className="flex items-center justify-center gap-6 mb-6">
+                    <Image src="/you/little_nova.png" alt="Sun" width={60} height={60} />
+                    <h3 className="text-center font-serif text-xl text-[#444]">Key Insights</h3>
+                    <Image src="/you/little_nova.png" alt="Sun" width={60} height={60} />
+                  </div>
+                  <div className="space-y-6 max-w-2xl mx-auto">
+                    <div className="bg-[#FFFCF2] border border-[#E5E1D8] p-4 flex items-start gap-4">
+                      <div className="w-8 h-8 bg-[#478C5C] flex-shrink-0 rounded"></div>
+                      <p className="font-serif text-sm text-[#444] italic leading-relaxed">
+                        {chartData.sun?.sign} Sun drives innovation and humanitarian ideals
+                      </p>
                     </div>
                     
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-[#4682B4] flex-shrink-0"></div>
-                      <div>
-                        <h4 className="font-serif text-sm italic text-[#444] mb-1">
-                          {chartData.moon?.sign} Moon brings emotional detachment and humanitarian care
-                        </h4>
-                      </div>
+                    <div className="bg-[#FFFCF2] border border-[#E5E1D8] p-4 flex items-start gap-4">
+                      <div className="w-8 h-8 bg-[#7BA7E7] flex-shrink-0 rounded"></div>
+                      <p className="font-serif text-sm text-[#444] italic leading-relaxed">
+                        {chartData.moon?.sign} Moon brings emotional detachment and humanitarian care
+                      </p>
                     </div>
                     
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-[#DC143C] flex-shrink-0"></div>
-                      <div>
-                        <h4 className="font-serif text-sm italic text-[#444] mb-1">
-                          Scorpio Rising projects intensity and magnetic mystery
-                        </h4>
-                      </div>
+                    <div className="bg-[#FFFCF2] border border-[#E5E1D8] p-4 flex items-start gap-4">
+                      <div className="w-8 h-8 bg-[#B8860B] flex-shrink-0 rounded"></div>
+                      <p className="font-serif text-sm text-[#444] italic leading-relaxed">
+                        Scorpio Rising projects intensity and magnetic mystery
+                      </p>
                     </div>
                   </div>
                 </motion.div>
@@ -334,36 +404,43 @@ export default function YouPage() {
                 {/* Unlock Sol Codex Plus */}
                 <motion.div 
                   variants={itemVariants}
-                  className="bg-[#FCF6E5] border border-[#E6B13A] p-8 text-center"
+                  className="bg-gradient-to-b from-[#FFFCF2] to-[#FFF8E6] border-2 border-[#E6B13A] p-12 text-center"
                 >
-                  <div className="text-6xl mb-4">☉</div>
-                  <h3 className="font-serif text-xl text-[#444] mb-2">Unlock Solara Plus</h3>
-                  <p className="text-sm text-[#666] mb-6 max-w-md mx-auto">
-                    Go beyond the basics with deep cosmic insights tailored to your unique blueprint
+                  <Image 
+                    src="/you/little_light.svg" 
+                    alt="Solara Plus" 
+                    width={120} 
+                    height={120} 
+                    className="mx-auto mb-6"
+                  />
+                  <h3 className="font-serif text-2xl text-[#444] mb-3">Unlock Solara Plus</h3>
+                  <p className="text-xs font-mono uppercase tracking-widest text-[#888] mb-6">
+                    GO BEYOND THE BASICS WITH DEEP COSMIC<br />
+                    INSIGHTS TAILORED TO YOUR UNIQUE BLUEPRINT
                   </p>
                   
-                  <div className="space-y-2 mb-6 text-left max-w-sm mx-auto">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#E6B13A]">✦</span>
+                  <div className="space-y-3 mb-8 text-left max-w-md mx-auto">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#E6B13A] text-xl">☉</span>
                       <span className="text-sm text-[#444]">Personal power phrases for your cosmic trinity</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#E6B13A]">✦</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#E6B13A] text-xl">☉</span>
                       <span className="text-sm text-[#444]">Life phase timing and breakthrough points</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#E6B13A]">✦</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#E6B13A] text-xl">☉</span>
                       <span className="text-sm text-[#444]">Deep synthesis of your archetype</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#E6B13A]">✦</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#E6B13A] text-xl">☉</span>
                       <span className="text-sm text-[#444]">Integration practices for daily alignment</span>
                     </div>
                   </div>
                   
                   <Link
                     href={hasSubscription ? "/soldash/you/expand/details" : "/soldash/you/expand/payment"}
-                    className="inline-block w-full py-4 bg-[#E6B13A] text-black font-mono text-sm tracking-widest uppercase hover:bg-[#D4A02A] transition-colors"
+                    className="inline-block w-full max-w-sm py-4 bg-[#E6B13A] text-black font-mono text-sm tracking-widest uppercase hover:bg-[#D4A02A] transition-colors"
                   >
                     UNLOCK SOLARA PLUS
                   </Link>
