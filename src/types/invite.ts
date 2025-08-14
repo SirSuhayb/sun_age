@@ -4,7 +4,7 @@ export interface Invite {
   id: string;
   invite_code: string;
   inviter_unified_user_id: string;
-  invitee_email?: string;
+  invitee_phone_number?: string;
   invitee_farcaster_fid?: number;
   status: 'pending' | 'accepted' | 'expired' | 'cancelled';
   expires_at: string;
@@ -32,7 +32,7 @@ export interface UserPrivacySettings {
   share_journal_entries_with_friends: boolean;
   share_milestones_with_friends: boolean;
   allow_friend_invites: boolean;
-  discoverable_by_email: boolean;
+  discoverable_by_phone: boolean;
   discoverable_by_farcaster: boolean;
   created_at: string;
   updated_at: string;
@@ -41,6 +41,7 @@ export interface UserPrivacySettings {
 export interface Friend {
   friend_unified_id: string;
   email?: string;
+  phone_number?: string;
   farcaster_fid?: number;
   sol_age?: number;
   archetype?: string;
@@ -54,7 +55,7 @@ export interface Friend {
 // API Request/Response types
 export interface CreateInviteRequest {
   inviter_unified_user_id: string;
-  invitee_email?: string;
+  invitee_phone_number?: string;
   invitee_farcaster_fid?: number;
 }
 
@@ -63,7 +64,7 @@ export interface CreateInviteResponse {
   invite: {
     invite_code: string;
     expires_at: string;
-    invitee_email?: string;
+    invitee_phone_number?: string;
     invitee_farcaster_fid?: number;
     created_at: string;
   };
@@ -101,7 +102,7 @@ export interface UpdatePrivacySettingsRequest {
   share_journal_entries_with_friends?: boolean;
   share_milestones_with_friends?: boolean;
   allow_friend_invites?: boolean;
-  discoverable_by_email?: boolean;
+  discoverable_by_phone?: boolean;
   discoverable_by_farcaster?: boolean;
 }
 

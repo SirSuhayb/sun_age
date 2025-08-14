@@ -73,7 +73,7 @@ export async function PUT(req: NextRequest) {
       share_journal_entries_with_friends,
       share_milestones_with_friends,
       allow_friend_invites,
-      discoverable_by_email,
+      discoverable_by_phone,
       discoverable_by_farcaster
     } = body;
     
@@ -104,8 +104,8 @@ export async function PUT(req: NextRequest) {
     if (typeof allow_friend_invites === 'boolean') {
       updateData.allow_friend_invites = allow_friend_invites;
     }
-    if (typeof discoverable_by_email === 'boolean') {
-      updateData.discoverable_by_email = discoverable_by_email;
+    if (typeof discoverable_by_phone === 'boolean') {
+      updateData.discoverable_by_phone = discoverable_by_phone;
     }
     if (typeof discoverable_by_farcaster === 'boolean') {
       updateData.discoverable_by_farcaster = discoverable_by_farcaster;

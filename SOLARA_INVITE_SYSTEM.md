@@ -9,8 +9,9 @@ This document describes the implementation of a simple invite flow for Solara us
 ### 1. Invite Generation & Sharing
 - **Unique 8-character invite codes** (e.g., "ABC123XY")
 - **7-day expiration** for invite codes
-- **Email and Farcaster** invite targets (Farcaster implementation pending)
+- **SMS and Farcaster** invite targets (Farcaster implementation pending)
 - **Direct link sharing** with shareable URLs: `/invite/[code]`
+- **SMS-first approach** for higher engagement and immediate delivery
 
 ### 2. Friend Connections
 - **Bilateral friend relationships** stored efficiently
@@ -26,7 +27,7 @@ This document describes the implementation of a simple invite flow for Solara us
   - Milestones visibility
 - **Discovery controls**:
   - Allow friend invites toggle
-  - Email discoverability
+  - Phone number discoverability
   - Farcaster discoverability
 
 ## Database Schema
@@ -124,7 +125,7 @@ The invite system enables the core flywheel:
 - **Share Journal Entries**: ❌ Disabled (personal by default)
 - **Share Milestones**: ✅ Enabled (celebration worthy)
 - **Allow Invites**: ✅ Enabled (growth mechanism)
-- **Email Discovery**: ✅ Enabled (practical connection)
+- **Phone Discovery**: ✅ Enabled (practical SMS connection)
 - **Farcaster Discovery**: ✅ Enabled (social platform integration)
 
 ### User Control

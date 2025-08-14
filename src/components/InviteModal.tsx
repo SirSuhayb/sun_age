@@ -16,17 +16,17 @@ export function InviteModal({
   onInviteCreated 
 }: InviteModalProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
+  const [invitePhone, setInvitePhone] = useState('');
   const [inviteFarcaster, setInviteFarcaster] = useState('');
-  const [activeTab, setActiveTab] = useState('email');
+  const [activeTab, setActiveTab] = useState('phone');
   const [createdInvite, setCreatedInvite] = useState<CreateInviteResponse['invite'] | null>(null);
   const { toast } = useToast();
 
   const handleCreateInvite = async () => {
-    if (!inviteEmail && !inviteFarcaster) {
+    if (!invitePhone && !inviteFarcaster) {
       toast({
         title: "Error",
-        description: "Please enter an email or Farcaster username",
+        description: "Please enter a phone number or Farcaster username",
         variant: "destructive",
       });
       return;
@@ -39,14 +39,14 @@ export function InviteModal({
         inviter_unified_user_id: userUnifiedId,
       };
 
-      if (activeTab === 'email' && inviteEmail) {
-        payload.invitee_email = inviteEmail;
+      if (activeTab === 'phone' && invitePhone) {
+        payload.invitee_phone_number = invitePhone;
       } else if (activeTab === 'farcaster' && inviteFarcaster) {
         // For now, we'll treat the Farcaster input as a username
         // In a real implementation, you'd need to resolve this to an FID
         toast({
           title: "Coming Soon",
-          description: "Farcaster invites will be available soon. Please use email for now.",
+          description: "Farcaster invites will be available soon. Please use phone for now.",
           variant: "default",
         });
         setIsLoading(false);
@@ -76,7 +76,7 @@ export function InviteModal({
       });
 
       // Reset form
-      setInviteEmail('');
+      setInvitePhone('');
       setInviteFarcaster('');
       
     } catch (error) {
@@ -122,7 +122,9 @@ export function InviteModal({
     if (!createdInvite) return;
     
     const inviteUrl = `${window.location.origin}/invite/${createdInvite.invite_code}`;
-    const shareText = `🌞 Join me on Solara! Calculate your Solar Age and discover your cosmic archetype. Use my invite: ${inviteUrl}`;
+    const shareText = `🌞 Join me on Solara! Calculate your Solar Age and discover your cosmic archetype. Use my invite: ${inviteUrl}
+
+Reply with your name to get started! ⭐`;
     
     if (navigator.share) {
       navigator.share({
@@ -136,9 +138,9 @@ export function InviteModal({
       
       // Try different sharing options
       const platforms = [
-        { name: 'Email', url: `mailto:?subject=${encodeURIComponent('Join me on Solara!')}&body=${encodedText}` },
         { name: 'SMS', url: `sms:?body=${encodedText}` },
         { name: 'WhatsApp', url: `https://wa.me/?text=${encodedText}` },
+        { name: 'Email', url: `mailto:?subject=${encodeURIComponent('Join me on Solara!')}&body=${encodedText}` },
         { name: 'Twitter', url: `https://twitter.com/intent/tweet?text=${encodedText}` },
       ];
       
@@ -149,7 +151,7 @@ export function InviteModal({
 
   const handleClose = () => {
     setCreatedInvite(null);
-    setInviteEmail('');
+    setInvitePhone('');
     setInviteFarcaster('');
     onClose();
   };
@@ -166,27 +168,30 @@ export function InviteModal({
         <div className="space-y-6">
           {!createdInvite ? (
             <>
-              <div className="text-center text-sm text-gray-600">
-                Invite friends to join your cosmic journey on Solara
-              </div>
+                          <div className="text-center text-sm text-gray-600">
+              Send your friends an SMS invite to join your cosmic journey on Solara
+            </div>
               
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email">Email</TabsTrigger>
+                  <TabsTrigger value="phone">Phone</TabsTrigger>
                   <TabsTrigger value="farcaster">Farcaster</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="email" className="space-y-4">
+                <TabsContent value="phone" className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="invite-email">Friend's Email</Label>
+                    <Label htmlFor="invite-phone">Friend's Phone Number</Label>
                     <Input
-                      id="invite-email"
-                      type="email"
-                      placeholder="friend@example.com"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
+                      id="invite-phone"
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      value={invitePhone}
+                      onChange={(e) => setInvitePhone(e.target.value)}
                       disabled={isLoading}
                     />
+                    <div className="text-xs text-gray-500">
+                      📱 SMS invite will be sent directly to their phone
+                    </div>
                   </div>
                 </TabsContent>
                 
@@ -202,7 +207,7 @@ export function InviteModal({
                       disabled={isLoading}
                     />
                     <div className="text-xs text-orange-600">
-                      Coming soon! Use email invites for now.
+                      Coming soon! Use phone invites for now.
                     </div>
                   </div>
                 </TabsContent>

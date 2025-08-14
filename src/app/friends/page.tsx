@@ -167,7 +167,7 @@ export default function FriendsPage() {
                             <div>
                               <div className="font-mono font-bold">{invite.invite_code}</div>
                               <div className="text-sm text-gray-600">
-                                {invite.invitee_email && `To: ${invite.invitee_email}`}
+                                {invite.invitee_phone_number && `To: ${invite.invitee_phone_number}`}
                                 {invite.invitee_farcaster_fid && `To: FID ${invite.invitee_farcaster_fid}`}
                               </div>
                               <div className="text-xs text-gray-500">

@@ -86,13 +86,13 @@ export async function POST(req: NextRequest) {
       if (identifier.identifier_type === 'account_id') {
         const { data: userAccount, error: accountError } = await supabase
           .from('user_accounts')
-          .select('email, farcaster_fid')
+          .select('phone_number, farcaster_fid')
           .eq('id', identifier.identifier_value)
           .single();
           
         if (!accountError && userAccount) {
-          // Check if invite is for this email or farcaster FID
-          if ((invite.invitee_email && userAccount.email === invite.invitee_email) ||
+          // Check if invite is for this phone number or farcaster FID
+          if ((invite.invitee_phone_number && userAccount.phone_number === invite.invitee_phone_number) ||
               (invite.invitee_farcaster_fid && userAccount.farcaster_fid === invite.invitee_farcaster_fid)) {
             canAcceptInvite = true;
             break;

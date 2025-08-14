@@ -1,15 +1,17 @@
 -- User accounts table for non-Farcaster users
 CREATE TABLE IF NOT EXISTS user_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) UNIQUE,
+  phone_number VARCHAR(20) UNIQUE,
   user_type VARCHAR(20) DEFAULT 'non_farcaster' CHECK (user_type IN ('farcaster', 'non_farcaster')),
   farcaster_fid INTEGER NULL, -- Only for Farcaster users who also create accounts
-  platform VARCHAR(50) NOT NULL, -- platform where they originated (email, twitter, etc.)
+  platform VARCHAR(50) NOT NULL, -- platform where they originated (sms, email, twitter, etc.)
   sol_age INTEGER,
   archetype VARCHAR(100),
   wallet_address VARCHAR(42),
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  updated_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT user_contact_check CHECK (email IS NOT NULL OR phone_number IS NOT NULL OR farcaster_fid IS NOT NULL)
 );
 
 -- User identifier mapping table to provide unified user identification
@@ -24,6 +26,7 @@ CREATE TABLE IF NOT EXISTS user_identifiers (
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_user_accounts_email ON user_accounts(email);
+CREATE INDEX IF NOT EXISTS idx_user_accounts_phone_number ON user_accounts(phone_number);
 CREATE INDEX IF NOT EXISTS idx_user_accounts_farcaster_fid ON user_accounts(farcaster_fid);
 CREATE INDEX IF NOT EXISTS idx_user_identifiers_unified_user_id ON user_identifiers(unified_user_id);
 CREATE INDEX IF NOT EXISTS idx_user_identifiers_lookup ON user_identifiers(identifier_type, identifier_value);
@@ -101,7 +104,8 @@ $$ LANGUAGE plpgsql;
 
 -- Function to create a new user account with unified ID
 CREATE OR REPLACE FUNCTION create_user_account_with_unified_id(
-  p_email VARCHAR(255),
+  p_email VARCHAR(255) DEFAULT NULL,
+  p_phone_number VARCHAR(20) DEFAULT NULL,
   p_platform VARCHAR(50),
   p_sol_age INTEGER DEFAULT NULL,
   p_archetype VARCHAR(100) DEFAULT NULL,
@@ -116,10 +120,11 @@ BEGIN
   unified_id := gen_random_uuid();
   
   -- Create the user account
-  INSERT INTO user_accounts (id, email, user_type, farcaster_fid, platform, sol_age, archetype)
+  INSERT INTO user_accounts (id, email, phone_number, user_type, farcaster_fid, platform, sol_age, archetype)
   VALUES (
     gen_random_uuid(), 
     p_email, 
+    p_phone_number,
     CASE WHEN p_farcaster_fid IS NOT NULL THEN 'farcaster' ELSE 'non_farcaster' END,
     p_farcaster_fid, 
     p_platform, 

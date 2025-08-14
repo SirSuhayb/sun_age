@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('[API] Request body:', body);
     
-    const { inviter_unified_user_id, invitee_email, invitee_farcaster_fid } = body;
+    const { inviter_unified_user_id, invitee_phone_number, invitee_farcaster_fid } = body;
     
     // Validate required fields
     if (!inviter_unified_user_id) {
@@ -18,19 +18,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!invitee_email && !invitee_farcaster_fid) {
+    if (!invitee_phone_number && !invitee_farcaster_fid) {
       return NextResponse.json(
-        { error: 'Either invitee email or Farcaster FID is required' },
+        { error: 'Either invitee phone number or Farcaster FID is required' },
         { status: 400 }
       );
     }
     
-    // Validate email format if provided
-    if (invitee_email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(invitee_email)) {
+    // Validate phone number format if provided
+    if (invitee_phone_number) {
+      const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
+      if (!phoneRegex.test(invitee_phone_number)) {
         return NextResponse.json(
-          { error: 'Invalid email format' },
+          { error: 'Invalid phone number format' },
           { status: 400 }
         );
       }
@@ -67,8 +67,8 @@ export async function POST(req: NextRequest) {
       .eq('inviter_unified_user_id', inviter_unified_user_id)
       .eq('status', 'pending');
       
-    if (invitee_email) {
-      existingInviteQuery = existingInviteQuery.eq('invitee_email', invitee_email);
+    if (invitee_phone_number) {
+      existingInviteQuery = existingInviteQuery.eq('invitee_phone_number', invitee_phone_number);
     } else {
       existingInviteQuery = existingInviteQuery.eq('invitee_farcaster_fid', invitee_farcaster_fid);
     }
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     const { data: inviteCode, error: createError } = await supabase
       .rpc('create_invite', {
         p_inviter_unified_user_id: inviter_unified_user_id,
-        p_invitee_email: invitee_email || null,
+        p_invitee_phone_number: invitee_phone_number || null,
         p_invitee_farcaster_fid: invitee_farcaster_fid || null
       });
       
@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
     console.log('[API] Invite created successfully:', {
       inviteCode,
       inviter: inviter_unified_user_id,
-      invitee_email: invitee_email,
+      invitee_phone_number: invitee_phone_number,
       invitee_farcaster_fid: invitee_farcaster_fid
     });
     
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
       invite: {
         invite_code: inviteCode,
         expires_at: newInvite.expires_at,
-        invitee_email: newInvite.invitee_email,
+        invitee_phone_number: newInvite.invitee_phone_number,
         invitee_farcaster_fid: newInvite.invitee_farcaster_fid,
         created_at: newInvite.created_at
       }
@@ -222,24 +222,24 @@ export async function GET(req: NextRequest) {
       
       for (const identifier of userIdentifiers) {
         if (identifier.identifier_type === 'account_id') {
-          // Get user account to find email
+          // Get user account to find phone number
           const { data: userAccount, error: accountError } = await supabase
             .from('user_accounts')
-            .select('email, farcaster_fid')
+            .select('phone_number, farcaster_fid')
             .eq('id', identifier.identifier_value)
             .single();
             
           if (!accountError && userAccount) {
-            // Get invites by email
-            if (userAccount.email) {
-              const { data: emailInvites, error: emailError } = await supabase
+            // Get invites by phone number
+            if (userAccount.phone_number) {
+              const { data: phoneInvites, error: phoneError } = await supabase
                 .from('invites')
                 .select('*')
-                .eq('invitee_email', userAccount.email)
+                .eq('invitee_phone_number', userAccount.phone_number)
                 .neq('inviter_unified_user_id', unified_user_id);
                 
-              if (!emailError && emailInvites) {
-                receivedInvites.push(...emailInvites);
+              if (!phoneError && phoneInvites) {
+                receivedInvites.push(...phoneInvites);
               }
             }
             

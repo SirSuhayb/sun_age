@@ -103,11 +103,16 @@ export function FriendsList({
                 {/* Friend Identity */}
                 <div className="flex items-center gap-2">
                   <div className="text-sm font-medium">
-                    {friend.email || `User ${friend.friend_unified_id.slice(0, 8)}`}
+                    {friend.phone_number || friend.email || `User ${friend.friend_unified_id.slice(0, 8)}`}
                   </div>
                   {friend.farcaster_fid && (
                     <div className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
                       Farcaster
+                    </div>
+                  )}
+                  {friend.phone_number && (
+                    <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                      📱 SMS
                     </div>
                   )}
                 </div>

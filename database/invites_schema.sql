@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS invites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   invite_code VARCHAR(20) UNIQUE NOT NULL,
   inviter_unified_user_id UUID NOT NULL,
-  invitee_email VARCHAR(255),
+  invitee_phone_number VARCHAR(20),
   invitee_farcaster_fid INTEGER,
   status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'expired', 'cancelled')),
   expires_at TIMESTAMP DEFAULT (NOW() + INTERVAL '7 days'),
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS user_privacy_settings (
   share_journal_entries_with_friends BOOLEAN DEFAULT false,
   share_milestones_with_friends BOOLEAN DEFAULT true,
   allow_friend_invites BOOLEAN DEFAULT true,
-  discoverable_by_email BOOLEAN DEFAULT true,
+  discoverable_by_phone BOOLEAN DEFAULT true,
   discoverable_by_farcaster BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -146,7 +146,7 @@ $$ LANGUAGE plpgsql;
 -- Function to create a new invite
 CREATE OR REPLACE FUNCTION create_invite(
   p_inviter_unified_user_id UUID,
-  p_invitee_email VARCHAR(255) DEFAULT NULL,
+  p_invitee_phone_number VARCHAR(20) DEFAULT NULL,
   p_invitee_farcaster_fid INTEGER DEFAULT NULL
 )
 RETURNS TEXT AS $$
@@ -160,13 +160,13 @@ BEGIN
   INSERT INTO invites (
     invite_code, 
     inviter_unified_user_id, 
-    invitee_email, 
+    invitee_phone_number, 
     invitee_farcaster_fid
   )
   VALUES (
     new_invite_code, 
     p_inviter_unified_user_id, 
-    p_invitee_email, 
+    p_invitee_phone_number, 
     p_invitee_farcaster_fid
   );
   
@@ -232,6 +232,7 @@ CREATE OR REPLACE FUNCTION get_user_friends(p_unified_user_id UUID)
 RETURNS TABLE(
   friend_unified_id UUID,
   email VARCHAR(255),
+  phone_number VARCHAR(20),
   farcaster_fid INTEGER,
   sol_age INTEGER,
   archetype VARCHAR(100),
@@ -249,6 +250,7 @@ BEGIN
       ELSE fc.user1_unified_id
     END as friend_unified_id,
     ua.email,
+    ua.phone_number,
     ua.farcaster_fid,
     CASE WHEN ups.share_sol_age_with_friends THEN ua.sol_age ELSE NULL END as sol_age,
     CASE WHEN ups.share_archetype_with_friends THEN ua.archetype ELSE NULL END as archetype,

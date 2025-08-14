@@ -44,7 +44,7 @@ export function PrivacySettings({
           share_journal_entries_with_friends: settings.share_journal_entries_with_friends,
           share_milestones_with_friends: settings.share_milestones_with_friends,
           allow_friend_invites: settings.allow_friend_invites,
-          discoverable_by_email: settings.discoverable_by_email,
+          discoverable_by_phone: settings.discoverable_by_phone,
           discoverable_by_farcaster: settings.discoverable_by_farcaster,
         }),
       });
@@ -118,10 +118,10 @@ export function PrivacySettings({
       category: 'discovery'
     },
     {
-      key: 'discoverable_by_email' as const,
-      title: 'Email Discovery',
-      description: 'Allow others to find you by your email address',
-      icon: '📧',
+      key: 'discoverable_by_phone' as const,
+      title: 'Phone Discovery',
+      description: 'Allow others to find you by your phone number',
+      icon: '📱',
       category: 'discovery'
     },
     {
