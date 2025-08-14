@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { shareSolAge } from '~/lib/sharing';
 import { useFrameSDK } from '~/hooks/useFrameSDK';
+import { InviteModal } from './InviteModal';
 
 interface ShareSelectionModalProps {
   isOpen: boolean;
@@ -21,12 +22,20 @@ interface ShareSelectionModalProps {
   userName?: string;
   profilePicUrl?: string;
   onShareComplete?: (platform: string, shareId: string) => void;
+  // For invite functionality
+  userUnifiedId?: string;
 }
 
-type SharePlatform = 'farcaster' | 'twitter' | 'linkedin' | 'facebook' | 'instagram' | 'tiktok' | 'sms' | 'copy';
+type SharePlatform = 'farcaster' | 'twitter' | 'linkedin' | 'facebook' | 'instagram' | 'tiktok' | 'sms' | 'copy' | 'invite';
 
 // Platform configuration
 const platformConfig = {
+  invite: {
+    name: 'INVITE FRIENDS',
+    icon: '👥',
+    color: 'bg-[#d4af37] hover:bg-[#e6c75a]',
+    enabled: true
+  },
   farcaster: {
     name: 'FARCASTER',
     icon: '📢',
@@ -87,10 +96,13 @@ export function ShareSelectionModal({
   quote,
   userName = 'TRAVELLER',
   profilePicUrl,
-  onShareComplete
+  onShareComplete,
+  // For invite functionality
+  userUnifiedId
 }: ShareSelectionModalProps) {
   const [isSharing, setIsSharing] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<SharePlatform | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const { sdk, isInFrame } = useFrameSDK();
 
   // Helper to generate share text based on content type
@@ -143,6 +155,13 @@ export function ShareSelectionModal({
       const shareId = `${content?.type || 'solage'}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       switch (platform) {
+        case 'invite':
+          // Open invite modal instead of sharing
+          setShowInviteModal(true);
+          setIsSharing(false);
+          setSelectedPlatform(null);
+          return;
+          
         case 'farcaster':
           // Use existing farcaster sharing logic for backward compatibility
           if (content?.type === 'sol_age' || solAge) {
@@ -226,8 +245,8 @@ export function ShareSelectionModal({
 
   // Determine which platforms to show based on environment
   const availablePlatforms: SharePlatform[] = isInFrame 
-    ? ['farcaster', 'copy'] // In Farcaster frame, prioritize Farcaster
-    : ['twitter', 'facebook', 'instagram', 'tiktok', 'linkedin', 'sms', 'copy']; // Web users get full selection
+    ? userUnifiedId ? ['invite', 'farcaster', 'copy'] : ['farcaster', 'copy'] // In Farcaster frame, prioritize Farcaster
+    : userUnifiedId ? ['invite', 'twitter', 'facebook', 'instagram', 'tiktok', 'linkedin', 'sms', 'copy'] : ['twitter', 'facebook', 'instagram', 'tiktok', 'linkedin', 'sms', 'copy']; // Web users get full selection
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -285,6 +304,19 @@ export function ShareSelectionModal({
           </button>
         </div>
       </div>
+      
+      {/* Invite Modal */}
+      {userUnifiedId && (
+        <InviteModal
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          userUnifiedId={userUnifiedId}
+          onInviteCreated={() => {
+            setShowInviteModal(false);
+            onShareComplete?.('invite', 'invite_created');
+          }}
+        />
+      )}
     </div>
   );
 }
